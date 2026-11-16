@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MULTIBOX For Gota.io By Kuksik & Judex Tutorial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0d0d;color:#d0d0d0;font-family:'Ubuntu',Arial,sans-serif;min-height:100vh;line-height:1.58;font-size:14px}
+header{position:sticky;top:0;z-index:50;background:#121212;border-bottom:1px solid #242424}
+.top-bar{max-width:1160px;margin:0 auto;padding:11px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.logo{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.logo-main{font-size:17px;font-weight:700;color:#efefef;letter-spacing:0.2px}
+.logo-main span{color:#3898ec}
+.logo-ver{font-size:12px;color:#777;font-weight:500}
+.lang-select{background:#191919;border:1px solid #303030;color:#e4e4e4;font-family:inherit;font-size:13px;font-weight:500;padding:6px 10px;border-radius:4px;outline:none;cursor:pointer;max-width:210px}
+.lang-select:hover,.lang-select:focus{border-color:#505050}
+.lang-select option{background:#161616;color:#e4e4e4}
+main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
+.notice{background:#181212;border:1px solid #2d1d1d;border-inline-start:3px solid #d13838;color:#c9b4b4;font-size:13.5px;padding:11px 15px;border-radius:4px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.notice b{color:#ff6b6b}
+.notice-text{flex:1 1 260px;min-width:0}
+.notice-link{display:inline-flex;align-items:center;gap:7px;background:#131c26;border:1px solid #233b54;color:#3898ec;font-size:13px;font-weight:700;line-height:1.25;padding:5px 11px;border-radius:4px;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:background 0.15s,border-color 0.15s,color 0.15s}
+.notice-link:hover,.notice-link:focus-visible{background:#192736;border-color:#3898ec;color:#62b2f5;outline:none}
+.notice-link svg{width:14px;height:14px;fill:currentColor;flex-shrink:0;display:block}
+.list{display:flex;flex-direction:column;gap:14px}
+.item{background:#141414;border:1px solid #242424;border-radius:5px;padding:18px 20px;display:grid;grid-template-columns:minmax(0,1fr) 450px;gap:22px;align-items:start}
+.item-head{font-size:16px;font-weight:700;color:#fff;padding-bottom:9px;margin-bottom:11px;border-bottom:1px solid #222}
+.item-body{font-size:13.5px;color:#c8c8c8;overflow-wrap:break-word}
+.item-body p{margin-bottom:10px}
+.item-body p:last-child{margin-bottom:0}
+.item-body strong{color:#fff}
+.media-wrap{width:100%;aspect-ratio:16/9;background:#070707;border:1px solid #262626;border-radius:4px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
+.media-wrap video{width:100%;height:100%;object-fit:contain;outline:none;display:block}
+.vid-empty{display:none;color:#666;font-size:12.5px;text-align:center;padding:14px;user-select:none}
+@media(max-width:940px){
+  .item{grid-template-columns:1fr;gap:16px;padding:16px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="top-bar">
+    <div class="logo">
+      <div class="logo-main"><span>MULTIBOX</span> For Gota.io By Kuksik & Judex Tutorial</div>
+      <div class="logo-ver">v0.3.9</div>
+    </div>
+    <select id="lang-select" class="lang-select" aria-label="Language selector">
+      <option value="en">English (EN)</option>
+      <option value="ru">Русский (RU)</option>
+      <option value="uk">Українська (UK)</option>
+      <option value="es">Español (ES)</option>
+      <option value="pt">Português (PT)</option>
+      <option value="fr">Français (FR)</option>
+      <option value="de">Deutsch (DE)</option>
+      <option value="it">Italiano (IT)</option>
+      <option value="pl">Polski (PL)</option>
+      <option value="nl">Nederlands (NL)</option>
+      <option value="ro">Română (RO)</option>
+      <option value="tr">Türkçe (TR)</option>
+      <option value="ar">العربية (AR)</option>
+      <option value="hi">हिन्दी (HI)</option>
+      <option value="zh">中文 (ZH)</option>
+      <option value="ja">日本語 (JA)</option>
+      <option value="ko">한국어 (KO)</option>
+      <option value="id">Indonesia (ID)</option>
+      <option value="vi">Tiếng Việt (VI)</option>
+      <option value="th">ไทย (TH)</option>
+    </select>
+  </div>
+</header>
+
+<main id="app-root">
+  <div class="notice">
+    <div class="notice-text" id="alert-box"></div>
+    <a class="notice-link" id="code-link" href="https://github.com/kuksikoid/gota-multibox-guide/blob/main/MultiBox" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      <span id="t-code-link"></span>
+    </a>
+  </div>
+
+  <div class="list">
+    <section class="item" id="card-solo">
+      <div>
+        <div class="item-head" id="t-solo-title"></div>
+        <div class="item-body" id="t-solo-desc"></div>
+      </div>
+      <div class="media-wrap">
+        <video id="solo-video" src="solo-trick.mp4" controls playsinline preload="metadata"></video>
+        <span class="vid-empty" data-file="solo-trick.mp4"></span>
+      </div>
+    </section>
+
+    <section class="item" id="card-fast">
+      <div>
+        <div class="item-head" id="t-fast-title"></div>
+        <div class="item-body" id="t-fast-desc"></div>
+      </div>
+      <div class="media-wrap">
+        <video id="fast-feed-video" src="fast-feed.mp4" controls playsinline preload="metadata"></video>
+        <span class="vid-empty" data-file="fast-feed.mp4"></span>
+      </div>
+    </section>
+
+    <section class="item" id="card-auto">
+      <div>
+        <div class="item-head" id="t-auto-title"></div>
+        <div class="item-body" id="t-auto-desc"></div>
+      </div>
+      <div class="media-wrap">
+        <video id="auto-rev-video" src="auto-rev.mp4" controls playsinline preload="metadata"></video>
+        <span class="vid-empty" data-file="auto-rev.mp4"></span>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+(function (k8LmQ) {
+  const d4PxN = {
+      en: {
+        alert: "<b>Important:</b> This script works ONLY in Google Chrome. If you use Yandex, delete it. The script will not work there.",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>This feature is made mainly for multiboxing with one big cell and one small cell. On the big cell, point your cursor toward the trick direction and PRESS (toggle) Freeze Mouse (or Line + Freeze Mouse). Do not hold it down, just press it, otherwise the big cell will split the other way.</p><p>Then switch to the small cell window and press the bind that fits the small cell's current mass. For example, at ~30k mass press key 7 (it is set by default, you can rebind it) (Trick 128). The small cell will instantly split 7 times (into 128 pieces) toward your cursor. At the same time, the big cell in the background will do 5 splits (32 pieces) along the frozen line, wait for the set time (Solo Delay - 800ms by default), and split another 5 times (32 pieces).</p><p>Right after pressing the bind, all you have to do is hold your normal in-game feed key so you successfully feed up for the Solo Trick. This gives you a clean solo-trick without switching tabs manually.</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>Want to efficiently dump mass into another cell? Use Fast-Feed. Press Freeze Mouse in the needed direction and press the Fast-Feed bind. Only the window where the bind was pressed will split.</p><p>The script does 5 splits (32 pieces), waits for the set time, and does another 5 splits (32 pieces). P.S. At heavy mass (~800k), raise the delay slider to around 850ms so the split does not trigger too early.</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>Yes, Auto-Rev is not implemented in the best way, but we had no other choice because the game is too protected. For the feature to work consistently, you need consistently good FPS and ping, and also:</p><p>The target cell must be fully visible and not covered by other cells or screen edges. You <strong>MUST</strong> turn off mass display, skins, and enemy nicknames in the game settings, otherwise there will be false triggers. Your camera must stay still, do not zoom while locked.</p><p>Notes: There is a ~10ms delay, but thanks to the clever implementation of the Auto-Rev mechanic, it will not break in future game updates; it is not recommended to set more than two splits (4 pieces), because you simply will not make it to the target in time.</p>",
+        noVideo: "Video unavailable",
+        codeLink: "Latest code"
+      },
+      ru: {
+        alert: "<b>Важно:</b> Этот скрипт работает ТОЛЬКО в Google Chrome. Если у вас Яндекс, удалите его. Скрипт там работать не будет.",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>Функция сделана в основном для игры с мультом: один большой и мелкий шары. На большом шаре наведите курсор в сторону трика и НАЖМИТЕ (toggle) Freeze Mouse (или Line + Freeze Mouse). Не зажать, а именно нажать, иначе большой шар разделится в другую сторону.</p><p>Затем перейдите в окно, где мелкий шар, нажмите бинд под текущую массу мелкого шара. Например, при массе ~30k жмите клавишу 7 (по умолчанию стоит она, можете перебиндить) (Trick 128). Мелкий шар мгновенно разделится 7 раз (на 128 частей) в сторону курсора. Одновременно большой шар в фоне сделает 5 сплитов (32 части) по замороженной линии, подождет заданное время (Solo Delay - по умолчанию 800ms) и разделится еще 5 раз (32 части).</p><p>Сразу после нажатия бинда вам остается только зажать обычную клавишу кормления из самой игры, чтобы вы успешно откормились для Solo Trick'а. Это дает чистый соло-трик без ручного переключения вкладок.</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>Хотите эффективно влить массу в другой шар? Используйте Fast-Feed. Нажмите Freeze Mouse в нужном направлении и нажмите бинд Fast-Feed'а. Делится только то окно, с которого нажат бинд.</p><p>Скрипт делает 5 сплитов (32 части), ждет заданное время и делает еще 5 сплитов (32 части). P.S. При большой массе (~800k) увеличьте ползунок задержки примерно до 850ms, чтобы деление не сработало слишком рано.</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>Да, авто-рев реализован не самым лучшим образом, но другого выбора у нас не было, игра слишком защищена. Чтобы функция работала стабильно, нужно иметь стабильно хорошие FPS и пинг, а также:</p><p>Шар цели должен быть полностью виден, не закрыт другими шарами или краями экрана. Вы <strong>ОБЯЗАНЫ</strong> выключить показ массы, скины и ники врагов в настройках игры, иначе будут ложные срабатывания. Камера должна быть неподвижной, не зумите во время лока.</p><p>Примечания: Есть задержка в ~10ms, но благодаря интересной реализации механики авто-рева, он не сломается при будущих обновлениях игры; больше двух сплитов (4 части) ставить не рекомендовано, так как вы тупо не успеете долететь до цели.</p>",
+        noVideo: "Видео недоступно",
+        codeLink: "Актуальный код"
+      },
+      uk: {
+        alert: "<b>Важливо:</b> Цей скрипт працює ЛИШЕ в Google Chrome. Якщо у вас Яндекс, видаліть його. Скрипт там не працюватиме.",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>Функція зроблена здебільшого для гри з мультом: одна велика й одна дрібна кулі. На великій кулі наведіть курсор у бік трюку і НАТИСНІТЬ (toggle) Freeze Mouse (або Line + Freeze Mouse). Не затиснути, а саме натиснути, інакше велика куля розділиться в інший бік.</p><p>Потім перейдіть у вікно з дрібною кулею і натисніть бінд під її поточну масу. Наприклад, при масі ~30k тисніть клавішу 7 (вона стоїть за замовчуванням, можете перебіндити) (Trick 128). Дрібна куля миттєво розділиться 7 разів (на 128 частин) у бік курсора. Одночасно велика куля у фоні зробить 5 сплітів (32 частини) по замороженій лінії, зачекає заданий час (Solo Delay - за замовчуванням 800ms) і розділиться ще 5 разів (32 частини).</p><p>Одразу після натискання бінда вам залишається лише затиснути звичайну клавішу годування з самої гри, щоб ви успішно відгодувалися для Solo Trick'а. Це дає чистий соло-трюк без ручного перемикання вкладок.</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>Хочете ефективно влити масу в іншу кулю? Використовуйте Fast-Feed. Натисніть Freeze Mouse у потрібному напрямку та натисніть бінд Fast-Feed'а. Ділиться лише те вікно, з якого натиснуто бінд.</p><p>Скрипт робить 5 сплітів (32 частини), чекає заданий час і робить ще 5 сплітів (32 частини). P.S. При великій масі (~800k) збільште повзунок затримки приблизно до 850ms, щоб поділ не спрацював занадто рано.</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>Так, авто-рев реалізовано не найкращим чином, але іншого вибору в нас не було — гра занадто захищена. Щоб функція працювала стабільно, потрібно мати стабільно хороші FPS і пінг, а також:</p><p>Куля цілі має бути повністю видимою, не закритою іншими кулями чи краями екрана. Ви <strong>ЗОБОВ'ЯЗАНІ</strong> вимкнути показ маси, скіни та ніки ворогів у налаштуваннях гри, інакше будуть хибні спрацьовування. Камера повинна бути нерухомою, не зуміть під час локу.</p><p>Примітки: Є затримка ~10ms, але завдяки цікавій реалізації механіки авто-рева він не зламається під час майбутніх оновлень гри; більше двох сплітів (4 частини) ставити не рекомендовано, бо ви тупо не встигнете долетіти до цілі.</p>",
+        noVideo: "Відео недоступне",
+        codeLink: "Актуальний код"
+      },
+      es: {
+        alert: "<b>Importante:</b> Este script funciona SOLO en Google Chrome. Si usas Yandex, bórralo. El script no funcionará allí.",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>Esta función está hecha principalmente para jugar con multibox: una célula grande y una pequeña. En la célula grande, apunta el cursor hacia el lado del truco y PULSA (toggle) Freeze Mouse (o Line + Freeze Mouse). No lo mantengas pulsado, solo púlsalo, o la célula grande se dividirá hacia otro lado.</p><p>Luego pasa a la ventana de la célula pequeña y pulsa el bind según su masa actual. Por ejemplo, con ~30k de masa pulsa la tecla 7 (viene por defecto, puedes cambiarla) (Trick 128). La pequeña se dividirá 7 veces al instante (128 partes) hacia el cursor. Al mismo tiempo, la grande en segundo plano hará 5 splits (32 partes) por la línea congelada, esperará el tiempo configurado (Solo Delay - 800ms por defecto) y volverá a dividirse 5 veces (32 partes).</p><p>Justo después de pulsar el bind, solo tienes que mantener tu tecla normal de feed del juego para alimentarte bien para el Solo Trick. Esto da un solo-trick limpio sin cambiar de pestaña manualmente.</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>¿Quieres pasar masa de forma eficiente a otra célula? Usa Fast-Feed. Pulsa Freeze Mouse en la dirección deseada y pulsa el bind de Fast-Feed. Solo se divide la ventana desde la que pulsaste el bind.</p><p>El script hace 5 splits (32 partes), espera el tiempo indicado y hace otros 5 splits (32 partes). P.D. Con masa alta (~800k), sube el deslizador de retraso a unos 850ms para que no se active demasiado pronto.</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>Sí, Auto-Rev no está hecho de la mejor manera, pero no teníamos otra opción porque el juego está muy protegido. Para que funcione de forma estable necesitas FPS estables y buen ping, y además:</p><p>La célula objetivo debe verse por completo y no quedar tapada por otras células o por los bordes de la pantalla. Estás <strong>OBLIGADO</strong> a desactivar la masa, skins y nombres enemigos en los ajustes del juego, o habrá falsos disparos. Mantén la cámara inmóvil y no hagas zoom durante el bloqueo.</p><p>Notas: Hay un retraso de ~10ms, pero gracias a cómo está hecha la mecánica de Auto-Rev no se romperá en futuras actualizaciones del juego; no se recomienda poner más de dos splits (4 partes), ya que simplemente no llegarás a tiempo al objetivo.</p>",
+        noVideo: "Video no disponible",
+        codeLink: "Código actual"
+      },
+      pt: {
+        alert: "<b>Importante:</b> Este script funciona APENAS no Google Chrome. Se você usa Yandex, exclua-o. O script não funcionará lá.",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>Esta função foi feita principalmente para jogar de multibox: uma célula grande e uma pequena. Na célula grande, aponte o cursor para o lado do trick e APERTE (toggle) Freeze Mouse (ou Line + Freeze Mouse). Não segure, apenas aperte, senão a célula grande vai se dividir para o outro lado.</p><p>Depois vá para a janela da célula pequena e aperte o bind correspondente à massa atual dela. Por exemplo, com ~30k de massa aperte a tecla 7 (já vem por padrão, você pode rebindar) (Trick 128). A pequena vai dividir 7 vezes na hora (128 pedaços) na direção do cursor. Ao mesmo tempo, a grande em segundo plano fará 5 splits (32 pedaços) na linha congelada, aguardará o tempo definido (Solo Delay - 800ms por padrão) e dividirá mais 5 vezes (32 pedaços).</p><p>Logo após apertar o bind, basta segurar sua tecla normal de feed do jogo para se alimentar bem para o Solo Trick. Isso garante um solo-trick limpo sem trocar de abas manualmente.</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>Quer passar massa de forma eficiente para outra célula? Use o Fast-Feed. Aperte Freeze Mouse na direção desejada e aperte o bind do Fast-Feed. Apenas a janela de onde o bind foi pressionado será dividida.</p><p>O script faz 5 splits (32 pedaços), aguarda o tempo definido e faz mais 5 splits (32 pedaços). P.S. Com massa alta (~800k), aumente o controle de atraso para cerca de 850ms para a divisão não disparar cedo demais.</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>Sim, o Auto-Rev não foi implementado da melhor forma, mas não tínhamos escolha porque o jogo é muito protegido. Para funcionar de forma estável, você precisa de FPS e ping consistentemente bons, e também:</p><p>A célula alvo deve estar totalmente visível, sem ser coberta por outras células ou pelas bordas da tela. Você é <strong>OBRIGADO</strong> a desativar exibição de massa, skins e nicks inimigos nas configurações do jogo, caso contrário haverá ativações falsas. Mantenha a câmera parada e não dê zoom durante o lock.</p><p>Notas: Há um atraso de ~10ms, mas graças à forma inteligente como a mecânica foi feita, ele não vai quebrar nas próximas atualizações do jogo; não é recomendado colocar mais de dois splits (4 pedaços), pois você simplesmente não chegará a tempo no alvo.</p>",
+        noVideo: "Vídeo indisponível",
+        codeLink: "Código atual"
+      },
+      fr: {
+        alert: "<b>Important :</b> Ce script fonctionne UNIQUEMENT sur Google Chrome. Si vous utilisez Yandex, supprimez-le. Le script n'y fonctionnera pas.",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>Cette fonction est surtout conçue pour le jeu en multibox : une grande cellule et une petite. Sur la grande cellule, pointez le curseur vers la direction du trick et APPUYEZ (toggle) sur Freeze Mouse (ou Line + Freeze Mouse). Ne maintenez pas la touche, appuyez juste dessus, sinon la grande cellule se divisera dans une autre direction.</p><p>Passez ensuite sur la fenêtre de la petite cellule et appuyez sur le bind adapté à sa masse actuelle. Par exemple, vers ~30k de masse, appuyez sur la touche 7 (par défaut, vous pouvez la rebind) (Trick 128). La petite cellule se divisera instantanément 7 fois (128 parts) vers le curseur. En même temps, la grande cellule en arrière-plan fera 5 splits (32 parts) sur la ligne gelée, attendra le délai réglé (Solo Delay - 800ms par défaut) puis se divisera encore 5 fois (32 parts).</p><p>Juste après avoir appuyé sur le bind, il ne vous reste qu'à maintenir votre touche normale de feed du jeu pour bien alimenter le Solo Trick. Cela donne un solo-trick propre sans changer d'onglet à la main.</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>Vous voulez envoyer efficacement de la masse dans une autre cellule ? Utilisez Fast-Feed. Appuyez sur Freeze Mouse dans la bonne direction puis appuyez sur le bind Fast-Feed. Seule la fenêtre depuis laquelle le bind est pressé se divisera.</p><p>Le script fait 5 splits (32 parts), attend le délai défini et refait 5 splits (32 parts). P.S. Avec une grosse masse (~800k), montez le curseur de délai vers 850ms pour éviter que la division ne parte trop tôt.</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>Oui, Auto-Rev n'est pas implémenté de la meilleure façon, mais nous n'avions pas le choix car le jeu est trop protégé. Pour qu'il fonctionne de façon stable, il faut un FPS et un ping constamment bons, ainsi que :</p><p>La cellule cible doit être entièrement visible, sans être cachée par d'autres cellules ou les bords de l'écran. Vous êtes <strong>OBLIGÉ</strong> de désactiver l'affichage de la masse, les skins et les pseudos ennemis dans les paramètres du jeu, sinon il y aura de faux déclenchements. Gardez la caméra immobile et ne zoomez pas pendant le verrouillage.</p><p>Notes : Il y a un délai d'environ 10ms, mais grâce à la conception astucieuse de la mécanique Auto-Rev, il ne cassera pas lors des futures mises à jour du jeu ; il est déconseillé de mettre plus de deux splits (4 parts), car vous n'aurez tout simplement pas le temps d'atteindre la cible.</p>",
+        noVideo: "Vidéo indisponible",
+        codeLink: "Code actuel"
+      },
+      de: {
+        alert: "<b>Wichtig:</b> Dieses Script funktioniert NUR in Google Chrome. Wenn du Yandex nutzt, lösche es. Das Script wird dort nicht funktionieren.",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>Diese Funktion ist hauptsächlich für das Spielen mit Multibox gedacht: eine große und eine kleine Zelle. Zeige auf der großen Zelle mit dem Cursor in Trick-Richtung und DRÜCKE (toggle) Freeze Mouse (oder Line + Freeze Mouse). Nicht gedrückt halten, sondern kurz drücken, sonst teilt sich die große Zelle in die falsche Richtung.</p><p>Wechsle danach ins Fenster der kleinen Zelle und drücke den Bind für ihre aktuelle Masse. Bei ca. ~30k Masse drücke z.B. Taste 7 (ist standardmäßig belegt, kannst du umbelegen) (Trick 128). Die kleine Zelle teilt sich sofort 7-mal (128 Teile) Richtung Cursor. Gleichzeitig macht die große Zelle im Hintergrund 5 Splits (32 Teile) entlang der eingefrorenen Linie, wartet die eingestellte Zeit (Solo Delay - Standard 800ms) und teilt sich erneut 5-mal (32 Teile).</p><p>Direkt nach dem Drücken musst du nur noch deine normale Ingame-Feed-Taste gedrückt halten, um für den Solo Trick sauber zu füttern. Das ergibt einen sauberen Solo-Trick ohne manuelles Tab-Wechseln.</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>Willst du Masse effizient in eine andere Zelle pumpen? Nutze Fast-Feed. Drücke Freeze Mouse in die gewünschte Richtung und drücke den Fast-Feed-Bind. Nur das Fenster, in dem der Bind gedrückt wurde, teilt sich.</p><p>Das Script macht 5 Splits (32 Teile), wartet die eingestellte Zeit und macht weitere 5 Splits (32 Teile). P.S. Bei hoher Masse (~800k) stelle den Delay-Regler auf etwa 850ms, damit der Split nicht zu früh auslöst.</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>Ja, Auto-Rev ist nicht optimal umgesetzt, aber wir hatten keine andere Wahl, da das Spiel zu stark geschützt ist. Damit es stabil läuft, brauchst du konstant gute FPS und einen niedrigen Ping sowie Folgendes:</p><p>Die Zielzelle muss vollständig sichtbar sein und darf weder von anderen Zellen noch vom Bildschirmrand verdeckt sein. Du <strong>MUSST</strong> Massenanzeige, Skins und gegnerische Namen in den Spieleinstellungen deaktivieren, sonst kommt es zu Fehlauslösungen. Halte die Kamera still und zoome während des Locks nicht.</p><p>Hinweise: Es gibt eine Verzögerung von ~10ms, aber dank der interessanten Umsetzung der Auto-Rev-Mechanik wird es bei zukünftigen Spiel-Updates nicht kaputtgehen; mehr als zwei Splits (4 Teile) einzustellen wird nicht empfohlen, da du es schlicht nicht rechtzeitig zum Ziel schaffst.</p>",
+        noVideo: "Video nicht verfügbar",
+        codeLink: "Aktueller Code"
+      },
+      it: {
+        alert: "<b>Importante:</b> Questo script funziona SOLO su Google Chrome. Se usi Yandex, eliminalo. Lo script non funzionerà lì.",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>Questa funzione è pensata principalmente per giocare in multibox: una cellula grande e una piccola. Sulla cellula grande punta il cursore nella direzione del trick e PREMI (toggle) Freeze Mouse (o Line + Freeze Mouse). Non tenere premuto, premi e basta, altrimenti la cellula grande si dividerà da un'altra parte.</p><p>Poi passa alla finestra della cellula piccola e premi il bind adatto alla sua massa attuale. Ad esempio, con ~30k di massa premi il tasto 7 (è impostato di default, puoi cambiarlo) (Trick 128). La piccola si dividerà subito 7 volte (128 parti) verso il cursore. Allo stesso tempo la grande in background farà 5 split (32 parti) lungo la linea bloccata, aspetterà il tempo impostato (Solo Delay - 800ms predefiniti) e si dividerà altre 5 volte (32 parti).</p><p>Subito dopo aver premuto il bind, ti resta solo da tenere premuto il tasto normale di feed del gioco per nutrirti con successo per il Solo Trick. Questo ti dà un solo-trick pulito senza cambiare scheda manualmente.</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>Vuoi passare massa in modo efficace in un'altra cellula? Usa Fast-Feed. Premi Freeze Mouse nella direzione voluta e premi il bind di Fast-Feed. Si divide solo la finestra da cui è stato premuto il bind.</p><p>Lo script fa 5 split (32 parti), aspetta il tempo impostato e fa altri 5 split (32 parti). P.S. Con massa elevata (~800k) aumenta lo slider del ritardo a circa 850ms per non far partire la divisione troppo presto.</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>Sì, Auto-Rev non è implementato nel modo migliore, ma non avevamo altra scelta perché il gioco è troppo protetto. Perché funzioni in modo stabile servono FPS e ping costantemente buoni, e inoltre:</p><p>La cellula bersaglio deve essere completamente visibile, non coperta da altre cellule o dai bordi dello schermo. Sei <strong>OBBLIGATO</strong> a disattivare massa, skin e nomi nemici nelle impostazioni di gioco, altrimenti ci saranno attivazioni false. Tieni la visuale ferma e non fare zoom durante il lock.</p><p>Note: C'è un ritardo di ~10ms, ma grazie all'interessante realizzazione della meccanica Auto-Rev non si romperà nei futuri aggiornamenti del gioco; impostare più di due split (4 parti) è sconsigliato, perché semplicemente non farai in tempo ad arrivare sul bersaglio.</p>",
+        noVideo: "Video non disponibile",
+        codeLink: "Codice attuale"
+      },
+      pl: {
+        alert: "<b>Ważne:</b> Ten skrypt działa TYLKO w Google Chrome. Jeśli używasz Yandexa, usuń go. Skrypt tam nie zadziała.",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>Funkcja stworzona głównie do gry z multiboxem: jedna duża i jedna mała kulka. Na dużej kulce nakieruj kursor w stronę tricka i NACIŚNIJ (toggle) Freeze Mouse (lub Line + Freeze Mouse). Nie przytrzymuj, tylko naciśnij, inaczej duża kulka podzieli się w inną stronę.</p><p>Następnie przejdź do okna z małą kulką i wciśnij bind dobrany do jej aktualnej masy. Na przykład przy masie ~30k wciśnij klawisz 7 (jest domyślny, możesz go zmienić) (Trick 128). Mała kulka natychmiast podzieli się 7 razy (na 128 części) w stronę kursora. Jednocześnie duża w tle zrobi 5 splitów (32 części) po zamrożonej linii, odczeka ustawiony czas (Solo Delay - domyślnie 800ms) i podzieli się kolejne 5 razy (32 części).</p><p>Zaraz po wciśnięciu binda wystarczy przytrzymać zwykły klawisz karmienia w grze, aby skutecznie nakarmić się pod Solo Tricka. Daje to czysty solo-trick bez ręcznego przełączania kart.</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>Chcesz skutecznie wlać masę w inną kulkę? Użyj Fast-Feed. Naciśnij Freeze Mouse w odpowiednim kierunku i wciśnij bind Fast-Feeda. Dzieli się tylko to okno, z którego wciśnięto bind.</p><p>Skrypt robi 5 splitów (32 części), czeka ustawiony czas i robi kolejne 5 splitów (32 części). P.S. Przy dużej masie (~800k) zwiększ suwak opóźnienia do około 850ms, aby podział nie zadziałał za wcześnie.</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>Tak, auto-rev nie jest zrobiony w najlepszy możliwy sposób, ale nie mieliśmy innego wyboru, bo gra jest zbyt mocno chroniona. Aby funkcja działała stabilnie, trzeba mieć stabilnie dobre FPS i ping, a także:</p><p>Kulka celu musi być w pełni widoczna, nie zasłonięta innymi kulkami ani krawędziami ekranu. Jesteś <strong>ZOBOWIĄZANY</strong> wyłączyć pokazywanie masy, skiny oraz nicki wrogów w ustawieniach gry, inaczej będą fałszywe reakcje. Kamera musi być nieruchoma, nie przybliżaj ani nie oddalaj podczas locka.</p><p>Uwagi: Jest opóźnienie ~10ms, ale dzięki sprytnej realizacji mechaniki auto-reva nie zepsuje się on przy przyszłych aktualizacjach gry; ustawianie więcej niż dwóch splitów (4 części) nie jest zalecane, bo po prostu nie zdążysz dolecieć do celu.</p>",
+        noVideo: "Wideo niedostępne",
+        codeLink: "Aktualny kod"
+      },
+      nl: {
+        alert: "<b>Belangrijk:</b> Dit script werkt ALLEEN in Google Chrome. Als je Yandex gebruikt, verwijder het dan. Het script werkt daar niet.",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>Deze functie is vooral gemaakt voor multiboxen: één grote en één kleine cel. Richt op de grote cel de cursor richting de trick en DRUK (toggle) op Freeze Mouse (of Line + Freeze Mouse). Niet ingedrukt houden, maar indrukken, anders splitst de grote cel de andere kant op.</p><p>Ga daarna naar het venster met de kleine cel en druk op de bind die past bij de huidige massa ervan. Druk bijvoorbeeld bij ~30k massa op toets 7 (staat standaard ingesteld, kun je aanpassen) (Trick 128). De kleine cel splitst direct 7 keer (128 delen) richting je cursor. Tegelijk doet de grote cel op de achtergrond 5 splits (32 delen) langs de bevroren lijn, wacht de ingestelde tijd (Solo Delay - standaard 800ms) en splitst nog eens 5 keer (32 delen).</p><p>Direct na het indrukken van de bind hoef je alleen je normale feed-toets uit het spel ingedrukt te houden om goed te voeren voor de Solo Trick. Dat geeft een strakke solo-trick zonder handmatig tabbladen te wisselen.</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>Wil je efficiënt massa in een andere cel pompen? Gebruik Fast-Feed. Druk op Freeze Mouse in de gewenste richting en druk op de Fast-Feed-bind. Alleen het venster waarin de bind is ingedrukt splitst.</p><p>Het script doet 5 splits (32 delen), wacht de ingestelde tijd en doet nog eens 5 splits (32 delen). P.S. Zet bij grote massa (~800k) de vertragingsschuif op ongeveer 850ms zodat de splitsing niet te vroeg afgaat.</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>Ja, Auto-Rev is niet op de allerbeste manier gebouwd, maar we hadden geen andere keus omdat de game te zwaar beveiligd is. Voor stabiele werking heb je constant goede FPS en ping nodig, en ook:</p><p>De doelcel moet volledig zichtbaar zijn en mag niet worden bedekt door andere cellen of schermranden. Je bent <strong>VERPLICHT</strong> om massaweergave, skins en vijandelijke namen uit te zetten in de spelinstellingen, anders krijg je valse triggers. Houd je camera stil en zoom niet tijdens de lock.</p><p>Opmerkingen: Er zit ~10ms vertraging op, maar dankzij de slimme opzet van de Auto-Rev-mechaniek gaat het niet stuk bij toekomstige updates; meer dan twee splits (4 delen) instellen wordt afgeraden, omdat je simpelweg niet op tijd bij het doel aankomt.</p>",
+        noVideo: "Video niet beschikbaar",
+        codeLink: "Actuele code"
+      },
+      ro: {
+        alert: "<b>Important:</b> Acest script funcționează DOAR în Google Chrome. Dacă folosești Yandex, șterge-l. Scriptul nu va funcționa acolo.",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>Funcția este făcută în principal pentru jocul cu multibox: o celulă mare și una mică. Pe celula mare, îndreaptă cursorul în direcția trick-ului și APASĂ (toggle) Freeze Mouse (sau Line + Freeze Mouse). Nu ține apăsat, doar apasă o dată, altfel celula mare se va împărți în altă direcție.</p><p>Apoi treci în fereastra cu celula mică și apasă bind-ul potrivit pentru masa ei actuală. De exemplu, la ~30k masă apasă tasta 7 (este setată implicit, o poți schimba) (Trick 128). Celula mică se va împărți instantaneu de 7 ori (128 bucăți) spre cursor. În același timp, celula mare din fundal va face 5 split-uri (32 bucăți) pe linia înghețată, va aștepta timpul setat (Solo Delay - implicit 800ms) și se va mai împărți de 5 ori (32 bucăți).</p><p>Imediat după apăsarea bind-ului, trebuie doar să ții apăsată tasta normală de feed din joc ca să te hrănești cu succes pentru Solo Trick. Asta oferă un solo-trick curat fără să schimbi filele manual.</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>Vrei să torni masă eficient într-o altă celulă? Folosește Fast-Feed. Apasă Freeze Mouse în direcția dorită și apasă bind-ul de Fast-Feed. Se împarte doar fereastra din care a fost apăsat bind-ul.</p><p>Scriptul face 5 split-uri (32 bucăți), așteaptă timpul setat și face încă 5 split-uri (32 bucăți). P.S. La masă mare (~800k), mărește slider-ul de întârziere pe la 850ms ca împărțirea să nu pornească prea devreme.</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>Da, auto-rev nu este implementat în cel mai bun mod, dar nu am avut altă opțiune, jocul este prea protejat. Ca funcția să meargă stabil, ai nevoie de FPS și ping constant bune, și de asemenea:</p><p>Celula țintă trebuie să fie complet vizibilă, neacoperită de alte celule sau de marginile ecranului. Ești <strong>OBLIGAT</strong> să dezactivezi afișarea masei, skin-urile și numele inamicilor din setările jocului, altfel vor apărea declanșări false. Camera trebuie să fie nemișcată, nu da zoom în timpul lock-ului.</p><p>Note: Există o întârziere de ~10ms, dar datorită modului interesant în care este făcută mecanica auto-rev, nu se va strica la viitoarele actualizări ale jocului; nu este recomandat să pui mai mult de două split-uri (4 bucăți), deoarece pur și simplu nu vei ajunge la timp până la țintă.</p>",
+        noVideo: "Video indisponibil",
+        codeLink: "Cod actual"
+      },
+      tr: {
+        alert: "<b>Önemli:</b> Bu script SADECE Google Chrome'da çalışır. Yandex kullanıyorsanız silin. Script orada çalışmayacaktır.",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>Bu özellik esas olarak multibox oyunu için yapılmıştır: bir büyük ve bir küçük hücre. Büyük hücrede imleci trick yönüne çevirin ve Freeze Mouse (veya Line + Freeze Mouse) tuşuna BASIN (toggle). Basılı tutmayın, sadece basıp bırakın; aksi halde büyük hücre başka yöne bölünür.</p><p>Ardından küçük hücrenin olduğu pencereye geçin ve mevcut kütlesine uygun tuşa basın. Örneğin ~30k kütlede 7 tuşuna basın (varsayılan budur, değiştirebilirsiniz) (Trick 128). Küçük hücre imlece doğru anında 7 kez (128 parça) bölünür. Aynı anda arka plandaki büyük hücre donmuş çizgi boyunca 5 split (32 parça) yapar, ayarlanan süreyi bekler (Solo Delay - varsayılan 800ms) ve tekrar 5 kez (32 parça) bölünür.</p><p>Tuşa bastıktan hemen sonra Solo Trick için düzgünce beslenmek adına oyunun kendi normal feed tuşunu basılı tutmanız yeterlidir. Bu sayede manuel sekme değiştirmeden temiz bir solo-trick yaparsınız.</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>Başka bir hücreye verimli şekilde kütle aktarmak mı istiyorsunuz? Fast-Feed kullanın. İstediğiniz yönde Freeze Mouse'a basın ve Fast-Feed tuşuna basın. Yalnızca tuşa basılan pencere bölünür.</p><p>Script 5 split (32 parça) yapar, ayarlanan süreyi bekler ve 5 split (32 parça) daha yapar. Not: Yüksek kütlede (~800k) bölünmenin çok erken tetiklenmemesi için gecikme kaydırıcısını yaklaşık 850ms'ye çıkarın.</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>Evet, auto-rev en iyi şekilde yapılmış değil ama başka seçeneğimiz yoktu, oyun çok fazla korunuyor. Özelliğin stabil çalışması için sürekli iyi FPS ve ping değerine sahip olmanız, ayrıca şunlara uymanız gerekir:</p><p>Hedef hücre tamamen görünür olmalı, başka hücreler veya ekran kenarları tarafından kapatılmamalıdır. Oyun ayarlarından kütle gösterimini, skinleri ve rakip isimlerini kapatmak <strong>ZORUNDASINIZ</strong>, aksi halde yanlış tetiklemeler olur. Kamera sabit kalmalı, kilitliyken zoom yapmamalısınız.</p><p>Notlar: ~10ms gecikme vardır ancak auto-rev mekaniğinin ilginç yapısı sayesinde gelecek oyun güncellemelerinde bozulmaz; ikiden fazla split (4 parça) koymanız önerilmez çünkü hedefe yetişemezsiniz.</p>",
+        noVideo: "Video kullanılamıyor",
+        codeLink: "Güncel kod"
+      },
+      ar: {
+        alert: "<b>هام:</b> يعمل هذا السكربت فقط في Google Chrome. إذا كنت تستخدم متصفح Yandex فاحذفه، فلن يعمل السكربت هناك.",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>هذه الميزة مصممة أساسًا للعب بالمالتي بوكس: كرة كبيرة وكرة صغيرة. على الكرة الكبيرة وجّه المؤشر نحو اتجاه التريك واضغط (toggle) على Freeze Mouse (أو Line + Freeze Mouse). لا تضغط باستمرار بل اضغط فقط، وإلا ستنقسم الكرة الكبيرة في اتجاه آخر.</p><p>بعد ذلك انتقل إلى نافذة الكرة الصغيرة واضغط الزر المناسب لكتلتها الحالية. مثلاً عند كتلة ~30k اضغط المفتاح 7 (هذا هو الافتراضي، ويمكنك تغييره) (Trick 128). ستنقسم الكرة الصغيرة فوراً 7 مرات (128 جزءاً) نحو المؤشر. وفي الوقت نفسه ستقوم الكرة الكبيرة في الخلفية بـ 5 انقسامات (32 جزءاً) على الخط المجمد، وتنتظر الوقت المحدد (Solo Delay - الافتراضي 800ms) ثم تنقسم 5 مرات أخرى (32 جزءاً).</p><p>مباشرة بعد الضغط على الزر، ما عليك سوى الضغط باستمرار على زر التغذية العادي في اللعبة لتتغذى بنجاح من أجل Solo Trick. هذا يمنحك سولو تريك نظيفاً بدون تبديل النوافذ يدوياً.</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>هل تريد ضخ الكتلة بفعالية إلى كرة أخرى؟ استخدم Fast-Feed. اضغط Freeze Mouse في الاتجاه المطلوب ثم اضغط زر Fast-Feed. ستنقسم النافذة التي ضغطت منها فقط.</p><p>يقوم السكربت بـ 5 انقسامات (32 جزءاً)، ينتظر الوقت المحدد ثم يقوم بـ 5 انقسامات أخرى (32 جزءاً). ملاحظة: عند الكتلة الكبيرة (~800k) ارفع شريط التأخير إلى حوالي 850ms حتى لا يبدأ الانقسام مبكراً جداً.</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>نعم، لم يُبنَ Auto-Rev بأفضل طريقة ممكنة، لكن لم يكن لدينا خيار آخر لأن اللعبة محمية جداً. لكي تعمل الميزة بثبات يجب أن يكون لديك FPS وبينغ جيدان باستمرار، وأيضاً:</p><p>يجب أن تكون الكرة الهدف ظاهرة بالكامل وغير مغطاة بكرات أخرى أو بحواف الشاشة. أنت <strong>مُلزم</strong> بإيقاف عرض الكتلة والسكينات وأسماء الخصوم في إعدادات اللعبة، وإلا ستحدث استجابات خاطئة. يجب أن تبقى الكاميرا ثابتة، ولا تقم بالتكبير أو التصغير أثناء القفل.</p><p>ملاحظات: يوجد تأخير ~10ms، ولكن بفضل طريقة تنفيذ آلية Auto-Rev الذكية لن يتعطل مع تحديثات اللعبة المستقبلية؛ ولا يُنصح بوضع أكثر من انقسامين (4 أجزاء) لأنك ببساطة لن تلحق بالوصول إلى الهدف.</p>",
+        noVideo: "الفيديو غير متاح",
+        codeLink: "الكود الأحدث"
+      },
+      hi: {
+        alert: "<b>महत्वपूर्ण:</b> यह स्क्रिप्ट केवल Google Chrome में काम करती है। यदि आप Yandex इस्तेमाल करते हैं, तो उसे हटा दें। स्क्रिप्ट वहाँ काम नहीं करेगी।",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>यह फीचर मुख्य रूप से मल्टीबॉक्स खेलने के लिए बनाया गया है: एक बड़ी और एक छोटी सेल। बड़ी सेल पर कर्सर को ट्रिक की दिशा में रखें और Freeze Mouse (या Line + Freeze Mouse) को दबाएँ (toggle)। दबाकर न रखें, बस एक बार दबाएँ, वरना बड़ी सेल दूसरी दिशा में स्प्लिट हो जाएगी।</p><p>फिर छोटी सेल वाली विंडो में जाएँ और उसकी मौजूदा मास के हिसाब से बाइंड दबाएँ। उदाहरण के लिए, ~30k मास पर कुंजी 7 दबाएँ (यह डिफ़ॉल्ट है, आप इसे रीबाइंड कर सकते हैं) (Trick 128)। छोटी सेल तुरंत कर्सर की ओर 7 बार (128 हिस्सों में) स्प्लिट हो जाएगी। उसी समय बैकग्राउंड में बड़ी सेल फ़्रोज़न लाइन पर 5 स्प्लिट (32 हिस्से) करेगी, तय समय (Solo Delay - डिफ़ॉल्ट 800ms) का इंतज़ार करेगी और फिर 5 बार (32 हिस्से) स्प्लिट होगी।</p><p>बाइंड दबाने के तुरंत बाद आपको बस गेम की सामान्य फ़ीड कुंजी दबाए रखनी है ताकि आप Solo Trick के लिए सही से फ़ीड कर सकें। इससे बिना मैन्युअल टैब बदले साफ़ सोलो-ट्रिक होता है।</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>किसी दूसरी सेल में तेज़ी और असरदार तरीके से मास डालना चाहते हैं? Fast-Feed का उपयोग करें। सही दिशा में Freeze Mouse दबाएँ और Fast-Feed बाइंड दबाएँ। केवल वही विंडो स्प्लिट होगी जहाँ से बाइंड दबाया गया है।</p><p>स्क्रिप्ट 5 स्प्लिट (32 हिस्से) करती है, तय समय तक रुकती है और फिर 5 स्प्लिट (32 हिस्से) करती है। नोट: बड़ी मास (~800k) पर डिले स्लाइडर को लगभग 850ms तक बढ़ा दें ताकि स्प्लिट बहुत जल्दी न हो जाए।</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>हाँ, Auto-Rev सबसे बेहतरीन तरीके से लागू नहीं किया गया है, लेकिन हमारे पास कोई दूसरा विकल्प नहीं था क्योंकि गेम बहुत ज़्यादा सुरक्षित है। इस फीचर के स्थिर चलने के लिए लगातार अच्छे FPS और पिंग होना ज़रूरी है, और साथ ही:</p><p>टारगेट सेल पूरी तरह दिखनी चाहिए, अन्य सेल्स या स्क्रीन के किनारों से ढकी नहीं होनी चाहिए। आपको गेम सेटिंग्स में मास डिस्प्ले, स्किन और दुश्मनों के नाम बंद करना <strong>अनिवार्य</strong> है, वरना गलत ट्रिगर होंगे। कैमरा स्थिर रहना चाहिए, लॉक के दौरान ज़ूम न करें।</p><p>नोट: इसमें ~10ms की देरी है, लेकिन Auto-Rev मैकेनिक की दिलचस्प बनावट की वजह से यह आने वाले गेम अपडेट्स में टूटेगा नहीं; दो स्प्लिट (4 हिस्से) से ज़्यादा रखने की सलाह नहीं दी जाती, क्योंकि आप बस समय पर टारगेट तक पहुँच ही नहीं पाएँगे।</p>",
+        noVideo: "वीडियो उपलब्ध नहीं है",
+        codeLink: "नवीनतम कोड"
+      },
+      zh: {
+        alert: "<b>重要提示：</b>本脚本仅可在 Google Chrome 中运行。如果您使用的是 Yandex 浏览器，请卸载，脚本无法在其中运行。",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>此功能主要用于多开玩法：一个大球和一个小球。在大球窗口中将光标指向技巧方向并按下（toggle）Freeze Mouse（或 Line + Freeze Mouse）。不要长按，只需按一下开启，否则大球会往反方向分裂。</p><p>随后切换到小球窗口，按下对应小球当前质量的快捷键。例如约 ~30k 质量时按 7 键（这是默认键位，可以自行改键）(Trick 128)。小球会立刻向光标方向分裂 7 次（128 份）。同时后台的大球会沿着锁定路线分裂 5 次（32 份），等待设定时间（Solo Delay - 默认 800ms）后再分裂 5 次（32 份）。</p><p>按下快捷键后只需按住游戏自带的喂球键，即可顺利完成 Solo Trick 的喂球。全程无需手动切换标签页。</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>想把质量高效地灌入另一个球？请使用 Fast-Feed。向目标方向按下 Freeze Mouse，然后按下 Fast-Feed 快捷键。只有按下快捷键的当前窗口会分裂。</p><p>脚本会分裂 5 次（32 份），等待设定时间后再分裂 5 次（32 份）。提示：质量很大（~800k）时，请把延迟滑块调高到约 850ms，以免过早触发。</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>是的，Auto-Rev 的实现方式并不算完美，但因为游戏保护太强我们没有别的选择。要让该功能稳定生效，需要持续保持良好的 FPS 和延迟，同时注意：</p><p>目标球必须完全可见，不能被其他球或屏幕边缘遮挡。您<strong>必须</strong>在游戏设置中关闭质量显示、皮肤和敌方昵称，否则会出现误触发。锁定期间视角必须保持静止，不要缩放画面。</p><p>说明：存在约 ~10ms 的延迟，但得益于 Auto-Rev 机制的巧妙实现，未来游戏更新也不会轻易失效；不建议设置超过两次分裂（4 份），因为您根本来不及飞到目标位置。</p>",
+        noVideo: "暂无视频",
+        codeLink: "最新代码"
+      },
+      ja: {
+        alert: "<b>重要:</b> このスクリプトは Google Chrome でのみ動作します。Yandex を使っている場合は削除してください。そこでは動作しません。",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>この機能は主にマルチボックス（大玉と小玉）で遊ぶためのものです。大玉側でトリックしたい方向にカーソルを合わせ、Freeze Mouse（または Line + Freeze Mouse）をトグルで押してください（Press）。長押しではなく押して切り替える必要があります。そうしないと大玉が別方向に分裂してしまいます。</p><p>次に小玉のウィンドウへ移り、現在の小玉の質量に合ったバインドを押します。たとえば質量 ~30k なら 7 キーを押してください（初期設定ですがリバインド可能です）(Trick 128)。小玉は即座にカーソル方向へ7回（128分割）分裂し、同時に裏側の大玉が固定ライン上へ5回（32分割）分裂して設定時間（Solo Delay - 初期値 800ms）待ってからさらに5回（32分割）分裂します。</p><p>バインドを押した直後は、ゲーム標準のフィードキーを押し続けるだけで Solo Trick のための餌やりが綺麗に完了します。手動でタブを切り替える必要はありません。</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>別の玉へ効率よく質量を流し込みたい時は Fast-Feed を使ってください。目的の方向で Freeze Mouse を押し、Fast-Feed のバインドを押します。バインドを押したウィンドウだけが分裂します。</p><p>5回分裂（32分割）し、設定時間待ってからさらに5回分裂（32分割）します。補足: 大質量（~800k）の時は早すぎる発動を防ぐため遅延スライダーを約 850ms まで上げてください。</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>確かに Auto-Rev の実装はベストとは言えませんが、ゲームの保護が強すぎるため他に選択肢がありませんでした。安定して動作させるには、常に良好な FPS と低 Ping、そして以下が必要です:</p><p>ターゲットの玉が他の玉や画面端に隠れず完全に見えている必要があります。ゲーム設定で質量表示・スキン・敵の名前をオフにするのが<strong>必須</strong>です。そうしないと誤作動します。ロック中はカメラを動かさずズームもしないでください。</p><p>備考: ~10ms の遅延がありますが、Auto-Rev メカニズムのユニークな実装により今後のゲームアップデートでも壊れません。また、ターゲットまで到底間に合わなくなるため、2回分裂（4分割）より多く設定するのは非推奨です。</p>",
+        noVideo: "動画が利用できません",
+        codeLink: "最新コード"
+      },
+      ko: {
+        alert: "<b>중요:</b> 이 스크립트는 Google Chrome에서만 작동합니다. Yandex 브라우저를 사용 중이라면 삭제하세요. 거기서는 작동하지 않습니다.",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>이 기능은 주로 큰 셀과 작은 셀로 멀티박스를 플레이할 때 사용합니다. 큰 셀에서 트릭을 넣을 방향으로 커서를 두고 Freeze Mouse(또는 Line + Freeze Mouse)를 한 번 누르세요(toggle). 길게 누르지 말고 꼭 한 번만 눌러야 하며, 그렇지 않으면 큰 셀이 다른 방향으로 분열합니다.</p><p>그다음 작은 셀 창으로 넘어가 현재 작은 셀의 매스에 맞는 바인드를 누르세요. 예를 들어 매스가 ~30k일 때는 7 키를 누르세요(기본값이며 키 변경 가능) (Trick 128). 작은 셀이 커서 방향으로 즉시 7번(128조각) 분열하며, 동시에 백그라운드의 큰 셀은 고정된 선을 따라 5번(32조각) 분열한 뒤 설정된 시간(Solo Delay - 기본 800ms)을 기다렸다가 다시 5번(32조각) 분열합니다.</p><p>바인드를 누른 직후에는 게임 기본 피드 키만 꾹 누르고 있으면 Solo Trick을 위한 피드가 성공적으로 들어갑니다. 수동 탭 전환 없이 깔끔한 솔로 트릭이 가능합니다.</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>다른 셀에 효율적으로 매스를 몰아주고 싶다면 Fast-Feed를 사용하세요. 원하는 방향에서 Freeze Mouse를 누른 뒤 Fast-Feed 바인드를 누르면 됩니다. 바인드를 누른 창만 분열합니다.</p><p>스크립트가 5번(32조각) 분열하고 설정된 시간만큼 기다린 뒤 다시 5번(32조각) 분열합니다. 참고: 매스가 클 때(~800k)는 분열이 너무 빨리 터지지 않도록 딜레이 슬라이더를 약 850ms로 높여 주세요.</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>네, Auto-Rev가 최선의 방식으로 구현된 것은 아니지만 게임 보안이 너무 강해서 다른 선택지가 없었습니다. 안정적으로 작동하려면 꾸준히 좋은 FPS와 낮은 핑이 필요하며, 다음 조건도 필수입니다:</p><p>대상 셀이 다른 셀이나 화면 가장자리에 가려지지 않고 온전히 보여야 합니다. 게임 설정에서 매스 표시, 스킨, 적 닉네임을 <strong>반드시</strong> 꺼야 오작동을 막을 수 있습니다. 락 중에는 카메라를 고정하고 줌을 하지 마세요.</p><p>참고: ~10ms의 지연이 있지만 Auto-Rev 메커니즘의 독특한 구현 덕분에 향후 게임 업데이트에서도 망가지지 않습니다. 또한 어차피 시간 안에 목표까지 닿지 못하므로 2회 분열(4조각)을 초과해 설정하는 것은 권장하지 않습니다.</p>",
+        noVideo: "동영상을 사용할 수 없습니다",
+        codeLink: "최신 코드"
+      },
+      id: {
+        alert: "<b>Penting:</b> Script ini HANYA berjalan di Google Chrome. Jika Anda memakai Yandex, hapus saja. Script tidak akan bekerja di sana.",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>Fitur ini dibuat terutama untuk bermain multibox: satu sel besar dan satu sel kecil. Pada sel besar, arahkan kursor ke arah trick lalu TEKAN (toggle) Freeze Mouse (atau Line + Freeze Mouse). Jangan ditahan, cukup tekan sekali, kalau tidak sel besar akan membelah ke arah lain.</p><p>Setelah itu pindah ke jendela sel kecil dan tekan tombol bind sesuai massa sel kecil saat ini. Contohnya pada massa ~30k tekan tombol 7 (itu default-nya, bisa Anda ubah sendiri) (Trick 128). Sel kecil langsung membelah 7 kali (128 bagian) ke arah kursor. Bersamaan dengan itu, sel besar di latar belakang membelah 5 kali (32 bagian) mengikuti garis beku, menunggu waktu yang ditentukan (Solo Delay - default 800ms), lalu membelah 5 kali lagi (32 bagian).</p><p>Tepat setelah menekan bind, Anda tinggal menahan tombol feed biasa dari gamenya agar berhasil memberi makan untuk Solo Trick. Hasilnya solo-trick bersih tanpa perlu ganti tab secara manual.</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>Ingin menyalurkan massa secara efektif ke sel lain? Gunakan Fast-Feed. Tekan Freeze Mouse ke arah yang diinginkan lalu tekan bind Fast-Feed. Hanya jendela tempat bind ditekan yang akan membelah.</p><p>Script membelah 5 kali (32 bagian), menunggu waktu yang diatur, lalu membelah 5 kali lagi (32 bagian). P.S. Saat massa besar (~800k), naikkan slider delay ke sekitar 850ms agar pembelahan tidak terpicu terlalu cepat.</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>Ya, Auto-Rev memang tidak dibuat dengan cara paling ideal, tapi kami tidak punya pilihan lain karena gamenya terlalu terlindungi. Agar fitur ini berjalan stabil, Anda harus punya FPS dan ping yang stabil bagus, serta:</p><p>Sel target harus terlihat penuh, tidak tertutup sel lain atau tepi layar. Anda <strong>WAJIB</strong> mematikan tampilan massa, skin, dan nama musuh di pengaturan game, jika tidak akan muncul pemicu palsu. Kamera harus diam, jangan zoom saat sedang lock.</p><p>Catatan: Ada delay ~10ms, tapi berkat implementasi mekanik Auto-Rev yang unik, fitur ini tidak akan rusak pada update game mendatang; tidak disarankan memasang lebih dari dua split (4 bagian), karena Anda memang tidak akan sempat sampai ke target.</p>",
+        noVideo: "Video tidak tersedia",
+        codeLink: "Kode terbaru"
+      },
+      vi: {
+        alert: "<b>Quan trọng:</b> Script này CHỈ hoạt động trên Google Chrome. Nếu bạn đang dùng Yandex, hãy xóa nó đi. Script sẽ không chạy ở đó.",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>Tính năng này chủ yếu dành cho việc chơi multibox: một bóng lớn và một bóng nhỏ. Ở bóng lớn, hãy đưa con trỏ về hướng trick và NHẤN (toggle) Freeze Mouse (hoặc Line + Freeze Mouse). Đừng nhấn giữ mà chỉ bấm một lần, nếu không bóng lớn sẽ tách sang hướng khác.</p><p>Sau đó chuyển sang cửa sổ bóng nhỏ và bấm phím bind phù hợp với khối lượng hiện tại của bóng nhỏ. Ví dụ ở mức ~30k hãy bấm phím 7 (mặc định là phím này, bạn có thể đổi lại) (Trick 128). Bóng nhỏ sẽ tách ngay 7 lần (128 mảnh) về phía con trỏ. Đồng thời, bóng lớn ở tab nền sẽ thực hiện 5 lần tách (32 mảnh) theo đường đã khóa, chờ đúng thời gian đã đặt (Solo Delay - mặc định 800ms) rồi tách thêm 5 lần (32 mảnh).</p><p>Ngay sau khi bấm bind, bạn chỉ cần giữ phím nhả khối lượng thông thường của game để bơm đủ cho Solo Trick. Điều này tạo ra cú solo-trick gọn gàng mà không phải chuyển tab thủ công.</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>Muốn dồn khối lượng hiệu quả sang một bóng khác? Hãy dùng Fast-Feed. Nhấn Freeze Mouse theo hướng mong muốn rồi bấm bind Fast-Feed. Chỉ cửa sổ nơi bạn bấm bind mới thực hiện tách.</p><p>Script tách 5 lần (32 mảnh), chờ theo thời gian đã đặt rồi tách tiếp 5 lần (32 mảnh). P.S. Khi khối lượng lớn (~800k), hãy tăng thanh độ trễ lên khoảng 850ms để bóng không tách quá sớm.</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>Đúng là Auto-Rev chưa được làm theo cách tối ưu nhất, nhưng chúng tôi không có lựa chọn khác vì game được bảo vệ quá kỹ. Để tính năng chạy ổn định, bạn cần có FPS và ping tốt ổn định, đồng thời:</p><p>Bóng mục tiêu phải hiện rõ hoàn toàn, không bị che bởi bóng khác hay mép màn hình. Bạn <strong>BẮT BUỘC</strong> phải tắt hiển thị khối lượng, skin và tên đối thủ trong cài đặt game, nếu không sẽ bị kích hoạt nhầm. Camera phải đứng yên, không zoom khi đang khóa.</p><p>Lưu ý: Có độ trễ ~10ms, nhưng nhờ cách xử lý thú vị của cơ chế Auto-Rev, nó sẽ không bị hỏng trong các bản cập nhật game tương lai; không khuyến nghị đặt quá hai lần tách (4 mảnh), vì đơn giản là bạn sẽ không kịp bay tới mục tiêu.</p>",
+        noVideo: "Video không khả dụng",
+        codeLink: "Mã mới nhất"
+      },
+      th: {
+        alert: "<b>สำคัญ:</b> สคริปต์นี้ทำงานได้เฉพาะบน Google Chrome เท่านั้น หากคุณใช้ Yandex ให้ลบทิ้งไปได้เลย สคริปต์จะไม่ทำงานบนเบราว์เซอร์นั้น",
+        soloTitle: "Solo-Trick",
+        soloDesc: "<p>ฟีเจอร์นี้ทำมาเพื่อการเล่นมัลติบ็อกซ์เป็นหลัก: ลูกใหญ่ 1 ลูกและลูกเล็ก 1 ลูก ในฝั่งลูกใหญ่ให้เลื่อนเคอร์เซอร์ไปทางที่จะทำทริคแล้วกด (toggle) Freeze Mouse (หรือ Line + Freeze Mouse) อย่ากดค้าง ให้กดครั้งเดียว ไม่อย่างนั้นลูกใหญ่จะแตกตัวไปทางอื่น</p><p>จากนั้นสลับไปหน้าต่างที่มีลูกเล็กแล้วกดปุ่มที่ตั้งไว้ให้เหมาะกับมวลปัจจุบันของลูกเล็ก เช่น ที่มวล ~30k ให้กดปุ่ม 7 (ค่าเริ่มต้นคือปุ่มนี้ คุณเปลี่ยนปุ่มเองได้) (Trick 128) ลูกเล็กจะแตกตัวทันที 7 ครั้ง (128 ชิ้น) ไปทางเคอร์เซอร์ พร้อมกันนั้นลูกใหญ่ในพื้นหลังจะแตกตัว 5 ครั้ง (32 ชิ้น) ตามแนวที่ล็อกไว้ รอตามเวลาที่ตั้ง (Solo Delay - ค่าเริ่มต้น 800ms) แล้วแตกตัวอีก 5 ครั้ง (32 ชิ้น)</p><p>หลังกดปุ่มแล้ว คุณแค่กดปุ่มป้อนมวลปกติในเกมค้างไว้เพื่อป้อนให้สำเร็จสำหรับ Solo Trick ทำให้ได้โซโล่ทริคแบบเนียนๆ โดยไม่ต้องสลับแท็บเอง</p>",
+        fastTitle: "Fast-Feed",
+        fastDesc: "<p>อยากส่งมวลเข้าอีกลูกอย่างมีประสิทธิภาพใช่ไหม? ใช้ Fast-Feed เลย กด Freeze Mouse ไปทิศทางที่ต้องการแล้วกดปุ่ม Fast-Feed เฉพาะหน้าต่างที่กดปุ่มเท่านั้นที่จะแตกตัว</p><p>สคริปต์จะแตกตัว 5 ครั้ง (32 ชิ้น) รอตามเวลาที่ตั้งไว้ แล้วแตกตัวอีก 5 ครั้ง (32 ชิ้น) หมายเหตุ: เมื่อมวลเยอะ (~800k) ให้เพิ่มตัวเลื่อนดีเลย์ไปประมาณ 850ms เพื่อไม่ให้การแตกตัวทำงานเร็วเกินไป</p>",
+        autoTitle: "Auto-Rev",
+        autoDesc: "<p>ใช่ Auto-Rev ยังไม่ได้ถูกทำด้วยวิธีที่ดีที่สุด แต่เราไม่มีทางเลือกอื่นเพราะเกมป้องกันแน่นหนาเกินไป เพื่อให้ฟีเจอร์นี้ทำงานเสถียร คุณต้องมี FPS และ Ping ที่ดีอย่างสม่ำเสมอ รวมถึง:</p><p>ลูกเป้าหมายต้องมองเห็นได้เต็มวง ไม่ถูกบังด้วยลูกอื่นหรือขอบจอ คุณ<strong>ต้อง</strong>ปิดการแสดงมวล สกิน และชื่อศัตรูในการตั้งค่าเกม มิฉะนั้นจะเกิดการทำงานผิดพลาด กล้องต้องนิ่ง ห้ามซูมระหว่างล็อกเป้า</p><p>หมายเหตุ: มีดีเลย์ราว ~10ms แต่ด้วยรูปแบบการทำงานที่น่าสนใจของกลไก Auto-Rev มันจะไม่พังเมื่อเกมอัปเดตในอนาคต ไม่แนะนำให้ตั้งเกิน 2 สปลิต (4 ชิ้น) เพราะคุณจะพุ่งไปถึงเป้าหมายไม่ทัน</p>",
+        noVideo: "ไม่มีวิดีโอ",
+        codeLink: "โค้ดล่าสุด"
+      }
+  };
+
+  const s2VnK = k8LmQ.getElementById("lang-select");
+  const a7RmT = k8LmQ.getElementById("alert-box");
+  const q1WxP = k8LmQ.getElementById("t-solo-title");
+  const w3ZnL = k8LmQ.getElementById("t-solo-desc");
+  const e5KpM = k8LmQ.getElementById("t-fast-title");
+  const r9TvB = k8LmQ.getElementById("t-fast-desc");
+  const t2YxC = k8LmQ.getElementById("t-auto-title");
+  const y4HuN = k8LmQ.getElementById("t-auto-desc");
+  const m6QcL = k8LmQ.getElementById("t-code-link");
+  const v8JsM = Object.keys(d4PxN);
+
+  function c6FgW(lang) {
+    const code = v8JsM.indexOf(lang) !== -1 ? lang : "en";
+    const d = d4PxN[code];
+    k8LmQ.documentElement.lang = code;
+    k8LmQ.documentElement.dir = code === "ar" ? "rtl" : "ltr";
+    a7RmT.innerHTML = d.alert;
+    q1WxP.textContent = d.soloTitle;
+    w3ZnL.innerHTML = d.soloDesc;
+    e5KpM.textContent = d.fastTitle;
+    r9TvB.innerHTML = d.fastDesc;
+    t2YxC.textContent = d.autoTitle;
+    y4HuN.innerHTML = d.autoDesc;
+    if (m6QcL) m6QcL.textContent = d.codeLink;
+    s2VnK.value = code;
+    k8LmQ.querySelectorAll(".vid-empty").forEach(el => {
+      el.textContent = d.noVideo + " (" + el.getAttribute("data-file") + ")";
+    });
+  }
+
+  const n3LpQ = ((navigator.languages && navigator.languages[0]) || navigator.language || "en").toLowerCase().slice(0, 2);
+  let p7XrZ = null;
+  try { p7XrZ = localStorage.getItem("mbx_user_lang"); } catch (_) {}
+  if (!p7XrZ || v8JsM.indexOf(p7XrZ) === -1) {
+    p7XrZ = v8JsM.indexOf(n3LpQ) !== -1 ? n3LpQ : "en";
+  }
+  c6FgW(p7XrZ);
+
+  s2VnK.addEventListener("change", function () {
+    const v = this.value;
+    try { localStorage.setItem("mbx_user_lang", v); } catch (_) {}
+    c6FgW(v);
+  });
+
+  ["solo-video", "fast-feed-video", "auto-rev-video"].forEach(id => {
+    const v = k8LmQ.getElementById(id);
+    if (!v) return;
+    v.addEventListener("error", () => {
+      v.style.display = "none";
+      const ph = v.parentElement && v.parentElement.querySelector(".vid-empty");
+      if (ph) ph.style.display = "block";
+    });
+  });
+})(document);
+</script>
+</body>
+</html>
