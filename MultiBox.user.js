@@ -1,15 +1,15 @@
 // ==UserScript==
 // @name         Gota.io Multibox Overlay
 // @namespace    http://tampermonkey.net/
-// @version      0.3.9
+// @version      0.4.0
 // @description  Rev is not Reverse
 // @author       Kuksik & Judex
 // @match        https://gota.io/camlan/*
 // @match        http://gota.io/*
-// @run-at       document-start
-// @grant        none
 // @updateURL    https://raw.githubusercontent.com/kuksikoid/gota-multibox-guide/main/MultiBox.user.js
 // @downloadURL  https://raw.githubusercontent.com/kuksikoid/gota-multibox-guide/main/MultiBox.user.js
+// @run-at       document-start
+// @grant        none
 // ==/UserScript==
 
 (function () {
