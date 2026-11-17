@@ -4840,7 +4840,7 @@
       .macro-num-input::-webkit-outer-spin-button,.macro-num-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
       .macro-btn-group{display:flex;gap:0.4em;align-items:center}
       .macro-bind-btn{min-width:5.5em;background:var(--macro-btn-bg,#242424);border:1px solid var(--macro-btn-border,#383838);color:var(--macro-btn-text,#eee);border-radius:0.35em;padding:0.4em 0.8em;font-size:0.92em;font-family:inherit;cursor:pointer;text-align:center;transition:color 0.28s ease}
-      .macro-bind-btn.recording,.macro-menu-bind-btn.recording{background:#7c3aed !important;border-color:#a78bfa !important;color:#fff !important}
+      .macro-bind-btn.recording,.macro-menu-bind-btn.recording{background:var(--macro-accent,#f2f2f4) !important;border-color:var(--macro-accent,#ffffff) !important;color:var(--macro-accent-text,#111114) !important;box-shadow:0 0 8px var(--macro-accent-muted,rgba(255,255,255,0.28))}
       .macro-rst-btn{background:var(--macro-btn-bg-sub,#1c1c1c);border:1px solid var(--macro-btn-border,#303030);color:var(--macro-btn-muted,#777);border-radius:0.35em;padding:0.4em 0.6em;font-family:inherit;font-size:0.85em;cursor:pointer;transition:color 0.28s ease}
       .macro-sep{height:1px;background:var(--macro-sep,rgba(255,255,255,0.08));margin:0.85em 0;transition:background-color 0.28s ease}
       .macro-chips-container{display:flex;background:var(--macro-btn-bg-sub,#141414);border:1px solid var(--macro-btn-border,#2d2d2d);border-radius:0.35em;padding:0.17em;gap:0.17em;flex:1;max-width:20.8em}
