@@ -973,41 +973,44 @@
   const v8WpM2tL = Math.random().toString(36).substring(2);
   const q5RzL9wK = new BroadcastChannel('gota_multibox_overlay_v2_sync');
 
-  let c7TnW1xP = null;
+  let c7TnW1xP = null, b3SilBuf = null, g8KeepOn = false;
   function p2LxQ8vM() {
     try {
       if (!c7TnW1xP) {
         const aCls = window.AudioContext || window.webkitAudioContext;
         if (!aCls) return;
-        c7TnW1xP = new aCls();
+        try { c7TnW1xP = new aCls({ latencyHint: 'interactive' }); } catch (_) { c7TnW1xP = new aCls(); }
         const osc = c7TnW1xP.createOscillator(), gn = c7TnW1xP.createGain();
-        gn.gain.value = 0.00001;
+        osc.type = 'sine';
+        osc.frequency.value = 25;
+        gn.gain.value = 0.002;
         osc.connect(gn); gn.connect(c7TnW1xP.destination); osc.start();
+        b3SilBuf = c7TnW1xP.createBuffer(1, 128, c7TnW1xP.sampleRate);
+        c7TnW1xP.onstatechange = () => {
+          if (c7TnW1xP && c7TnW1xP.state === 'suspended' && g8KeepOn) {
+            c7TnW1xP.resume().catch(() => {});
+          }
+        };
       }
-      if (c7TnW1xP.state === 'suspended') c7TnW1xP.resume();
+      g8KeepOn = true;
+      if (c7TnW1xP.state === 'suspended') c7TnW1xP.resume().catch(() => {});
     } catch (e) {}
   }
-  ['keydown', 'pointerdown', 'focus'].forEach(ev => window.addEventListener(ev, p2LxQ8vM, { passive: true }));
+  ['keydown', 'pointerdown', 'mousedown', 'touchstart', 'focus'].forEach(ev => window.addEventListener(ev, p2LxQ8vM, { passive: true, capture: true }));
+  document.addEventListener('visibilitychange', () => { if (g8KeepOn) p2LxQ8vM(); }, { passive: true });
 
   const g6VwN3tK = new Worker(URL.createObjectURL(new Blob([`
       let hB=null;
       self.onmessage=e=>{
         const m=e.data;
-        if(m.type==='delay') setTimeout(()=>self.postMessage({type:'task',id:m.id}),m.delay);
-        else if(m.type==='startHeartbeat'){ if(!hB) hB=setInterval(()=>self.postMessage({type:'pulse'}),m.interval||30); }
+        if(m.type==='startHeartbeat'){ if(!hB) hB=setInterval(()=>self.postMessage({type:'pulse'}),m.interval||30); }
         else if(m.type==='stopHeartbeat'){ if(hB){ clearInterval(hB); hB=null; } }
       };
     `], { type: 'application/javascript' })));
 
-  let d9TvL5xQ = 0;
-  const s4XmP8wR = new Map();
-
   g6VwN3tK.onmessage = function (e) {
     const m = e.data;
-    if (m.type === 'task') {
-      const cb = s4XmP8wR.get(m.id);
-      if (cb) { s4XmP8wR.delete(m.id); cb(); }
-    } else if (m.type === 'pulse') {
+    if (m.type === 'pulse') {
       if (!k4FeedLock && hSt2xK9m && (!document.hasFocus() || document.hidden)) {
         hEv2xK9m(hSt2xK9m, hSt2xK9m.kind === 'key' ? 'keydown' : 'mousedown');
       }
@@ -1019,12 +1022,6 @@
   };
   g6VwN3tK.postMessage({ type: 'startHeartbeat', interval: 30 });
 
-  function n7KwQ2vL(ms, cb) {
-    const id = ++d9TvL5xQ;
-    s4XmP8wR.set(id, cb);
-    g6VwN3tK.postMessage({ type: 'delay', id, delay: ms });
-  }
-
   const f2QpL8xN = new Worker(URL.createObjectURL(new Blob([`
       const q=new Map();
       let t=null;
@@ -1034,16 +1031,17 @@
         let m=Infinity;
         q.forEach((e,i)=>{
           const r=e-n;
-          if(r<=1.5){ q.delete(i); self.postMessage(i); }
+          if(r<=2.5){ q.delete(i); self.postMessage(i); }
           else if(r<m) m=r;
         });
-        if(q.size) t=setTimeout(p,m>20?m-12:(m>6?4:1));
+        if(q.size) t=setTimeout(p,Math.max(1,Math.ceil(m)));
       }
       self.onmessage=e=>{
         const d=e.data;
-        q.set(d.i,performance.now()+d.w);
+        if(d.c){ q.delete(d.c); }
+        else { q.set(d.i,performance.now()+d.w); }
         if(t!==null){ clearTimeout(t); t=null; }
-        p();
+        if(q.size) p();
       };
     `], { type: 'application/javascript' })));
 
@@ -1052,18 +1050,82 @@
 
   f2QpL8xN.onmessage = function (e) {
     const cb = k8VpT4sQ.get(e.data);
-    if (cb) {
-      k8VpT4sQ.delete(e.data);
-      cb();
-    }
+    if (cb) cb();
   };
 
-  function z7PxM4wK(ms, cb) {
+  function k7RunDelay(ms, cb, minMs) {
     p2LxQ8vM();
+    const w = Math.max(minMs || 1, Number(ms) || 0);
     const i = ++x6RnL3wM;
-    const w = Math.max(50, Number(ms) || 800);
-    k8VpT4sQ.set(i, cb);
+    const tgt = performance.now() + w;
+    let done = false;
+    let aSrc = null;
+
+    function cln() {
+      k8VpT4sQ.delete(i);
+      f2QpL8xN.postMessage({ c: i });
+      if (aSrc) {
+        const s = aSrc;
+        aSrc = null;
+        try { s.onended = null; s.stop(0); s.disconnect(); } catch (_) {}
+      }
+    }
+
+    function armAudio(remMs) {
+      if (done || aSrc || !c7TnW1xP || c7TnW1xP.state !== 'running' || !b3SilBuf) return;
+      try {
+        const s = c7TnW1xP.createBufferSource();
+        s.buffer = b3SilBuf;
+        s.loop = true;
+        s.connect(c7TnW1xP.destination);
+        aSrc = s;
+        s.onended = () => {
+          if (aSrc === s) aSrc = null;
+          try { s.disconnect(); } catch (_) {}
+          if (!done) chk();
+        };
+        s.start(0);
+        s.stop(c7TnW1xP.currentTime + Math.max(0.001, (remMs + 2.5) / 1000));
+      } catch (_) { aSrc = null; }
+    }
+
+    function chk() {
+      if (done) return;
+      const rem = tgt - performance.now();
+      if (rem <= 2.0) {
+        done = true;
+        cln();
+        cb();
+        return;
+      }
+      f2QpL8xN.postMessage({ i, w: rem });
+      armAudio(rem);
+    }
+
+    k8VpT4sQ.set(i, chk);
     f2QpL8xN.postMessage({ i, w });
+    armAudio(w);
+    if (c7TnW1xP && c7TnW1xP.state === 'suspended') {
+      c7TnW1xP.resume().then(() => {
+        if (!done && !aSrc) {
+          const r = tgt - performance.now();
+          if (r <= 2.0) chk();
+          else armAudio(r);
+        }
+      }).catch(() => {});
+    }
+  }
+
+  function n7KwQ2vL(ms, cb) {
+    k7RunDelay(Math.max(50, Number(ms) || 800), cb, 50);
+  }
+
+  function z7PxM4wK(ms, cb) {
+    k7RunDelay(Math.max(50, Number(ms) || 800), cb, 50);
+  }
+
+  function d2TinyWait(ms, cb) {
+    k7RunDelay(Math.max(1, Number(ms) || 1), cb, 1);
   }
 
   const u9PxL2wT = new Set();
@@ -1092,7 +1154,8 @@
     box2Id: '',
     activeId: '',
     activeBox: 0,
-    matchGen: 0
+    matchGen: 0,
+    swSeq: 0
   };
 
   const v5PeerMap = new Map();
@@ -1322,12 +1385,10 @@
     }
     const el = g4PidEl();
     let done = false;
-    let tm = null;
     let ob = null;
     const fin = ok => {
       if (done) return;
       done = true;
-      if (tm) clearTimeout(tm);
       if (ob) ob.disconnect();
       u2SyncPidState();
       cb(ok, m9MbSt.activeId);
@@ -1338,14 +1399,14 @@
       });
       ob.observe(el, { childList: true, characterData: true, subtree: true });
     }
-    tm = setTimeout(() => fin(g5ReadPid() !== prevId), maxMs);
+    d2TinyWait(maxMs, () => fin(g5ReadPid() !== prevId));
   }
 
   function h4HasPeerTab() {
     const nw = performance.now();
     let alive = false;
     v5PeerMap.forEach((ts, id) => {
-      if (nw - ts > 2600) v5PeerMap.delete(id);
+      if (nw - ts > 10000) v5PeerMap.delete(id);
       else alive = true;
     });
     return alive;
@@ -1435,9 +1496,11 @@
   setInterval(v5PingPeers, 1000);
   window.addEventListener('focus', v5PingPeers, { passive: true });
   document.addEventListener('visibilitychange', v5PingPeers, { passive: true });
-  window.addEventListener('pagehide', () => {
+  const f4ByePeer = () => {
     try { q5RzL9wK.postMessage({ type: 'MB_BYE', senderId: v8WpM2tL }); } catch (_) {}
-  });
+  };
+  window.addEventListener('pagehide', f4ByePeer);
+  window.addEventListener('beforeunload', f4ByePeer);
   v5PingPeers();
 
   let k4FeedLock = false;
@@ -1448,6 +1511,7 @@
     const tg = e.target, tn = tg && tg.tagName ? tg.tagName.toLowerCase() : '';
     if ((tn === 'input' && tg.type !== 'checkbox') || tn === 'textarea' || (tg && tg.isContentEditable)) return;
     const kc = e.keyCode || e.which || 0;
+    if (!e.repeat && g2BindTbl.sw > 5 && kc === g2BindTbl.sw) m9MbSt.swSeq++;
     if (g2BindTbl.ej > 5 && kc === g2BindTbl.ej) {
       m4EjPhys.down = true;
       m4EjPhys.kc = kc;
@@ -1464,6 +1528,7 @@
     if (!e.isTrusted) return;
     const tg = e.target;
     if (tg && tg.closest && tg.closest('#macro-window, #macro-toggle-pill, #chat-container, #chat-panel, .chat-panel, button, a, select, #main-panel, #login-panel, #party-panel')) return;
+    if (g2BindTbl.sw >= 1 && g2BindTbl.sw <= 5 && e.button === g4KcMeta(g2BindTbl.sw).btn) m9MbSt.swSeq++;
     if (g2BindTbl.ej >= 1 && g2BindTbl.ej <= 5 && e.button === g4KcMeta(g2BindTbl.ej).btn) {
       m4EjPhys.down = true;
       m4EjPhys.kc = g2BindTbl.ej;
@@ -1550,9 +1615,18 @@
     return Boolean(el && el.checked);
   }
 
+  function g5ReadPingMs() {
+    const el = g4PidEl();
+    const box = el && el.parentElement && el.parentElement.parentElement ? el.parentElement.parentElement : null;
+    if (!box) return 0;
+    const m = (box.textContent || '').match(/Ping\s*:\s*(\d+)/i);
+    return m ? (parseInt(m[1], 10) || 0) : 0;
+  }
+
   function k4MbFastFeed(delayMs, onDone) {
     const mbInit = !h4HasPeerTab() && m4IsMbOn();
     const startId = mbInit ? g5ReadPid() : '';
+    const startSw = m9MbSt.swSeq;
     const runGen = m9MbSt.matchGen;
     s7PzR(5);
     z7PxM4wK(delayMs, () => {
@@ -1561,11 +1635,13 @@
           if (onDone) onDone();
           return;
         }
-        if (!h4HasPeerTab() && m4IsMbOn() && startId && startId !== '0' && g2BindTbl.sw > 0) {
+        if (!h4HasPeerTab() && m4IsMbOn() && g2BindTbl.sw > 0) {
           const curId = g5ReadPid();
-          if (curId && curId !== '0' && curId !== startId) {
+          const swDelta = (m9MbSt.swSeq - startSw) & 1;
+          const pidSwitched = Boolean(startId && startId !== '0' && curId && curId !== '0' && curId !== startId && m9MbSt.swSeq !== startSw);
+          if (swDelta === 1 || pidSwitched) {
             if (k4MbBusy && tries < 16) {
-              setTimeout(() => runSecond(tries + 1), 15);
+              d2TinyWait(15, () => runSecond(tries + 1));
               return;
             }
             const hudHid = m4HudHidden();
@@ -1573,18 +1649,17 @@
             w5SetMbBusy(true);
             if (hadFeed) { k4FeedLock = true; m4SendEj(false); }
             w5PzR8tM(g2BindTbl.sw, 1);
-            w3WaitPidFlip(curId, hudHid ? 35 : 120, ok => {
-              if (m9MbSt.matchGen !== runGen || (!ok && !hudHid)) {
+            w3WaitPidFlip(curId, hudHid ? 35 : 45, () => {
+              if (m9MbSt.matchGen !== runGen) {
                 k4FeedLock = false;
                 w5SetMbBusy(false);
-                if (m9MbSt.matchGen === runGen && (Boolean(hSt2xK9m) || m4EjPhys.down)) m4SendEj(true);
                 if (onDone) onDone();
                 return;
               }
               if (Boolean(hSt2xK9m) || m4EjPhys.down) { k4FeedLock = true; m4SendEj(false); }
               s7PzR(5);
               const backFrom = g5ReadPid();
-              setTimeout(() => {
+              d2TinyWait(25, () => {
                 if (m9MbSt.matchGen !== runGen) {
                   k4FeedLock = false;
                   w5SetMbBusy(false);
@@ -1592,13 +1667,13 @@
                   return;
                 }
                 w5PzR8tM(g2BindTbl.sw, 1);
-                w3WaitPidFlip(backFrom, hudHid ? 35 : 120, () => {
+                w3WaitPidFlip(backFrom, hudHid ? 35 : 45, () => {
                   k4FeedLock = false;
                   w5SetMbBusy(false);
                   if (m9MbSt.matchGen === runGen && (Boolean(hSt2xK9m) || m4EjPhys.down)) m4SendEj(true);
                   if (onDone) onDone();
                 });
-              }, 25);
+              });
             });
             return;
           }
@@ -1618,15 +1693,16 @@
     }
     const runGen = m9MbSt.matchGen;
     const hudHid = m4HudHidden();
+    const allowNoAck = hudHid || Boolean(m9MbSt.box2Id) || g5ReadPingMs() >= 45;
     w5SetMbBusy(true);
     u2SyncPidState();
     const stId = m9MbSt.activeId;
     const hadFeed1 = Boolean(hSt2xK9m) || m4EjPhys.down;
     if (hadFeed1) { k4FeedLock = true; m4SendEj(false); }
     w5PzR8tM(g2BindTbl.sw, 1);
-    w3WaitPidFlip(stId, hudHid ? 35 : 120, (ok1, curId) => {
+    w3WaitPidFlip(stId, hudHid ? 35 : 45, (ok1, curId) => {
       m9MbSt.lastTrace = 'st=' + stId + ' cur=' + curId + ' ok1=' + ok1 + ' sw=' + g2BindTbl.sw;
-      if (m9MbSt.matchGen !== runGen || (!ok1 && !hudHid && stId && stId !== '0')) {
+      if (m9MbSt.matchGen !== runGen || (!ok1 && !allowNoAck && stId && stId !== '0')) {
         k4FeedLock = false;
         w5SetMbBusy(false);
         if (m9MbSt.matchGen === runGen) {
@@ -1637,26 +1713,26 @@
       }
       if (Boolean(hSt2xK9m) || m4EjPhys.down) { k4FeedLock = true; m4SendEj(false); }
       s7PzR(5);
-      setTimeout(() => {
+      d2TinyWait(25, () => {
         if (m9MbSt.matchGen !== runGen) {
           k4FeedLock = false;
           w5SetMbBusy(false);
           return;
         }
         w5PzR8tM(g2BindTbl.sw, 1);
-        w3WaitPidFlip(curId, hudHid ? 35 : 120, () => {
+        w3WaitPidFlip(curId, hudHid ? 35 : 45, () => {
           k4FeedLock = false;
           w5SetMbBusy(false);
           if (m9MbSt.matchGen !== runGen) return;
           if (Boolean(hSt2xK9m) || m4EjPhys.down) m4SendEj(true);
           s7PzR(spCnt);
         });
-      }, 25);
+      });
       n7KwQ2vL(m9TvL2sP.soloDelay, () => {
         function runStep2(tries) {
           if (m9MbSt.matchGen !== runGen || !m4IsMbOn() || h4HasPeerTab()) return;
           if (k4MbBusy) {
-            if (tries < 16) setTimeout(() => runStep2(tries + 1), 15);
+            if (tries < 16) d2TinyWait(15, () => runStep2(tries + 1));
             return;
           }
           u2SyncPidState();
@@ -1664,12 +1740,13 @@
           if (!nowId || nowId === '0') return;
           if (nowId === stId) {
             const hudHid2 = m4HudHidden();
+            const allowNoAck2 = hudHid2 || Boolean(m9MbSt.box2Id) || g5ReadPingMs() >= 45;
             const hadFeed2 = Boolean(hSt2xK9m) || m4EjPhys.down;
             w5SetMbBusy(true);
             if (hadFeed2) { k4FeedLock = true; m4SendEj(false); }
             w5PzR8tM(g2BindTbl.sw, 1);
-            w3WaitPidFlip(nowId, hudHid2 ? 35 : 120, ok2 => {
-              if (m9MbSt.matchGen !== runGen || (!ok2 && !hudHid2)) {
+            w3WaitPidFlip(nowId, hudHid2 ? 35 : 45, ok2 => {
+              if (m9MbSt.matchGen !== runGen || (!ok2 && !allowNoAck2)) {
                 k4FeedLock = false;
                 w5SetMbBusy(false);
                 if (m9MbSt.matchGen === runGen && (Boolean(hSt2xK9m) || m4EjPhys.down)) m4SendEj(true);
@@ -1678,19 +1755,19 @@
               if (Boolean(hSt2xK9m) || m4EjPhys.down) { k4FeedLock = true; m4SendEj(false); }
               s7PzR(5);
               const b2Id = g5ReadPid();
-              setTimeout(() => {
+              d2TinyWait(25, () => {
                 if (m9MbSt.matchGen !== runGen) {
                   k4FeedLock = false;
                   w5SetMbBusy(false);
                   return;
                 }
                 w5PzR8tM(g2BindTbl.sw, 1);
-                w3WaitPidFlip(b2Id, hudHid2 ? 35 : 120, () => {
+                w3WaitPidFlip(b2Id, hudHid2 ? 35 : 45, () => {
                   k4FeedLock = false;
                   w5SetMbBusy(false);
                   if (m9MbSt.matchGen === runGen && (Boolean(hSt2xK9m) || m4EjPhys.down)) m4SendEj(true);
                 });
-              }, 25);
+              });
             });
           } else if (nowId !== stId) {
             s7PzR(5);
