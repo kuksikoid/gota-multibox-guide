@@ -406,6 +406,7 @@
     mapBgEnabled: false, fixedBackgroundEnabled: false,
     mapBgSrc: null, fixedBgSrc: null,
     plexusEnabled: true, syncScale: false,
+    selectableText: false,
     menuColor: null, buttonsColor: null, plexusColor: null,
     lang: 'en'
   };
@@ -512,7 +513,7 @@
       cull: 'Frustum Culling', filt: 'Strip Heavy Filters', marg: 'Cull Margin', secBg: 'MAP & BACKGROUND',
       tipBg: 'When Fixed Background is enabled, Map Background is disabled and turns gray until Fixed mode is turned off. You MUST enable custom background during the game itself to avoid crash risks.',
       mapBg: 'Map Background', fixBg: 'Fixed Background', fFile: 'File', fUrl: 'URL',
-      promptUrl: 'Enter image, video or color:', secMisc: 'MISC', fixFeed: 'Fix Feed Button',
+      promptUrl: 'Enter image, video or color:', secMisc: 'MISC', fixFeed: 'Fix Feed Button', selTxt: 'Selectable Text',
       secName: 'NAME CHANGER', skinSt: 'Skin Stealer', nameSt: 'Name / Skin Stealer',
       custSw: 'Custom Nick / Skin Switcher', menuBind: 'Menu Bind', rst: 'Reset', none: 'None',
       rstAll: 'Reset to Default', tut: 'Tutorial & Guide', secIf: 'INTERFACE', geo: 'Geometric Effect',
@@ -529,7 +530,7 @@
       cull: 'Отсечение за экраном', filt: 'Убрать тяжёлые фильтры', marg: 'Отступ отсечения', secBg: 'КАРТА И ФОН',
       tipBg: 'Когда включён статичный фон, фон карты отключается и становится серым до выключения статичного режима. Кастомный фон ОБЯЗАТЕЛЬНО нужно включать во время самой игры, чтобы исключить риски краша.',
       mapBg: 'Фон карты', fixBg: 'Статичный фон', fFile: 'Файл', fUrl: 'URL',
-      promptUrl: 'Введите ссылку на картинку, видео или цвет:', secMisc: 'ПРОЧЕЕ', fixFeed: 'Фикс кнопки фида',
+      promptUrl: 'Введите ссылку на картинку, видео или цвет:', secMisc: 'ПРОЧЕЕ', fixFeed: 'Фикс кнопки фида', selTxt: 'Выделение текста',
       secName: 'СМЕНА НИКА', skinSt: 'Стиллер скина', nameSt: 'Стиллер ника / скина',
       custSw: 'Свои ники / скины', menuBind: 'Бинд меню', rst: 'Сброс', none: 'Нет',
       rstAll: 'Сбросить всё', tut: 'Гайд и обучение', secIf: 'ИНТЕРФЕЙС', geo: 'Геометрический эффект',
@@ -546,7 +547,7 @@
       cull: 'Відсікання за екраном', filt: 'Прибрати важкі фільтри', marg: 'Запас відсікання', secBg: 'МАПА ТА ФОН',
       tipBg: 'Коли увімкнено фіксований фон, фон мапи вимикається та стає сірим до вимкнення фіксованого режиму. Кастомний фон ОБОВ’ЯЗКОВО потрібно вмикати під час самої гри, щоб виключити ризик крашу.',
       mapBg: 'Фон мапи', fixBg: 'Фіксований фон', fFile: 'Файл', fUrl: 'URL',
-      promptUrl: 'Введіть посилання на зображення, відео або колір:', secMisc: 'ІНШЕ', fixFeed: 'Фікс кнопки фіду',
+      promptUrl: 'Введіть посилання на зображення, відео або колір:', secMisc: 'ІНШЕ', fixFeed: 'Фікс кнопки фіду', selTxt: 'Виділення тексту',
       secName: 'ЗМІНА НІКУ', skinSt: 'Стілер скіна', nameSt: 'Стілер ніку / скіна',
       custSw: 'Свої ніки / скіни', menuBind: 'Бінд меню', rst: 'Скинути', none: 'Немає',
       rstAll: 'Скинути все', tut: 'Гайд та навчання', secIf: 'ІНТЕРФЕЙС', geo: 'Геометричний ефект',
@@ -562,7 +563,7 @@
       cull: 'Recorte fuera de pantalla', filt: 'Quitar filtros pesados', marg: 'Margen de recorte', secBg: 'MAPA Y FONDO',
       tipBg: 'Cuando el fondo fijo está activo, el fondo del mapa se desactiva y se vuelve gris hasta apagar el modo fijo. Es OBLIGATORIO activar el fondo personalizado durante la partida para evitar riesgos de cierre.',
       mapBg: 'Fondo del mapa', fixBg: 'Fondo fijo', fFile: 'Archivo', fUrl: 'URL',
-      promptUrl: 'Introduce imagen, vídeo o color:', secMisc: 'VARIOS', fixFeed: 'Fix botón de feed',
+      promptUrl: 'Introduce imagen, vídeo o color:', secMisc: 'VARIOS', fixFeed: 'Fix botón de feed', selTxt: 'Texto seleccionable',
       secName: 'CAMBIO DE NOMBRE', skinSt: 'Robar skin', nameSt: 'Robar nombre / skin',
       custSw: 'Nombres / skins propios', menuBind: 'Tecla menú', rst: 'Reset', none: 'Ninguno',
       rstAll: 'Restablecer todo', tut: 'Tutorial y guía', secIf: 'INTERFAZ', geo: 'Efecto geométrico',
@@ -578,7 +579,7 @@
       cull: 'Recorte fora da tela', filt: 'Remover filtros pesados', marg: 'Margem de recorte', secBg: 'MAPA E FUNDO',
       tipBg: 'Quando o fundo fixo está ativado, o fundo do mapa é desativado e fica cinza até desligar o modo fixo. É OBRIGATÓRIO ativar o fundo personalizado durante a partida para evitar riscos de crash.',
       mapBg: 'Fundo do mapa', fixBg: 'Fundo fixo', fFile: 'Arquivo', fUrl: 'URL',
-      promptUrl: 'Insira imagem, vídeo ou cor:', secMisc: 'OUTROS', fixFeed: 'Corrigir botão feed',
+      promptUrl: 'Insira imagem, vídeo ou cor:', secMisc: 'OUTROS', fixFeed: 'Corrigir botão feed', selTxt: 'Texto selecionável',
       secName: 'TROCA DE NOME', skinSt: 'Roubar skin', nameSt: 'Roubar nome / skin',
       custSw: 'Nomes / skins próprios', menuBind: 'Tecla do menu', rst: 'Reset', none: 'Nenhum',
       rstAll: 'Restaurar padrão', tut: 'Tutorial e guia', secIf: 'INTERFACE', geo: 'Efeito geométrico',
@@ -594,7 +595,7 @@
       cull: 'Masquage hors écran', filt: 'Retirer filtres lourds', marg: 'Marge de rendu', secBg: 'CARTE & FOND',
       tipBg: 'Lorsque le fond fixe est activé, le fond de carte est désactivé et grisé jusqu’à la désactivation du mode fixe. Vous DEVEZ activer le fond personnalisé pendant la partie pour éviter tout risque de crash.',
       mapBg: 'Fond de carte', fixBg: 'Fond fixe', fFile: 'Fichier', fUrl: 'URL',
-      promptUrl: 'Entrez une image, vidéo ou couleur :', secMisc: 'DIVERS', fixFeed: 'Fix bouton feed',
+      promptUrl: 'Entrez une image, vidéo ou couleur :', secMisc: 'DIVERS', fixFeed: 'Fix bouton feed', selTxt: 'Texte sélectionnable',
       secName: 'CHANGEUR DE PSEUDO', skinSt: 'Voleur de skin', nameSt: 'Voleur pseudo / skin',
       custSw: 'Pseudos / skins perso', menuBind: 'Touche menu', rst: 'Reset', none: 'Aucun',
       rstAll: 'Réinitialiser', tut: 'Tutoriel & guide', secIf: 'INTERFACE', geo: 'Effet géométrique',
@@ -610,7 +611,7 @@
       cull: 'Ausblendung außerhalb', filt: 'Schwere Filter entfernen', marg: 'Sicht-Puffer', secBg: 'KARTE & HINTERGRUND',
       tipBg: 'Wenn der feste Hintergrund aktiv ist, wird der Kartenhintergrund deaktiviert und ausgegraut, bis der feste Modus aus ist. Der eigene Hintergrund MUSS zwingend während des Spiels eingeschaltet werden, um Abstürze zu vermeiden.',
       mapBg: 'Kartenhintergrund', fixBg: 'Fester Hintergrund', fFile: 'Datei', fUrl: 'URL',
-      promptUrl: 'Bild, Video oder Farbe eingeben:', secMisc: 'SONSTIGES', fixFeed: 'Feed-Taste fixen',
+      promptUrl: 'Bild, Video oder Farbe eingeben:', secMisc: 'SONSTIGES', fixFeed: 'Feed-Taste fixen', selTxt: 'Wählbarer Text',
       secName: 'NAMENSWECHSLER', skinSt: 'Skin-Stealer', nameSt: 'Name / Skin Stealer',
       custSw: 'Eigene Namen / Skins', menuBind: 'Menü-Taste', rst: 'Reset', none: 'Keine',
       rstAll: 'Zurücksetzen', tut: 'Anleitung & Guide', secIf: 'OBERFLÄCHE', geo: 'Geometrie-Effekt',
@@ -626,7 +627,7 @@
       cull: 'Taglio fuori schermo', filt: 'Rimuovi filtri pesanti', marg: 'Margine di taglio', secBg: 'MAPPA E SFONDO',
       tipBg: 'Quando lo sfondo fisso è attivo, lo sfondo della mappa si disattiva e diventa grigio finché non disattivi la modalità fissa. Lo sfondo personalizzato va attivato OBBLIGATORIAMENTE durante la partita per evitare crash.',
       mapBg: 'Sfondo mappa', fixBg: 'Sfondo fisso', fFile: 'File', fUrl: 'URL',
-      promptUrl: 'Inserisci immagine, video o colore:', secMisc: 'VARIE', fixFeed: 'Fix tasto feed',
+      promptUrl: 'Inserisci immagine, video o colore:', secMisc: 'VARIE', fixFeed: 'Fix tasto feed', selTxt: 'Testo selezionabile',
       secName: 'CAMBIO NOME', skinSt: 'Ruba skin', nameSt: 'Ruba nome / skin',
       custSw: 'Nomi / skin personalizzati', menuBind: 'Tasto menu', rst: 'Reset', none: 'Nessuno',
       rstAll: 'Ripristina tutto', tut: 'Tutorial e guida', secIf: 'INTERFACCIA', geo: 'Effetto geometrico',
@@ -642,7 +643,7 @@
       cull: 'Odcinanie poza ekranem', filt: 'Usuń ciężkie filtry', marg: 'Margines odcinania', secBg: 'MAPA I TŁO',
       tipBg: 'Gdy stałe tło jest włączone, tło mapy jest wyłączone i wyszarzone do czasu wyłączenia trybu stałego. Własne tło NALEŻY włączać podczas samej gry, aby uniknąć ryzyka crasha.',
       mapBg: 'Tło mapy', fixBg: 'Stałe tło', fFile: 'Plik', fUrl: 'URL',
-      promptUrl: 'Podaj link do obrazu, wideo lub kolor:', secMisc: 'RÓŻNE', fixFeed: 'Fix przycisku feed',
+      promptUrl: 'Podaj link do obrazu, wideo lub kolor:', secMisc: 'RÓŻNE', fixFeed: 'Fix przycisku feed', selTxt: 'Zaznaczanie tekstu',
       secName: 'ZMIANA NICKU', skinSt: 'Kradzież skina', nameSt: 'Kradzież nicku / skina',
       custSw: 'Własne nicki / skiny', menuBind: 'Klawisz menu', rst: 'Reset', none: 'Brak',
       rstAll: 'Przywróć domyślne', tut: 'Poradnik i instrukcja', secIf: 'INTERFEJS', geo: 'Efekt geometryczny',
@@ -658,7 +659,7 @@
       cull: 'Buiten scherm verbergen', filt: 'Zware filters strippen', marg: 'Verberg-marge', secBg: 'KAART & ACHTERGROND',
       tipBg: 'Wanneer vaste achtergrond is ingeschakeld, is de kaartachtergrond uitgeschakeld en grijs totdat vaste modus wordt uitgezet. Aangepaste achtergrond MOET tijdens het spelen worden ingeschakeld om crashrisico te voorkomen.',
       mapBg: 'Kaartachtergrond', fixBg: 'Vaste achtergrond', fFile: 'Bestand', fUrl: 'URL',
-      promptUrl: 'Voer afbeelding, video of kleur in:', secMisc: 'OVERIG', fixFeed: 'Fix feed-knop',
+      promptUrl: 'Voer afbeelding, video of kleur in:', secMisc: 'OVERIG', fixFeed: 'Fix feed-knop', selTxt: 'Selecteerbare tekst',
       secName: 'NAAMWISSELAAR', skinSt: 'Skin steler', nameSt: 'Naam / Skin steler',
       custSw: 'Eigen namen / skins', menuBind: 'Menu toets', rst: 'Reset', none: 'Geen',
       rstAll: 'Standaard herstellen', tut: 'Handleiding & gids', secIf: 'INTERFACE', geo: 'Geometrisch effect',
@@ -674,7 +675,7 @@
       cull: 'Ascundere în afara ecranului', filt: 'Elimină filtrele grele', marg: 'Marjă randare', secBg: 'HARTĂ ȘI FUNDAL',
       tipBg: 'Când fundalul fix este activ, fundalul hărții este dezactivat și devine gri până la oprirea modului fix. Fundalul personalizat TREBUIE activat în timpul jocului pentru a evita riscul de crash.',
       mapBg: 'Fundal hartă', fixBg: 'Fundal fix', fFile: 'Fișier', fUrl: 'URL',
-      promptUrl: 'Introdu imagine, video sau culoare:', secMisc: 'DIVERSE', fixFeed: 'Fix buton feed',
+      promptUrl: 'Introdu imagine, video sau culoare:', secMisc: 'DIVERSE', fixFeed: 'Fix buton feed', selTxt: 'Text selectabil',
       secName: 'SCHIMBARE NUME', skinSt: 'Furt skin', nameSt: 'Furt nume / skin',
       custSw: 'Nume / skin-uri proprii', menuBind: 'Tastă meniu', rst: 'Reset', none: 'Nimic',
       rstAll: 'Resetează tot', tut: 'Tutorial și ghid', secIf: 'INTERFAȚĂ', geo: 'Efect geometric',
@@ -690,7 +691,7 @@
       cull: 'Ekran Dışı Gizleme', filt: 'Ağır Filtreleri Kaldır', marg: 'Görüş Payı', secBg: 'HARİTA VE ARKA PLAN',
       tipBg: 'Sabit Arka Plan etkinken Harita Arka Planı devre dışı kalır ve sabit mod kapatılana kadar gri görünür. Çökme riskini önlemek için özel arka planı MUTLAKA oyun içindeyken açın.',
       mapBg: 'Harita Arka Planı', fixBg: 'Sabit Arka Plan', fFile: 'Dosya', fUrl: 'URL',
-      promptUrl: 'Resim, video veya renk girin:', secMisc: 'DİĞER', fixFeed: 'Feed Tuşu Düzeltme',
+      promptUrl: 'Resim, video veya renk girin:', secMisc: 'DİĞER', fixFeed: 'Feed Tuşu Düzeltme', selTxt: 'Seçilebilir Metin',
       secName: 'İSİM DEĞİŞTİRİCİ', skinSt: 'Skin Çalıcı', nameSt: 'İsim / Skin Çalıcı',
       custSw: 'Özel İsim / Skin', menuBind: 'Menü Tuşu', rst: 'Sıfırla', none: 'Yok',
       rstAll: 'Varsayılana Sıfırla', tut: 'Rehber ve Öğretici', secIf: 'ARAYÜZ', geo: 'Geometrik Efekt',
@@ -706,7 +707,7 @@
       cull: 'إخفاء خارج الشاشة', filt: 'إزالة الفلاتر الثقيلة', marg: 'هامش الإخفاء', secBg: 'الخريطة والخلفية',
       tipBg: 'عند تفعيل الخلفية الثابتة يتم تعطيل خلفية الخريطة وتتحول للرمادي حتى إيقاف الوضع الثابت. يجب تفعيل الخلفية المخصصة أثناء اللعب الفعلي داخل الخريطة فقط لتجنب خطر الانهيار.',
       mapBg: 'خلفية الخريطة', fixBg: 'خلفية ثابتة', fFile: 'ملف', fUrl: 'رابط',
-      promptUrl: 'أدخل رابط صورة أو فيديو أو لون:', secMisc: 'متنوع', fixFeed: 'إصلاح زر الإطعام',
+      promptUrl: 'أدخل رابط صورة أو فيديو أو لون:', secMisc: 'متنوع', fixFeed: 'إصلاح زر الإطعام', selTxt: 'تحديد النص',
       secName: 'تغيير الاسم', skinSt: 'سارق السكن', nameSt: 'سارق الاسم / السكن',
       custSw: 'تبديل أسماء / سكينات', menuBind: 'زر القائمة', rst: 'إعادة', none: 'لا شيء',
       rstAll: 'استعادة الافتراضي', tut: 'الشرح والدليل', secIf: 'الواجهة', geo: 'تأثير هندسي',
@@ -722,7 +723,7 @@
       cull: 'स्क्रीन के बाहर छिपाएँ', filt: 'भारी फ़िल्टर हटाएँ', marg: 'छिपाने की सीमा', secBg: 'मैप और बैकग्राउंड',
       tipBg: 'फिक्स्ड बैकग्राउंड चालू होने पर मैप बैकग्राउंड बंद और ग्रे हो जाता है, और बंद करने पर फिर काम करता है। क्रैश से बचने के लिए कस्टम बैकग्राउंड को केवल गेम के दौरान ही चालू करना अनिवार्य है।',
       mapBg: 'मैप बैकग्राउंड', fixBg: 'फिक्स्ड बैकग्राउंड', fFile: 'फ़ाइल', fUrl: 'URL',
-      promptUrl: 'इमेज, वीडियो या रंग दर्ज करें:', secMisc: 'अन्य', fixFeed: 'फ़ीड बटन फ़िक्स',
+      promptUrl: 'इमेज, वीडियो या रंग दर्ज करें:', secMisc: 'अन्य', fixFeed: 'फ़ीड बटन फ़िक्स', selTxt: 'चयन योग्य टेक्स्ट',
       secName: 'नेम चेंजर', skinSt: 'स्किन स्टीलर', nameSt: 'नेम / स्किन स्टीलर',
       custSw: 'कस्टम नाम / स्किन स्विचर', menuBind: 'मेनू कुंजी', rst: 'रीसेट', none: 'कोई नहीं',
       rstAll: 'डिफ़ॉल्ट पर रीसेट', tut: 'ट्यूटोरियल और गाइड', secIf: 'इंटरफ़ेस', geo: 'जियोमेट्रिक इफ़ेक्ट',
@@ -738,7 +739,7 @@
       cull: '视锥剔除', filt: '移除高耗滤镜', marg: '剔除边距', secBg: '地图与背景',
       tipBg: '开启固定背景时，地图背景会被禁用并变灰，关闭固定模式后恢复。为避免崩溃风险，必须在游戏过程中开启自定义背景。',
       mapBg: '地图背景', fixBg: '固定背景', fFile: '文件', fUrl: 'URL',
-      promptUrl: '输入图片、视频或颜色：', secMisc: '杂项', fixFeed: '修复喂球按键',
+      promptUrl: '输入图片、视频或颜色：', secMisc: '杂项', fixFeed: '修复喂球按键', selTxt: '可选中文本',
       secName: '改名器', skinSt: '皮肤窃取', nameSt: '昵称 / 皮肤窃取',
       custSw: '自定义昵称 / 皮肤轮换', menuBind: '菜单热键', rst: '重置', none: '无',
       rstAll: '恢复默认', tut: '教程与指南', secIf: '界面', geo: '几何粒子效果',
@@ -754,7 +755,7 @@
       cull: '画面外カリング', filt: '重いフィルター削除', marg: 'カリング余白', secBg: 'マップ＆背景',
       tipBg: '固定背景を有効にするとマップ背景は無効になり、固定モードを解除するまで灰色になります。クラッシュを避けるため、カスタム背景はゲーム中に必ず有効にしてください。',
       mapBg: 'マップ背景', fixBg: '固定背景', fFile: 'ファイル', fUrl: 'URL',
-      promptUrl: '画像、動画、または色を入力：', secMisc: 'その他', fixFeed: 'フィードキー修正',
+      promptUrl: '画像、動画、または色を入力：', secMisc: 'その他', fixFeed: 'フィードキー修正', selTxt: 'テキスト選択',
       secName: '名前変更', skinSt: 'スキンスティーラー', nameSt: '名前 / スキン盗用',
       custSw: 'カスタム名 / スキン切替', menuBind: 'メニューキー', rst: 'リセット', none: 'なし',
       rstAll: '初期設定に戻す', tut: 'チュートリアル', secIf: 'インターフェース', geo: '幾何学エフェクト',
@@ -770,7 +771,7 @@
       cull: '화면 밖 컬링', filt: '무거운 필터 제거', marg: '컬링 여백', secBg: '맵 및 배경',
       tipBg: '고정 배경이 활성화되면 맵 배경이 비활성화되어 회색으로 표시됩니다. 충돌 위험을 방지하려면 게임 중에 커스텀 배경을 반드시 활성화하세요.',
       mapBg: '맵 배경', fixBg: '고정 배경', fFile: '파일', fUrl: 'URL',
-      promptUrl: '이미지, 동영상 또는 색상 입력:', secMisc: '기타', fixFeed: '피드 버튼 수정',
+      promptUrl: '이미지, 동영상 또는 색상 입력:', secMisc: '기타', fixFeed: '피드 버튼 수정', selTxt: '텍스트 선택',
       secName: '닉네임 변경', skinSt: '스킨 스틸러', nameSt: '닉네임 / 스킨 스틸러',
       custSw: '커스텀 닉 / 스킨 전환', menuBind: '메뉴 단축키', rst: '초기화', none: '없음',
       rstAll: '기본값으로 초기화', tut: '튜토리얼 및 가이드', secIf: '인터페이스', geo: '기하학 효과',
@@ -786,7 +787,7 @@
       cull: 'Sembunyikan Luar Layar', filt: 'Hapus Filter Berat', marg: 'Batas Jarak', secBg: 'PETA & LATAR',
       tipBg: 'Saat latar tetap aktif, latar peta dinonaktifkan dan menjadi abu-abu hingga mode tetap dimatikan. Latar kustom WAJIB diaktifkan selama permainan untuk menghindari risiko crash.',
       mapBg: 'Latar Peta', fixBg: 'Latar Tetap', fFile: 'Berkas', fUrl: 'URL',
-      promptUrl: 'Masukkan gambar, video, atau warna:', secMisc: 'LAINNYA', fixFeed: 'Perbaiki Tombol Feed',
+      promptUrl: 'Masukkan gambar, video, atau warna:', secMisc: 'LAINNYA', fixFeed: 'Perbaiki Tombol Feed', selTxt: 'Teks Dapat Dipilih',
       secName: 'PENGUBAH NAMA', skinSt: 'Pencuri Skin', nameSt: 'Pencuri Nama / Skin',
       custSw: 'Nama / Skin Kustom', menuBind: 'Tombol Menu', rst: 'Reset', none: 'Tidak Ada',
       rstAll: 'Reset ke Default', tut: 'Tutorial & Panduan', secIf: 'ANTARMUKA', geo: 'Efek Geometris',
@@ -802,7 +803,7 @@
       cull: 'Ẩn ngoài màn hình', filt: 'Bỏ bộ lọc nặng', marg: 'Vùng đệm', secBg: 'BẢN ĐỒ & NỀN',
       tipBg: 'Khi bật Nền cố định, Nền bản đồ sẽ tạm tắt và chuyển màu xám cho đến khi tắt chế độ cố định. BẮT BUỘC bật nền tùy chỉnh trong trận đấu để tránh nguy cơ văng game.',
       mapBg: 'Nền bản đồ', fixBg: 'Nền cố định', fFile: 'Tệp', fUrl: 'URL',
-      promptUrl: 'Nhập ảnh, video hoặc màu sắc:', secMisc: 'KHÁC', fixFeed: 'Sửa nút Feed',
+      promptUrl: 'Nhập ảnh, video hoặc màu sắc:', secMisc: 'KHÁC', fixFeed: 'Sửa nút Feed', selTxt: 'Chọn văn bản',
       secName: 'ĐỔI TÊN', skinSt: 'Sao chép Skin', nameSt: 'Sao chép Tên / Skin',
       custSw: 'Đổi Tên / Skin tùy chỉnh', menuBind: 'Phím mở Menu', rst: 'Đặt lại', none: 'Không',
       rstAll: 'Khôi phục mặc định', tut: 'Hướng dẫn sử dụng', secIf: 'GIAO DIỆN', geo: 'Hiệu ứng hình học',
@@ -818,7 +819,7 @@
       cull: 'ซ่อนนอกหน้าจอ', filt: 'ปิดฟิลเตอร์หนัก', marg: 'ขอบเขตเผื่อ', secBg: 'แผนที่และพื้นหลัง',
       tipBg: 'เมื่อเปิดพื้นหลังคงที่ พื้นหลังแผนที่จะถูกปิดและเป็นสีเทาจนกว่าจะปิดโหมดพื้นหลังคงที่ ต้องเปิดพื้นหลังแบบกำหนดเองระหว่างเล่นเกม เพื่อป้องกันความเสี่ยงเกมแครช',
       mapBg: 'พื้นหลังแผนที่', fixBg: 'พื้นหลังคงที่', fFile: 'ไฟล์', fUrl: 'URL',
-      promptUrl: 'ใส่ลิงก์รูป วิดีโอ หรือสี:', secMisc: 'เบ็ดเตล็ด', fixFeed: 'แก้ปุ่มฟีดค้าง',
+      promptUrl: 'ใส่ลิงก์รูป วิดีโอ หรือสี:', secMisc: 'เบ็ดเตล็ด', fixFeed: 'แก้ปุ่มฟีดค้าง', selTxt: 'เลือกข้อความได้',
       secName: 'เปลี่ยนชื่อ', skinSt: 'ขโมยสกิน', nameSt: 'ขโมยชื่อ / สกิน',
       custSw: 'สลับชื่อ / สกินที่ตั้งเอง', menuBind: 'ปุ่มเปิดเมนู', rst: 'รีเซ็ต', none: 'ไม่มี',
       rstAll: 'รีเซ็ตเป็นค่าเริ่มต้น', tut: 'คู่มือและวิธีใช้', secIf: 'อินเทอร์เฟซ', geo: 'เอฟเฟกต์เรขาคณิต',
@@ -1934,6 +1935,740 @@
     q2WnS7xM(true);
   }
 
+  const v9TxtOn = () => Boolean(m9TvL2sP.selectableText);
+  const b4AllowDef = new WeakSet();
+  const q6OgPrevDef = Event.prototype.preventDefault;
+  Event.prototype.preventDefault = function () {
+    if (v9TxtOn() && b4AllowDef.has(this)) return;
+    return q6OgPrevDef.apply(this, arguments);
+  };
+
+  const w3CvsTxt = new WeakMap();
+  const w3ConnTxt = new WeakMap();
+  const w3DirtyCv = new Set();
+  const w3TxtLayers = new WeakMap();
+  const w3AllLayers = new Set();
+  const w3NodeSlots = new WeakMap();
+
+  const w3MeasCvs = document.createElement('canvas');
+  const w3MeasCtx = w3MeasCvs.getContext('2d');
+  const w3WCache = new Map();
+  if (document.fonts && document.fonts.addEventListener) {
+    document.fonts.addEventListener('loadingdone', () => w3WCache.clear());
+  }
+
+  const w3Rng = document.createRange();
+  let w3PeList = [];
+  let w3PeDirty = true;
+  let w3PeLastScan = 0;
+  let w3PeObs = null;
+  let w3PeHovered = null;
+  let w3PeDragGrp = [];
+  let w3DragSel = false;
+  let w3DragCvs = false;
+  let w3RmbHit = false;
+  let w3RmbTs = 0;
+  let w3PixiCv = null;
+  let w3PixiMs = 0;
+  let w3HoverMs = 0;
+  let w3HoverX = -1;
+  let w3HoverY = -1;
+  const w3Fwded = new WeakSet();
+  let w3BypTm = 0;
+  let w3RmbTm = 0;
+
+  function w3IsUi(tg) {
+    const el = tg && tg.nodeType === 1 ? tg : (tg && tg.parentElement);
+    return Boolean(el && el.closest && el.closest('#macro-window, #macro-toggle-pill'));
+  }
+
+  function w3IsEd(tg) {
+    const el = tg && tg.nodeType === 1 ? tg : (tg && tg.parentElement);
+    if (!el) return false;
+    const tn = (el.tagName || '').toLowerCase();
+    return (tn === 'input' && !/^(checkbox|radio|range|color|button|submit|reset|file|image)$/i.test(el.type || 'text')) || tn === 'textarea' || Boolean(el.isContentEditable);
+  }
+
+  function w3NormFont(raw) {
+    if (!raw || typeof raw !== 'string') return '700 20px/20px Ubuntu,sans-serif';
+    let s = raw.replace(/(\d+(?:\.\d+)?)px(?:\s*\/\s*[\d.]+(?:px|em|%)?)?/i, '20px/20px');
+    if (!/20px\/20px/.test(s)) s = '700 20px/20px ' + s;
+    return s;
+  }
+
+  function w3MeasW(txt, nf) {
+    const k = nf + '\0' + txt;
+    let w = w3WCache.get(k);
+    if (w !== undefined) return w;
+    w3MeasCtx.font = nf;
+    w = Math.max(1, w3MeasCtx.measureText(txt).width);
+    if (w3WCache.size > 600) w3WCache.clear();
+    w3WCache.set(k, w);
+    return w;
+  }
+
+  function w3RecTxt(ctx, rawTxt, x, y, maxW, isStrk) {
+    if (!ctx || !ctx.canvas || ctx.canvas === w3MeasCvs) return;
+    const cv = ctx.canvas;
+    if (cv.id === 'autorev-overlay' || cv.id === 'macro-bg-canvas' || cv.id === 'macro-plexus-canvas') return;
+    const isConn = Boolean(cv.isConnected);
+    if (isConn && !v9TxtOn()) return;
+    if (ctx.globalAlpha !== undefined && ctx.globalAlpha <= 0.03) return;
+    const s = String(rawTxt);
+    if (!/\S/.test(s)) return;
+    const trm = s.trim();
+    const m = ctx.measureText(s);
+    const mw = (typeof maxW === 'number' && maxW > 0 && m.width > maxW) ? maxW : m.width;
+    const sx = m.width > 0 ? mw / m.width : 1;
+    let lx0, lx1;
+    if (typeof m.actualBoundingBoxLeft === 'number' && typeof m.actualBoundingBoxRight === 'number' && (m.actualBoundingBoxLeft !== 0 || m.actualBoundingBoxRight !== 0)) {
+      lx0 = x - m.actualBoundingBoxLeft * sx;
+      lx1 = x + m.actualBoundingBoxRight * sx;
+    } else {
+      const al = ctx.textAlign || 'start';
+      if (al === 'center') { lx0 = x - mw * 0.5; lx1 = x + mw * 0.5; }
+      else if (al === 'right' || al === 'end') { lx0 = x - mw; lx1 = x; }
+      else { lx0 = x; lx1 = x + mw; }
+    }
+    const fm = String(ctx.font || '').match(/(\d+(?:\.\d+)?)px/i);
+    const fs = fm ? parseFloat(fm[1]) : 16;
+    let ly0, ly1;
+    if (typeof m.actualBoundingBoxAscent === 'number' && typeof m.actualBoundingBoxDescent === 'number' && (m.actualBoundingBoxAscent !== 0 || m.actualBoundingBoxDescent !== 0)) {
+      ly0 = y - m.actualBoundingBoxAscent;
+      ly1 = y + m.actualBoundingBoxDescent;
+    } else {
+      const bl = ctx.textBaseline || 'alphabetic';
+      if (bl === 'top' || bl === 'hanging') { ly0 = y; ly1 = y + fs * 1.15; }
+      else if (bl === 'middle') { ly0 = y - fs * 0.55; ly1 = y + fs * 0.55; }
+      else if (bl === 'bottom' || bl === 'ideographic') { ly0 = y - fs * 1.05; ly1 = y + fs * 0.1; }
+      else { ly0 = y - fs * 0.85; ly1 = y + fs * 0.25; }
+    }
+    if (isStrk) {
+      const pad = Math.min(4, (ctx.lineWidth || 0) * 0.5);
+      lx0 -= pad; lx1 += pad; ly0 -= pad; ly1 += pad;
+    }
+    const mt = ctx.getTransform();
+    const p0x = lx0 * mt.a + ly0 * mt.c + mt.e;
+    const p0y = lx0 * mt.b + ly0 * mt.d + mt.f;
+    const p1x = lx1 * mt.a + ly0 * mt.c + mt.e;
+    const p1y = lx1 * mt.b + ly0 * mt.d + mt.f;
+    const p2x = lx0 * mt.a + ly1 * mt.c + mt.e;
+    const p2y = lx0 * mt.b + ly1 * mt.d + mt.f;
+    const p3x = lx1 * mt.a + ly1 * mt.c + mt.e;
+    const p3y = lx1 * mt.b + ly1 * mt.d + mt.f;
+    const x0 = Math.min(p0x, p1x, p2x, p3x);
+    const y0 = Math.min(p0y, p1y, p2y, p3y);
+    const x1 = Math.max(p0x, p1x, p2x, p3x);
+    const y1 = Math.max(p0y, p1y, p2y, p3y);
+    const w = Math.hypot(p1x - p0x, p1y - p0y);
+    const h = Math.hypot(p2x - p0x, p2y - p0y);
+    if (w < 2 || h < 2) return;
+    const ang = Math.atan2(p1y - p0y, p1x - p0x);
+    const store = isConn ? w3ConnTxt : w3CvsTxt;
+    let rec = store.get(cv);
+    if (!rec || rec.w !== cv.width || rec.h !== cv.height) {
+      rec = { w: cv.width, h: cv.height, items: [] };
+      store.set(cv, rec);
+    }
+    const arr = rec.items;
+    const nLim = Math.max(0, arr.length - 8);
+    for (let i = arr.length - 1; i >= nLim; i--) {
+      const it = arr[i];
+      if (it.t === trm && Math.abs(it.x0 - x0) < 6 && Math.abs(it.y0 - y0) < 6 && Math.abs(it.x1 - x1) < 8 && Math.abs(it.y1 - y1) < 8) {
+        it.x0 = Math.min(it.x0, x0);
+        it.y0 = Math.min(it.y0, y0);
+        it.x1 = Math.max(it.x1, x1);
+        it.y1 = Math.max(it.y1, y1);
+        it.w = Math.max(it.w, w);
+        it.h = Math.max(it.h, h);
+        it.s = performance.now();
+        if (isConn) w3DirtyCv.add(cv);
+        return;
+      }
+    }
+    if (arr.length > 800) arr.shift();
+    arr.push({ t: trm, x0, y0, x1, y1, px: p0x, py: p0y, w, h, a: ang, f: ctx.font || '', s: performance.now() });
+    if (isConn) w3DirtyCv.add(cv);
+  }
+
+  function w3ClrArea(ctx, x, y, w, h, fullOnly) {
+    if (!ctx || !ctx.canvas) return;
+    const cv = ctx.canvas;
+    const isConn = Boolean(cv.isConnected);
+    if (isConn && !v9TxtOn()) return;
+    const store = isConn ? w3ConnTxt : w3CvsTxt;
+    const rec = store.get(cv);
+    if (!rec || !rec.items.length) return;
+    const mt = ctx.getTransform();
+    const xA = x * mt.a + y * mt.c + mt.e;
+    const yA = x * mt.b + y * mt.d + mt.f;
+    const xB = (x + w) * mt.a + (y + h) * mt.c + mt.e;
+    const yB = (x + w) * mt.b + (y + h) * mt.d + mt.f;
+    const cx0 = Math.min(xA, xB), cy0 = Math.min(yA, yB);
+    const cx1 = Math.max(xA, xB), cy1 = Math.max(yA, yB);
+    const full = cx0 <= cv.width * 0.12 && cy0 <= cv.height * 0.12 && cx1 >= cv.width * 0.88 && cy1 >= cv.height * 0.88;
+    if (full) {
+      rec.items.length = 0;
+      if (isConn) w3DirtyCv.add(cv);
+      return;
+    }
+    if (fullOnly) return;
+    const kept = [];
+    for (let i = 0; i < rec.items.length; i++) {
+      const it = rec.items[i];
+      const mx = (it.x0 + it.x1) * 0.5, my = (it.y0 + it.y1) * 0.5;
+      if (mx < cx0 || mx > cx1 || my < cy0 || my > cy1) kept.push(it);
+    }
+    if (kept.length !== rec.items.length) {
+      rec.items = kept;
+      if (isConn) w3DirtyCv.add(cv);
+    }
+  }
+
+  function w3CopyCvsRec(src, dst) {
+    if (!src || !dst) return;
+    const r = w3CvsTxt.get(src);
+    if (r && r.items && r.items.length) {
+      w3CvsTxt.set(dst, { w: r.w, h: r.h, items: r.items.slice() });
+    }
+  }
+
+  function w3TexSrc(tex) {
+    if (!tex) return null;
+    if (tex.source && tex.source.resource) return tex.source.resource;
+    if (tex._source && tex._source.resource) return tex._source.resource;
+    const bt = tex.baseTexture;
+    if (bt) {
+      if (bt.resource && bt.resource.source) return bt.resource.source;
+      if (bt.source) return bt.source;
+    }
+    return null;
+  }
+
+  function w3GetLayer(cv) {
+    let lr = w3TxtLayers.get(cv);
+    if (!lr) {
+      const root = document.createElement('div');
+      root.className = 'macro-txt-layer';
+      lr = { root, slots: [], pool: [], stamp: 0, l: -999, t: -999, w: -1, h: -1, z: '' };
+      w3TxtLayers.set(cv, lr);
+      w3AllLayers.add(lr);
+    }
+    if (cv.parentNode && lr.root.parentNode !== cv.parentNode) {
+      cv.parentNode.insertBefore(lr.root, cv.nextSibling);
+    }
+    return lr;
+  }
+
+  function w3AllocSlot(lr) {
+    let sl = lr.pool.pop();
+    if (!sl) {
+      const el = document.createElement('span');
+      el.className = 'macro-cvs-txt';
+      lr.root.appendChild(el);
+      sl = { el, lr, txt: '', nf: '', tr: '', x: 0, y: 0, st: 0, nd: null, ki: -1, vis: false };
+    }
+    lr.slots.push(sl);
+    return sl;
+  }
+
+  function w3UpdSlot(sl, it) {
+    const el = sl.el;
+    if (!sl.vis) {
+      el.style.display = 'block';
+      sl.vis = true;
+    }
+    if (sl.txt !== it.t) {
+      const sel = window.getSelection();
+      if (!(w3DragSel && sel && !sel.isCollapsed && sel.containsNode(el, true))) {
+        el.textContent = it.t;
+        sl.txt = it.t;
+      }
+    }
+    const nf = w3NormFont(it.f);
+    if (sl.nf !== nf) {
+      el.style.font = nf;
+      sl.nf = nf;
+    }
+    const mw = w3MeasW(sl.txt || it.t, nf);
+    const sx = it.w / Math.max(1, mw);
+    const sy = it.h / 20;
+    sl.x = it.x;
+    sl.y = it.y;
+    const rot = Math.abs(it.a) > 0.002 ? ` rotate(${it.a.toFixed(4)}rad)` : '';
+    const tr = `translate3d(${it.x.toFixed(1)}px,${it.y.toFixed(1)}px,0)${rot} scale(${sx.toFixed(4)},${sy.toFixed(4)})`;
+    if (sl.tr !== tr) {
+      el.style.transform = tr;
+      sl.tr = tr;
+    }
+  }
+
+  function w3SyncLayer(cv, cRc, items) {
+    if (!cv || !cv.isConnected) return;
+    const lr = w3GetLayer(cv);
+    const rl = Math.round(cRc.left), rt = Math.round(cRc.top), rw = Math.round(cRc.width), rh = Math.round(cRc.height);
+    const cz = getComputedStyle(cv).zIndex;
+    const rz = cz && cz !== 'auto' ? cz : '';
+    if (lr.l !== rl) { lr.l = rl; lr.root.style.left = rl + 'px'; }
+    if (lr.t !== rt) { lr.t = rt; lr.root.style.top = rt + 'px'; }
+    if (lr.w !== rw) { lr.w = rw; lr.root.style.width = rw + 'px'; }
+    if (lr.h !== rh) { lr.h = rh; lr.root.style.height = rh + 'px'; }
+    if (lr.z !== rz) { lr.z = rz; lr.root.style.zIndex = rz; }
+    if (lr.root.style.display === 'none') lr.root.style.display = 'block';
+
+    const st = ++lr.stamp;
+    const used = new Set();
+    for (let i = 0; i < items.length; i++) {
+      const it = items[i];
+      let sl = null;
+      if (it.nd) {
+        let arr = w3NodeSlots.get(it.nd);
+        if (!arr) { arr = []; w3NodeSlots.set(it.nd, arr); }
+        sl = arr[it.ki];
+        if (!sl || sl.lr !== lr || sl.nd !== it.nd || sl.ki !== it.ki || used.has(sl)) {
+          sl = w3AllocSlot(lr);
+          sl.nd = it.nd;
+          sl.ki = it.ki;
+          arr[it.ki] = sl;
+        }
+      } else {
+        let bestD = 110;
+        for (let j = 0; j < lr.slots.length; j++) {
+          const cand = lr.slots[j];
+          if (used.has(cand) || cand.nd !== null || cand.txt !== it.t) continue;
+          const d = Math.hypot(cand.x - it.x, cand.y - it.y);
+          if (d < bestD) { bestD = d; sl = cand; }
+        }
+        if (!sl) {
+          sl = w3AllocSlot(lr);
+          sl.nd = null;
+          sl.ki = -1;
+        }
+      }
+      used.add(sl);
+      sl.st = st;
+      w3UpdSlot(sl, it);
+    }
+
+    const sel = window.getSelection();
+    let k = 0;
+    for (let i = 0; i < lr.slots.length; i++) {
+      const sl = lr.slots[i];
+      if (sl.st === st) {
+        lr.slots[k++] = sl;
+      } else if (w3DragSel && sel && !sel.isCollapsed && sel.containsNode(sl.el, true)) {
+        lr.slots[k++] = sl;
+      } else {
+        sl.el.style.display = 'none';
+        sl.el.textContent = '';
+        sl.txt = '';
+        sl.tr = '';
+        sl.vis = false;
+        sl.nd = null;
+        sl.ki = -1;
+        lr.pool.push(sl);
+      }
+    }
+    lr.slots.length = k;
+  }
+
+  function w3MergeAtlas(items) {
+    if (items.length < 2) return items;
+    const out = [];
+    for (let i = 0; i < items.length; i++) {
+      const cur = items[i];
+      const prev = out.length ? out[out.length - 1] : null;
+      if (prev && prev.at && cur.at && prev.pr && prev.pr === cur.pr && cur.t.length <= 2 && prev.t.length < 28 &&
+          Math.abs(cur.a - prev.a) < 0.08 && Math.abs(cur.h - prev.h) < prev.h * 0.38 &&
+          Math.abs(cur.y - prev.y) < prev.h * 0.45 &&
+          cur.x >= prev.x + prev.w * 0.3 && cur.x <= prev.x + prev.w + prev.h * 0.75) {
+        const gap = cur.x - (prev.x + prev.w);
+        prev.t += (gap > prev.h * 0.25 ? ' ' : '') + cur.t;
+        const nx = Math.min(prev.x, cur.x), ny = Math.min(prev.y, cur.y);
+        const nr = Math.max(prev.x + prev.w, cur.x + cur.w), nb = Math.max(prev.y + prev.h, cur.y + cur.h);
+        prev.x = nx; prev.y = ny; prev.w = nr - nx; prev.h = nb - ny;
+      } else {
+        out.push(cur);
+      }
+    }
+    return out;
+  }
+
+  function w3PushConnItems(cv, cRc, out) {
+    const rec = w3ConnTxt.get(cv);
+    if (!rec || !rec.items.length || cv.width <= 0 || cv.height <= 0) return;
+    const sx = cRc.width / cv.width, sy = cRc.height / cv.height;
+    for (let i = 0; i < rec.items.length; i++) {
+      const it = rec.items[i];
+      const x = it.px * sx, y = it.py * sy, w = it.w * sx, h = it.h * sy;
+      if (w < 4 || h < 5) continue;
+      if (x + w < -4 || x > cRc.width + 4 || y + h < -4 || y > cRc.height + 4) continue;
+      out.push({ nd: null, ki: -1, pr: null, at: false, t: it.t, f: it.f, x, y, w, h, a: it.a });
+    }
+  }
+
+  function w3PixiScan(st, scn, rnd) {
+    if (!v9TxtOn() || !st) return;
+    const cv = rnd.canvas || rnd.view || t8VwM4xK();
+    if (!cv || !cv.isConnected || !scn || scn.width <= 0 || scn.height <= 0) return;
+    const cRc = cv.getBoundingClientRect();
+    if (cRc.width < 10 || cRc.height < 10) return;
+    w3PixiCv = cv;
+    w3PixiMs = performance.now();
+    const sx = cRc.width / scn.width, sy = cRc.height / scn.height;
+    const cw = cRc.width, ch = cRc.height;
+    const items = [];
+
+    function proj(nd, pr, ki, at, t, f, lx0, ly0, lx1, ly1) {
+      const wt = nd.worldTransform;
+      if (!wt) return;
+      const px0 = lx0 * wt.a + ly0 * wt.c + wt.tx;
+      const py0 = lx0 * wt.b + ly0 * wt.d + wt.ty;
+      const vxX = (lx1 - lx0) * wt.a, vxY = (lx1 - lx0) * wt.b;
+      const vyX = (ly1 - ly0) * wt.c, vyY = (ly1 - ly0) * wt.d;
+      const x = px0 * sx, y = py0 * sy;
+      const w = Math.hypot(vxX * sx, vxY * sy);
+      const h = Math.hypot(vyX * sx, vyY * sy);
+      if (w < 4 || h < 5) return;
+      const ang = Math.atan2(vxY * sy, vxX * sx);
+      const bnd = Math.max(w, h);
+      if (x + bnd < -4 || x - bnd > cw + 4 || y + bnd < -4 || y - bnd > ch + 4) return;
+      items.push({ nd, ki, pr, at, t, f, x, y, w, h, a: ang });
+    }
+
+    function walk(nd) {
+      if (!nd || nd.visible === false || nd.renderable === false || nd.destroyed) return;
+      if (nd.worldAlpha !== undefined && nd.worldAlpha <= 0.05) return;
+      if (nd.isParticleContainer) return;
+      const hasTxt = typeof nd.text === 'string' && /\S/.test(nd.text);
+      const tex = nd.texture;
+      const src = tex ? w3TexSrc(tex) : (nd.canvas || null);
+      const rec = src ? w3CvsTxt.get(src) : null;
+      if (rec && rec.items.length && tex) {
+        const fr = tex.frame;
+        const orig = tex.orig || fr;
+        const trm = tex.trim;
+        const ax = nd.anchor ? nd.anchor.x : 0;
+        const ay = nd.anchor ? nd.anchor.y : 0;
+        const bw = (tex.source && tex.source.width) || (tex.baseTexture && tex.baseTexture.width) || (fr ? fr.width : 0);
+        const bh = (tex.source && tex.source.height) || (tex.baseTexture && tex.baseTexture.height) || (fr ? fr.height : 0);
+        const res = (tex.source && tex.source.resolution) || (tex.baseTexture && tex.baseTexture.resolution) || tex.resolution || 1;
+        const sw = src.width || rec.w || 1, sh = src.height || rec.h || 1;
+        const rx = bw > 0 ? sw / bw : res;
+        const ry = bh > 0 ? sh / bh : res;
+        const fx0 = fr ? fr.x * rx : 0, fy0 = fr ? fr.y * ry : 0;
+        const fx1 = fr ? (fr.x + fr.width) * rx : sw, fy1 = fr ? (fr.y + fr.height) * ry : sh;
+        const isAtl = Boolean(fr && (fr.width * rx < sw * 0.92 || fr.height * ry < sh * 0.92));
+        const ow = orig ? orig.width : sw / rx, oh = orig ? orig.height : sh / ry;
+        const tx0 = trm ? trm.x : 0, ty0 = trm ? trm.y : 0;
+        let ki = 0;
+        for (let i = 0; i < rec.items.length; i++) {
+          const it = rec.items[i];
+          if (isAtl) {
+            const mx = (it.x0 + it.x1) * 0.5, my = (it.y0 + it.y1) * 0.5;
+            if (mx < fx0 - 2 || mx > fx1 + 2 || my < fy0 - 2 || my > fy1 + 2) continue;
+          }
+          const lx0 = -ax * ow + tx0 + (it.x0 - fx0) / rx;
+          const ly0 = -ay * oh + ty0 + (it.y0 - fy0) / ry;
+          const lx1 = -ax * ow + tx0 + (it.x1 - fx0) / rx;
+          const ly1 = -ay * oh + ty0 + (it.y1 - fy0) / ry;
+          proj(nd, nd.parent, ki++, isAtl, it.t, it.f, lx0, ly0, lx1, ly1);
+        }
+        if (hasTxt) return;
+      } else if (hasTxt) {
+        const lb = typeof nd.getLocalBounds === 'function' ? m7Box(nd.getLocalBounds()) : null;
+        if (lb && lb.w > 0 && lb.h > 0) {
+          const lns = nd.text.split(/\r?\n/);
+          const lh = lb.h / lns.length;
+          const stF = nd.style && nd.style.fontFamily ? ('700 20px/20px ' + nd.style.fontFamily) : '';
+          let ki = 0;
+          for (let i = 0; i < lns.length; i++) {
+            const ln = lns[i].trim();
+            if (!ln) continue;
+            proj(nd, nd.parent, ki++, false, ln, stF, lb.x, lb.y + i * lh, lb.x + lb.w, lb.y + (i + 1) * lh);
+          }
+          return;
+        }
+      }
+      const ch = nd.children;
+      if (ch && ch.length) {
+        for (let i = 0; i < ch.length; i++) walk(ch[i]);
+      }
+    }
+
+    walk(st);
+    const merged = w3MergeAtlas(items);
+    w3PushConnItems(cv, cRc, merged);
+    w3DirtyCv.delete(cv);
+    w3SyncLayer(cv, cRc, merged);
+  }
+
+  function w3TickTxt() {
+    if (!v9TxtOn()) return;
+    if (w3DirtyCv.size > 0) {
+      const nw = performance.now();
+      w3DirtyCv.forEach(cv => {
+        w3DirtyCv.delete(cv);
+        if (!cv || !cv.isConnected) return;
+        if (cv === w3PixiCv && nw - w3PixiMs < 250) return;
+        const cRc = cv.getBoundingClientRect();
+        if (cRc.width < 10 || cRc.height < 10) return;
+        const arr = [];
+        w3PushConnItems(cv, cRc, arr);
+        w3SyncLayer(cv, cRc, arr);
+      });
+    }
+    w3AllLayers.forEach(lr => {
+      if (lr.root.parentNode && !lr.root.parentNode.isConnected) {
+        lr.root.style.display = 'none';
+      }
+    });
+  }
+
+  function w3ScanPeNone() {
+    w3PeDirty = false;
+    w3PeLastScan = performance.now();
+    const out = [];
+    if (!document.body) { w3PeList = out; return; }
+    const seen = new Set();
+    const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    let n;
+    while ((n = tw.nextNode())) {
+      if (!n.nodeValue || !/\S/.test(n.nodeValue)) continue;
+      const el = n.parentElement;
+      if (!el || seen.has(el)) continue;
+      if (w3IsUi(el) || el.closest('.macro-txt-layer')) continue;
+      const tn = (el.tagName || '').toUpperCase();
+      if (tn === 'SCRIPT' || tn === 'STYLE' || tn === 'NOSCRIPT' || tn === 'CANVAS' || tn === 'SVG') continue;
+      seen.add(el);
+      const cs = getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) <= 0.02) continue;
+      if (cs.pointerEvents === 'none' || el.classList.contains('macro-pe-txt')) {
+        if (el.offsetParent !== null || cs.position === 'fixed') out.push(el);
+      }
+    }
+    w3PeList = out;
+  }
+
+  function w3ElTxtHit(el, x, y) {
+    if (!el || !el.isConnected) return false;
+    const cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) <= 0.02) return false;
+    const er = el.getBoundingClientRect();
+    if (er.width <= 0 || er.height <= 0 || x < er.left - 2 || x > er.right + 2 || y < er.top - 1 || y > er.bottom + 1) return false;
+    for (let n = el.firstChild; n; n = n.nextSibling) {
+      if (n.nodeType !== 3) continue;
+      const v = n.nodeValue;
+      if (!v || !/\S/.test(v)) continue;
+      const s = v.search(/\S/);
+      let e = v.length - 1;
+      while (e > s && /\s/.test(v[e])) e--;
+      try {
+        w3Rng.setStart(n, s);
+        w3Rng.setEnd(n, e + 1);
+        const rcs = w3Rng.getClientRects();
+        for (let i = 0; i < rcs.length; i++) {
+          const r = rcs[i];
+          if (r.width > 0 && r.height > 0 && x >= r.left - 2 && x <= r.right + 2 && y >= r.top - 1 && y <= r.bottom + 1) return true;
+        }
+      } catch (_) {}
+    }
+    return false;
+  }
+
+  function w3IsOccluded(el, topEl) {
+    if (!topEl || topEl === document.body || topEl === document.documentElement || topEl.tagName === 'CANVAS' || topEl.classList.contains('macro-txt-layer') || topEl.classList.contains('macro-cvs-txt')) return false;
+    if (el.contains(topEl) || topEl.contains(el)) return false;
+    const tCs = getComputedStyle(topEl);
+    const bg = tCs.backgroundColor;
+    const opaque = bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)';
+    if (!opaque && !topEl.closest('#main-panel, #login-panel, #context-menu, .modal')) return false;
+    const tz = parseInt(tCs.zIndex, 10) || 0;
+    const ez = parseInt(getComputedStyle(el).zIndex, 10) || 0;
+    return tz >= ez;
+  }
+
+  function w3HitText(x, y, tg) {
+    if (!v9TxtOn()) return false;
+    if (w3IsUi(tg)) return false;
+    const topEl = document.elementFromPoint(x, y);
+    if (w3IsUi(topEl)) return false;
+
+    const tgEl = tg && tg.nodeType === 1 ? tg : (tg && tg.parentElement);
+    if (tgEl && tgEl.classList && tgEl.classList.contains('macro-cvs-txt')) {
+      const r = tgEl.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0 && x >= r.left - 2 && x <= r.right + 2 && y >= r.top - 1 && y <= r.bottom + 1) return true;
+    }
+
+    const sel = window.getSelection();
+    if (sel && !sel.isCollapsed) {
+      for (let i = 0; i < sel.rangeCount; i++) {
+        const rg = sel.getRangeAt(i);
+        const ac = rg.commonAncestorContainer;
+        const ae = ac && ac.nodeType === 1 ? ac : (ac && ac.parentElement);
+        if (ae && w3IsUi(ae)) continue;
+        const rcs = rg.getClientRects();
+        for (let j = 0; j < rcs.length; j++) {
+          const r = rcs[j];
+          if (r.width > 0 && r.height > 0 && x >= r.left - 2 && x <= r.right + 2 && y >= r.top - 1 && y <= r.bottom + 1) return true;
+        }
+      }
+    }
+
+    const els = document.elementsFromPoint(x, y);
+    for (let i = 0; i < els.length; i++) {
+      const el = els[i];
+      if (w3IsUi(el)) return false;
+      if (el === document.body || el === document.documentElement || el.tagName === 'CANVAS' || el.classList.contains('macro-txt-layer')) continue;
+      if (el.classList.contains('macro-cvs-txt')) return true;
+      if (w3IsEd(el)) return true;
+      if (w3ElTxtHit(el, x, y)) return true;
+    }
+
+    if (w3PeDirty || performance.now() - w3PeLastScan > 350) w3ScanPeNone();
+    for (let i = 0; i < w3PeList.length; i++) {
+      const el = w3PeList[i];
+      if (!el.isConnected || w3IsOccluded(el, topEl)) continue;
+      if (w3ElTxtHit(el, x, y)) return true;
+    }
+    return false;
+  }
+
+  function w3SetBypass(on) {
+    if (w3BypTm) { clearTimeout(w3BypTm); w3BypTm = 0; }
+    if (document.body) document.body.classList.toggle('macro-txt-bypass', Boolean(on));
+  }
+
+  function w3FwdRmb(e) {
+    const under = document.elementFromPoint(e.clientX, e.clientY);
+    if (!under || under === e.target || w3IsUi(under)) return;
+    const init = {
+      button: 2,
+      buttons: e.buttons,
+      clientX: e.clientX,
+      clientY: e.clientY,
+      screenX: e.screenX,
+      screenY: e.screenY,
+      ctrlKey: e.ctrlKey,
+      shiftKey: e.shiftKey,
+      altKey: e.altKey,
+      metaKey: e.metaKey,
+      bubbles: true,
+      cancelable: true
+    };
+    const ev = e.type === 'pointerdown' && typeof PointerEvent === 'function'
+      ? new PointerEvent('pointerdown', Object.assign(init, {
+          pointerId: e.pointerId || 1,
+          pointerType: e.pointerType || 'mouse',
+          isPrimary: true
+        }))
+      : new MouseEvent(e.type, init);
+    Object.defineProperty(ev, 'which', { value: 3, writable: false });
+    w3Fwded.add(ev);
+    under.dispatchEvent(ev);
+  }
+
+  function w3HitSel(x, y, tg) {
+    if (!v9TxtOn() || w3IsUi(tg)) return false;
+    const topEl = document.elementFromPoint(x, y);
+    if (w3IsUi(topEl)) return false;
+
+    const tgEl = tg && tg.nodeType === 1 ? tg : (tg && tg.parentElement);
+    const ed = (tgEl && w3IsEd(tgEl) && tgEl) || (topEl && w3IsEd(topEl) && topEl);
+    if (ed && typeof ed.selectionStart === 'number' && typeof ed.selectionEnd === 'number' && ed.selectionStart !== ed.selectionEnd) {
+      const r = ed.getBoundingClientRect();
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return true;
+    }
+
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed) return false;
+    for (let i = 0; i < sel.rangeCount; i++) {
+      const rg = sel.getRangeAt(i);
+      const ac = rg.commonAncestorContainer;
+      const ae = ac && ac.nodeType === 1 ? ac : (ac && ac.parentElement);
+      if (ae && w3IsUi(ae)) continue;
+      const rcs = rg.getClientRects();
+      for (let j = 0; j < rcs.length; j++) {
+        const r = rcs[j];
+        if (r.width > 0 && r.height > 0 && x >= r.left - 2 && x <= r.right + 2 && y >= r.top - 1 && y <= r.bottom + 1) return true;
+      }
+    }
+    return false;
+  }
+
+  function w3ClearPe() {
+    if (w3PeHovered) { w3PeHovered.classList.remove('macro-pe-txt'); w3PeHovered = null; }
+    for (let i = 0; i < w3PeDragGrp.length; i++) w3PeDragGrp[i].classList.remove('macro-pe-txt');
+    w3PeDragGrp = [];
+  }
+
+  function w3HoverTick(x, y) {
+    if (!v9TxtOn() || w3DragSel) return;
+    if (w3PeDirty || performance.now() - w3PeLastScan > 350) w3ScanPeNone();
+    const topEl = document.elementFromPoint(x, y);
+    if (w3IsUi(topEl)) { w3ClearPe(); return; }
+    let found = null;
+    for (let i = 0; i < w3PeList.length; i++) {
+      const el = w3PeList[i];
+      if (!el.isConnected || w3IsOccluded(el, topEl)) continue;
+      if (w3ElTxtHit(el, x, y)) { found = el; break; }
+    }
+    if (w3PeHovered && w3PeHovered !== found) {
+      const sel = window.getSelection();
+      if (!(sel && !sel.isCollapsed && sel.containsNode(w3PeHovered, true))) {
+        w3PeHovered.classList.remove('macro-pe-txt');
+      }
+      w3PeHovered = null;
+    }
+    if (found) {
+      found.classList.add('macro-pe-txt');
+      w3PeHovered = found;
+    }
+  }
+
+  function k9SyncTxtMode() {
+    const on = v9TxtOn();
+    if (document.body) {
+      document.body.classList.toggle('macro-txt-sel-on', on);
+      if (on && !w3PeObs && typeof MutationObserver === 'function') {
+        w3PeObs = new MutationObserver(() => { w3PeDirty = true; });
+        w3PeObs.observe(document.body, { childList: true, subtree: true, characterData: true });
+      }
+    }
+    if (!on) {
+      if (w3PeObs) { w3PeObs.disconnect(); w3PeObs = null; }
+      w3ClearPe();
+      w3SetBypass(false);
+      w3DragSel = false;
+      w3DragCvs = false;
+      w3RmbHit = false;
+      document.querySelectorAll('.macro-pe-txt').forEach(el => el.classList.remove('macro-pe-txt'));
+      w3AllLayers.forEach(lr => {
+        lr.root.style.display = 'none';
+        for (let i = 0; i < lr.slots.length; i++) {
+          const sl = lr.slots[i];
+          sl.el.style.display = 'none';
+          sl.el.textContent = '';
+          sl.txt = '';
+          sl.tr = '';
+          sl.vis = false;
+          sl.nd = null;
+          sl.ki = -1;
+          lr.pool.push(sl);
+        }
+        lr.slots.length = 0;
+      });
+      w3DirtyCv.clear();
+    } else {
+      w3PeDirty = true;
+      w3PixiMs = 0;
+      document.querySelectorAll('canvas').forEach(cv => {
+        if (w3ConnTxt.has(cv)) w3DirtyCv.add(cv);
+      });
+      w3TickTxt();
+    }
+  }
+
   const c9LmW2xR = new Set();
   let r7DpK4vM = 0;
 
@@ -2107,6 +2842,7 @@
             if (isRoot && st && st.children) u5KnP8sT(st, this.screen);
             const res = ro.apply(this, arguments);
             if (isRoot && st && st.children) m7SyncPixi(st, this.screen, this);
+            if (isRoot && st && v9TxtOn()) w3PixiScan(st, this.screen, this);
             return res;
           } finally {
             r7DpK4vM--;
@@ -2752,6 +3488,7 @@
 
   function m4WnL7sT() {
     const nw = performance.now();
+    if (v9TxtOn()) w3TickTxt();
     if ((!r8QnS4mT || nw - w2VpL9xK > 40) && !b5TxM1wP) {
       b5TxM1wP = true;
       try { j8PnL4wV++; p3WnK7vT(); } finally { b5TxM1wP = false; }
@@ -3063,6 +3800,172 @@
     if (e.metaKey && !cd.startsWith('Meta')) return false;
     return true;
   }
+
+  window.addEventListener('mousemove', e => {
+    if (!v9TxtOn() || w3DragSel) return;
+    const nw = performance.now();
+    if (nw - w3HoverMs < 24 && Math.abs(e.clientX - w3HoverX) < 3 && Math.abs(e.clientY - w3HoverY) < 3) return;
+    w3HoverMs = nw;
+    w3HoverX = e.clientX;
+    w3HoverY = e.clientY;
+    w3HoverTick(e.clientX, e.clientY);
+  }, true);
+
+  window.addEventListener('selectstart', e => {
+    if (!v9TxtOn() || w3IsUi(e.target)) return;
+    b4AllowDef.add(e);
+    e.stopImmediatePropagation();
+  }, true);
+
+  window.addEventListener('copy', e => {
+    if (!v9TxtOn() || w3IsUi(e.target) || w3IsEd(e.target)) return;
+    const s = window.getSelection();
+    if (s && !s.isCollapsed) {
+      b4AllowDef.add(e);
+      e.stopImmediatePropagation();
+    }
+  }, true);
+
+  window.addEventListener('keydown', e => {
+    if (!v9TxtOn() || !e.isTrusted || w3IsUi(e.target) || w3IsEd(e.target)) return;
+    if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.code === 'KeyC' || (e.key || '').toLowerCase() === 'c')) {
+      const s = window.getSelection();
+      if (s && !s.isCollapsed) e.stopImmediatePropagation();
+    }
+  }, true);
+
+  const w3PtrDown = e => {
+    if (!v9TxtOn() || w3Fwded.has(e) || !e.isTrusted || w3IsUi(e.target)) return;
+    if (e.button === 2) {
+      if (w3RmbTm) { clearTimeout(w3RmbTm); w3RmbTm = 0; }
+      const hit = w3HitSel(e.clientX, e.clientY, e.target);
+      w3RmbHit = hit;
+      w3RmbTs = performance.now();
+      if (hit) {
+        w3SetBypass(false);
+        b4AllowDef.add(e);
+        e.stopImmediatePropagation();
+        return;
+      }
+      const tg = e.target && e.target.nodeType === 1 ? e.target : (e.target && e.target.parentElement);
+      if (tg && tg.classList && (tg.classList.contains('macro-cvs-txt') || tg.classList.contains('macro-pe-txt'))) {
+        w3SetBypass(true);
+        e.stopImmediatePropagation();
+        w3FwdRmb(e);
+      }
+      return;
+    }
+    if (e.button === 0) {
+      w3SetBypass(false);
+      const tg = e.target && e.target.nodeType === 1 ? e.target : (e.target && e.target.parentElement);
+      const isCvs = Boolean(tg && tg.classList && tg.classList.contains('macro-cvs-txt'));
+      const isCtrl = Boolean(tg && tg.closest && tg.closest('button, a, select, input, textarea, [role="button"], .macro-resizer'));
+      if (isCvs) {
+        if (e.type === 'mousedown') {
+          const act = document.activeElement;
+          if (act && w3IsEd(act)) act.blur();
+        }
+        w3DragSel = true;
+        w3DragCvs = true;
+        b4AllowDef.add(e);
+        e.stopImmediatePropagation();
+        return;
+      }
+      if (!isCtrl && w3HitText(e.clientX, e.clientY, e.target)) {
+        w3DragSel = true;
+        w3DragCvs = false;
+        b4AllowDef.add(e);
+        if (w3PeHovered && w3PeHovered.parentElement) {
+          const pr = w3PeHovered.parentElement;
+          for (let i = 0; i < w3PeList.length; i++) {
+            const p = w3PeList[i];
+            if (p.parentElement === pr && !p.classList.contains('macro-pe-txt')) {
+              p.classList.add('macro-pe-txt');
+              w3PeDragGrp.push(p);
+            }
+          }
+        }
+        return;
+      }
+      if (e.type === 'mousedown' && !isCtrl && !e.shiftKey) {
+        const s = window.getSelection();
+        if (s && !s.isCollapsed) s.removeAllRanges();
+        w3ClearPe();
+      }
+    }
+  };
+
+  const w3PtrUp = e => {
+    if (!v9TxtOn() || w3Fwded.has(e) || !e.isTrusted || w3IsUi(e.target)) return;
+    if (e.button === 2) {
+      if ((w3RmbHit && performance.now() - w3RmbTs < 1500) || w3HitSel(e.clientX, e.clientY, e.target)) {
+        b4AllowDef.add(e);
+        e.stopImmediatePropagation();
+      } else {
+        if (w3BypTm) clearTimeout(w3BypTm);
+        w3BypTm = setTimeout(() => w3SetBypass(false), 120);
+      }
+      return;
+    }
+    if (e.button === 0 && w3DragSel) {
+      const tg = e.target && e.target.nodeType === 1 ? e.target : (e.target && e.target.parentElement);
+      const isCvs = Boolean(tg && tg.classList && tg.classList.contains('macro-cvs-txt'));
+      if (w3DragCvs || isCvs) e.stopImmediatePropagation();
+      if (e.type === 'mouseup') {
+        setTimeout(() => {
+          w3DragSel = false;
+          w3DragCvs = false;
+          for (let i = 0; i < w3PeDragGrp.length; i++) w3PeDragGrp[i].classList.remove('macro-pe-txt');
+          w3PeDragGrp = [];
+        }, 25);
+      }
+    }
+  };
+
+  window.addEventListener('pointerdown', w3PtrDown, true);
+  window.addEventListener('mousedown', w3PtrDown, true);
+  window.addEventListener('pointerup', w3PtrUp, true);
+  window.addEventListener('mouseup', w3PtrUp, true);
+
+  window.addEventListener('click', e => {
+    if (!v9TxtOn() || !e.isTrusted || w3IsUi(e.target)) return;
+    if (w3DragSel) {
+      const tg = e.target && e.target.nodeType === 1 ? e.target : (e.target && e.target.parentElement);
+      const s = window.getSelection();
+      if (w3DragCvs || (tg && tg.classList && tg.classList.contains('macro-cvs-txt')) || (s && !s.isCollapsed)) {
+        e.stopImmediatePropagation();
+      }
+      w3DragSel = false;
+      w3DragCvs = false;
+    }
+  }, true);
+
+  window.addEventListener('contextmenu', e => {
+    if (!v9TxtOn() || w3IsUi(e.target)) return;
+    const hit = (w3RmbHit && performance.now() - w3RmbTs < 1500) || w3HitSel(e.clientX, e.clientY, e.target);
+    if (w3RmbTm) clearTimeout(w3RmbTm);
+    w3RmbTm = setTimeout(() => { w3RmbHit = false; w3RmbTm = 0; }, 120);
+    if (hit) {
+      w3SetBypass(false);
+      b4AllowDef.add(e);
+      e.stopImmediatePropagation();
+    }
+  }, true);
+
+  window.addEventListener('contextmenu', e => {
+    if (!v9TxtOn() || w3IsUi(e.target)) return;
+    if (w3BypTm) clearTimeout(w3BypTm);
+    w3BypTm = setTimeout(() => w3SetBypass(false), 0);
+    if (!w3HitSel(e.clientX, e.clientY, e.target)) e.preventDefault();
+  }, false);
+
+  window.addEventListener('blur', () => {
+    w3SetBypass(false);
+    w3DragSel = false;
+    w3DragCvs = false;
+    w3RmbHit = false;
+    w3ClearPe();
+  });
 
   document.addEventListener('keydown', e => {
     if (v7QzP2wM) return;
@@ -3658,6 +4561,9 @@
     const tSc = document.getElementById('macro-toggle-sync-scale');
     if (tPx) tPx.checked = Boolean(m9TvL2sP.plexusEnabled);
     if (tSc) tSc.checked = Boolean(m9TvL2sP.syncScale);
+    const tSt = document.getElementById('macro-toggle-seltxt');
+    if (tSt) tSt.checked = Boolean(m9TvL2sP.selectableText);
+    k9SyncTxtMode();
     if (w9LpT5vN) w9LpT5vN();
     a2LnQ8vM();
     k6RebuildPlans();
@@ -3746,20 +4652,105 @@
   }
 
   const p4TxL8wS = CanvasRenderingContext2D.prototype.fillText;
-  CanvasRenderingContext2D.prototype.fillText = function (txt) {
-    if (!m9TvL2sP.skinStealer && !m9TvL2sP.nameStealer && !m9TvL2sP.customSwitcher) {
-      return p4TxL8wS.apply(this, arguments);
-    }
-    if (this.canvas && (this.canvas.id === 'leaderboard-canvas' || (this.canvas.parentElement && this.canvas.parentElement.id === 'leaderboard-panel'))) {
-      if (typeof txt === 'string') {
-        const str = txt.trim();
-        if (/^1[\.\)]\s*/.test(str)) q9TxL3wP.clear();
-        const cln = str.replace(/^\d+[\.\)]\s*/, '').trim();
-        if (cln && !/^leaderboard$/i.test(cln)) q9TxL3wP.add(cln);
+  CanvasRenderingContext2D.prototype.fillText = function (txt, x, y, maxW) {
+    if (m9TvL2sP.skinStealer || m9TvL2sP.nameStealer || m9TvL2sP.customSwitcher) {
+      if (this.canvas && (this.canvas.id === 'leaderboard-canvas' || (this.canvas.parentElement && this.canvas.parentElement.id === 'leaderboard-panel'))) {
+        if (typeof txt === 'string') {
+          const str = txt.trim();
+          if (/^1[\.\)]\s*/.test(str)) q9TxL3wP.clear();
+          const cln = str.replace(/^\d+[\.\)]\s*/, '').trim();
+          if (cln && !/^leaderboard$/i.test(cln)) q9TxL3wP.add(cln);
+        }
       }
     }
+    w3RecTxt(this, txt, x, y, maxW, false);
     return p4TxL8wS.apply(this, arguments);
   };
+
+  const p4StrkOg = CanvasRenderingContext2D.prototype.strokeText;
+  CanvasRenderingContext2D.prototype.strokeText = function (txt, x, y, maxW) {
+    w3RecTxt(this, txt, x, y, maxW, true);
+    return p4StrkOg.apply(this, arguments);
+  };
+
+  const p4ClrOg = CanvasRenderingContext2D.prototype.clearRect;
+  CanvasRenderingContext2D.prototype.clearRect = function (x, y, w, h) {
+    w3ClrArea(this, x, y, w, h, false);
+    return p4ClrOg.apply(this, arguments);
+  };
+
+  const p4FillOg = CanvasRenderingContext2D.prototype.fillRect;
+  CanvasRenderingContext2D.prototype.fillRect = function (x, y, w, h) {
+    if (this.canvas && this.canvas.isConnected && v9TxtOn()) w3ClrArea(this, x, y, w, h, true);
+    return p4FillOg.apply(this, arguments);
+  };
+
+  if (typeof OffscreenCanvasRenderingContext2D !== 'undefined') {
+    const o4Ft = OffscreenCanvasRenderingContext2D.prototype.fillText;
+    OffscreenCanvasRenderingContext2D.prototype.fillText = function (txt, x, y, maxW) {
+      w3RecTxt(this, txt, x, y, maxW, false);
+      return o4Ft.apply(this, arguments);
+    };
+    const o4St = OffscreenCanvasRenderingContext2D.prototype.strokeText;
+    OffscreenCanvasRenderingContext2D.prototype.strokeText = function (txt, x, y, maxW) {
+      w3RecTxt(this, txt, x, y, maxW, true);
+      return o4St.apply(this, arguments);
+    };
+    const o4Cl = OffscreenCanvasRenderingContext2D.prototype.clearRect;
+    OffscreenCanvasRenderingContext2D.prototype.clearRect = function (x, y, w, h) {
+      w3ClrArea(this, x, y, w, h, false);
+      return o4Cl.apply(this, arguments);
+    };
+  }
+
+  ['width', 'height'].forEach(prop => {
+    const d = Object.getOwnPropertyDescriptor(HTMLCanvasElement.prototype, prop);
+    if (d && d.set) {
+      Object.defineProperty(HTMLCanvasElement.prototype, prop, {
+        configurable: true,
+        enumerable: d.enumerable,
+        get: d.get,
+        set(val) {
+          w3CvsTxt.delete(this);
+          w3ConnTxt.delete(this);
+          return d.set.call(this, val);
+        }
+      });
+    }
+    if (typeof OffscreenCanvas !== 'undefined') {
+      const od = Object.getOwnPropertyDescriptor(OffscreenCanvas.prototype, prop);
+      if (od && od.set) {
+        Object.defineProperty(OffscreenCanvas.prototype, prop, {
+          configurable: true,
+          enumerable: od.enumerable,
+          get: od.get,
+          set(val) {
+            w3CvsTxt.delete(this);
+            return od.set.call(this, val);
+          }
+        });
+      }
+    }
+  });
+
+  if (typeof window.createImageBitmap === 'function') {
+    const o4Cib = window.createImageBitmap;
+    window.createImageBitmap = function (src) {
+      return o4Cib.apply(this, arguments).then(bmp => {
+        w3CopyCvsRec(src, bmp);
+        return bmp;
+      });
+    };
+  }
+
+  if (typeof OffscreenCanvas !== 'undefined' && OffscreenCanvas.prototype.transferToImageBitmap) {
+    const o4Tib = OffscreenCanvas.prototype.transferToImageBitmap;
+    OffscreenCanvas.prototype.transferToImageBitmap = function () {
+      const bmp = o4Tib.apply(this, arguments);
+      w3CopyCvsRec(this, bmp);
+      return bmp;
+    };
+  }
 
   setInterval(() => {
     if (!m9TvL2sP.skinStealer && !m9TvL2sP.nameStealer && !m9TvL2sP.customSwitcher) return;
@@ -3935,6 +4926,13 @@
       #macro-window *:not(input):not(textarea)::selection{background:transparent}
       #macro-window input,#macro-window textarea{user-select:text !important;-webkit-user-select:text !important;cursor:text}
       #macro-window input::selection,#macro-window textarea::selection{background:var(--macro-sel-bg,rgba(56,152,236,0.48));color:var(--macro-sel-fg,#ffffff)}
+      body.macro-txt-sel-on *:not(#macro-window):not(#macro-window *):not(#macro-toggle-pill):not(#autorev-overlay):not(#macro-bg-canvas):not(canvas):not(input[type="range"]):not(input[type="checkbox"]):not(input[type="radio"]):not(input[type="color"]):not(.macro-txt-layer){user-select:text !important;-webkit-user-select:text !important}
+      body.macro-txt-sel-on *:not(#macro-window):not(#macro-window *):not(#macro-toggle-pill):not(#autorev-overlay):not(#macro-bg-canvas):not(canvas):not(button):not(a):not(select):not(input):not(textarea):not(.macro-txt-layer){cursor:auto}
+      body.macro-txt-sel-on .macro-pe-txt{pointer-events:auto !important;cursor:text !important}
+      .macro-txt-layer{position:fixed;left:0;top:0;width:0;height:0;pointer-events:none !important;overflow:hidden;margin:0;padding:0;border:0;user-select:none !important;-webkit-user-select:none !important}
+      .macro-cvs-txt{position:absolute;left:0;top:0;margin:0;padding:0;border:0;white-space:pre;display:block;width:max-content;transform-origin:0 0;color:transparent !important;background:transparent !important;font-family:'Ubuntu',sans-serif,Arial;font-size:20px;font-weight:700;line-height:20px;height:20px;user-select:text !important;-webkit-user-select:text !important;pointer-events:auto !important;cursor:text !important;box-sizing:border-box}
+      .macro-cvs-txt::selection{background:rgba(51,153,255,0.45) !important;color:transparent !important}
+      body.macro-txt-bypass .macro-cvs-txt,body.macro-txt-bypass .macro-pe-txt{pointer-events:none !important}
     `;
     document.head.appendChild(st);
 
@@ -4111,6 +5109,13 @@
             <button class="macro-bind-btn" id="macro-btn-keyHoldSpam" data-id="keyHoldSpam">${p7TvM3wL(m9TvL2sP.keyHoldSpam)}</button>
             <button class="macro-rst-btn" data-reset="keyHoldSpam" data-i18n="rst">${k3Tr('rst')}</button>
           </div>
+        </div>
+        <div class="macro-row">
+          <span data-i18n="selTxt">${k3Tr('selTxt')}</span>
+          <label class="macro-switch">
+            <input type="checkbox" id="macro-toggle-seltxt">
+            <span class="macro-switch-slider"></span>
+          </label>
         </div>
         <div class="macro-sep"></div>
         <div class="macro-section-header"><span data-i18n="secName">${k3Tr('secName')}</span></div>
@@ -4787,6 +5792,8 @@
     if (tCl) tCl.addEventListener('change', e => { m9TvL2sP.frustumCulling = e.target.checked; x3QnK8wR(); a2LnQ8vM(); e.target.blur(); });
     if (tFl) tFl.addEventListener('change', e => { m9TvL2sP.stripFilters = e.target.checked; x3QnK8wR(); e.target.blur(); });
     if (tMg) tMg.addEventListener('change', e => { m9TvL2sP.cullMarginToggle = e.target.checked; x3QnK8wR(); a2LnQ8vM(); e.target.blur(); });
+    const tSt = document.getElementById('macro-toggle-seltxt');
+    if (tSt) tSt.addEventListener('change', e => { m9TvL2sP.selectableText = e.target.checked; x3QnK8wR(); k9SyncTxtMode(); e.target.blur(); });
     const g5LkW8nP = document.getElementById('macro-settings-btn');
     if (g5LkW8nP) {
       g5LkW8nP.addEventListener('mousedown', e => {
