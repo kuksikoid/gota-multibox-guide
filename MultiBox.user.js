@@ -406,6 +406,7 @@
     mapBgEnabled: false, fixedBackgroundEnabled: false,
     mapBgSrc: null, fixedBgSrc: null,
     plexusEnabled: true, syncScale: false,
+    revNotify: false, revNotifyPos: 'top',
     selectableText: false,
     menuColor: null, buttonsColor: null, plexusColor: null,
     lang: 'en'
@@ -470,6 +471,8 @@
   m9TvL2sP.cullMargin = Number.isFinite(savedCullMargin) ? Math.max(30, Math.min(500, savedCullMargin)) : 120;
   m9TvL2sP.plexusEnabled = m9TvL2sP.plexusEnabled !== false;
   m9TvL2sP.syncScale = Boolean(m9TvL2sP.syncScale);
+  m9TvL2sP.revNotify = Boolean(m9TvL2sP.revNotify);
+  m9TvL2sP.revNotifyPos = m9TvL2sP.revNotifyPos === 'bottom' ? 'bottom' : 'top';
   m9TvL2sP.extraFastFeeds = Array.isArray(m9TvL2sP.extraFastFeeds)
     ? m9TvL2sP.extraFastFeeds.filter(x => x && typeof x === 'object').map(x => ({
         delay: Math.max(50, Math.min(3000, Number(x.delay) || 800)),
@@ -508,7 +511,7 @@
       cfg: 'Settings', soloDel: 'Solo-Trick Delay', ffDel: 'Fast-Feed Delay', ffDelN: 'Fast-Feed {n} Delay',
       ff: 'Fast-Feed', ffAdd: 'Add Fast-Feed', ffRem: 'Remove', trick: 'Trick', secRev: 'AUTO-REV',
       tipRev: 'The target cell must be fully visible and not hidden behind other cells or the screen edges. You MUST disable mass display, skins, and enemy nicknames; otherwise, the script will instantly fail and cause false triggers. Keep your camera completely static and avoid zooming during use. Note: There is a ~10ms processing delay with a slight margin of error, BUT it is built to work consistently across all future game updates',
-      lock: 'Lock Target', unlock: 'Cancel Lock', revSp: 'Rev Splits', selRev: 'Select Rev', secOpt: 'OPTIMIZATION',
+      lock: 'Lock Target', unlock: 'Cancel Lock', revSp: 'Rev Splits', revNot: 'Select Rev Notify', posTop: 'Top', posBot: 'Bottom', selRev: 'Select Rev', secOpt: 'OPTIMIZATION',
       tipOpt: '"Frustum Culling" is the main switch that stops rendering off-screen entities to boost FPS. "Cull Margin" sets an extra pre-render buffer zone so cells appear smoothly. If "Frustum Culling" is OFF, margin settings will have no effect.',
       cull: 'Frustum Culling', filt: 'Strip Heavy Filters', marg: 'Cull Margin', secBg: 'MAP & BACKGROUND',
       tipBg: 'When Fixed Background is enabled, Map Background is disabled and turns gray until Fixed mode is turned off. You MUST enable custom background during the game itself to avoid crash risks.',
@@ -525,7 +528,7 @@
       cfg: 'Настройки', soloDel: 'Задержка Соло-Трика', ffDel: 'Задержка Fast-Feed', ffDelN: 'Задержка Fast-Feed {n}',
       ff: 'Fast-Feed', ffAdd: 'Добавить Fast-Feed', ffRem: 'Удалить', trick: 'Трюк', secRev: 'АВТО-РЕВ',
       tipRev: 'Шар цели должен быть полностью виден, не закрыт другими шарами или краями экрана. Вы ОБЯЗАНЫ выключить показ массы, скины и ники врагов в настройках игры, иначе будут ложные срабатывания. Камера должна быть неподвижной, не зумите во время лока. Примечания: Есть задержка в ~10ms, но благодаря интересной реализации механики авто-рева, он не сломается при будущих обновлениях игры; больше двух сплитов (4 части) ставить не рекомендовано, так как вы тупо не успеете долететь до цели.',
-      lock: 'Захват цели', unlock: 'Снять захват', revSp: 'Сплиты рева', selRev: 'Выбор рева', secOpt: 'ОПТИМИЗАЦИЯ',
+      lock: 'Захват цели', unlock: 'Снять захват', revSp: 'Сплиты рева', revNot: 'Уведомление рева', posTop: 'Верх', posBot: 'Низ', selRev: 'Выбор рева', secOpt: 'ОПТИМИЗАЦИЯ',
       tipOpt: '"Отсечение за экраном" - главный переключатель, отключающий отрисовку объектов вне видимости для повышения FPS. "Отступ отсечения" задаёт запасную буферную зону предзагрузки, чтобы шары появлялись плавно. Если "Отсечение за экраном" выключено, настройки отступа не действуют.',
       cull: 'Отсечение за экраном', filt: 'Убрать тяжёлые фильтры', marg: 'Отступ отсечения', secBg: 'КАРТА И ФОН',
       tipBg: 'Когда включён статичный фон, фон карты отключается и становится серым до выключения статичного режима. Кастомный фон ОБЯЗАТЕЛЬНО нужно включать во время самой игры, чтобы исключить риски краша.',
@@ -542,7 +545,7 @@
       cfg: 'Налаштування', soloDel: 'Затримка Соло-Тріку', ffDel: 'Затримка Fast-Feed', ffDelN: 'Затримка Fast-Feed {n}',
       ff: 'Fast-Feed', ffAdd: 'Додати Fast-Feed', ffRem: 'Видалити', trick: 'Трюк', secRev: 'АВТО-РЕВ',
       tipRev: 'Куля цілі має бути повністю видимою та не перекритою іншими кулями чи краями екрана. Ви ЗОБОВ’ЯЗАНІ вимкнути показ маси, скіни та ніки ворогів у налаштуваннях гри, інакше будуть хибні спрацьовування. Тримайте камеру нерухомо та не змінюйте зум під час локу. Примітка: є затримка ~10ms, але авто-рев стабільно працюватиме в усіх майбутніх оновленнях гри; більше 4 частин ставити не рекомендовано.',
-      lock: 'Захопити ціль', unlock: 'Зняти захоплення', revSp: 'Спліти реву', selRev: 'Вибір реву', secOpt: 'ОПТИМІЗАЦІЯ',
+      lock: 'Захопити ціль', unlock: 'Зняти захоплення', revSp: 'Спліти реву', revNot: 'Сповіщення реву', posTop: 'Верх', posBot: 'Низ', selRev: 'Вибір реву', secOpt: 'ОПТИМІЗАЦІЯ',
       tipOpt: '"Відсікання за екраном" - головний перемикач, що вимикає рендер об’єктів поза екраном для підняття FPS. "Запас відсікання" задає буферну зону, щоб кулі з’являлися плавно. Якщо "Відсікання за екраном" вимкнено, запас не діє.',
       cull: 'Відсікання за екраном', filt: 'Прибрати важкі фільтри', marg: 'Запас відсікання', secBg: 'МАПА ТА ФОН',
       tipBg: 'Коли увімкнено фіксований фон, фон мапи вимикається та стає сірим до вимкнення фіксованого режиму. Кастомний фон ОБОВ’ЯЗКОВО потрібно вмикати під час самої гри, щоб виключити ризик крашу.',
@@ -558,7 +561,7 @@
       cfg: 'Ajustes', soloDel: 'Retardo Solo-Trick', ffDel: 'Retardo Fast-Feed', ffDelN: 'Retardo Fast-Feed {n}',
       ff: 'Fast-Feed', ffAdd: 'Añadir Fast-Feed', ffRem: 'Eliminar', trick: 'Truco', secRev: 'AUTO-REV',
       tipRev: 'La célula objetivo debe estar totalmente visible y sin ser tapada por otras células o bordes. Debes desactivar masa, skins y nombres enemigos o fallará. Mantén la cámara quieta y sin hacer zoom. Tiene ~10ms de retardo de proceso con mínimo margen de error, estable en futuras actualizaciones.',
-      lock: 'Fijar objetivo', unlock: 'Soltar objetivo', revSp: 'Divisiones Rev', selRev: 'Elegir Rev', secOpt: 'OPTIMIZACIÓN',
+      lock: 'Fijar objetivo', unlock: 'Soltar objetivo', revSp: 'Divisiones Rev', revNot: 'Aviso de Rev', posTop: 'Arriba', posBot: 'Abajo', selRev: 'Elegir Rev', secOpt: 'OPTIMIZACIÓN',
       tipOpt: '"Recorte fuera de pantalla" oculta entidades fuera de vista para mejorar los FPS. "Margen de recorte" añade una zona extra para que las células aparezcan suavemente. Si "Recorte fuera de pantalla" está apagado, el margen no tiene efecto.',
       cull: 'Recorte fuera de pantalla', filt: 'Quitar filtros pesados', marg: 'Margen de recorte', secBg: 'MAPA Y FONDO',
       tipBg: 'Cuando el fondo fijo está activo, el fondo del mapa se desactiva y se vuelve gris hasta apagar el modo fijo. Es OBLIGATORIO activar el fondo personalizado durante la partida para evitar riesgos de cierre.',
@@ -574,7 +577,7 @@
       cfg: 'Configurações', soloDel: 'Atraso Solo-Trick', ffDel: 'Atraso Fast-Feed', ffDelN: 'Atraso Fast-Feed {n}',
       ff: 'Fast-Feed', ffAdd: 'Adicionar Fast-Feed', ffRem: 'Remover', trick: 'Truque', secRev: 'AUTO-REV',
       tipRev: 'A célula alvo deve estar totalmente visível e sem obstruções ou bordas da tela. Desative massa, skins e nomes inimigos ou causará falsos disparos. Mantenha a câmera parada e não dê zoom. Há ~10ms de atraso de processamento, funcionando de forma estável em futuras atualizações.',
-      lock: 'Travar alvo', unlock: 'Cancelar trava', revSp: 'Divisões Rev', selRev: 'Selecionar Rev', secOpt: 'OTIMIZAÇÃO',
+      lock: 'Travar alvo', unlock: 'Cancelar trava', revSp: 'Divisões Rev', revNot: 'Aviso de Rev', posTop: 'Topo', posBot: 'Fundo', selRev: 'Selecionar Rev', secOpt: 'OTIMIZAÇÃO',
       tipOpt: '"Recorte fora da tela" deixa de renderizar entidades fora da tela para aumentar o FPS. "Margem de recorte" define uma zona extra de pré-carregamento. Se "Recorte fora da tela" estiver desligado, a margem não tem efeito.',
       cull: 'Recorte fora da tela', filt: 'Remover filtros pesados', marg: 'Margem de recorte', secBg: 'MAPA E FUNDO',
       tipBg: 'Quando o fundo fixo está ativado, o fundo do mapa é desativado e fica cinza até desligar o modo fixo. É OBRIGATÓRIO ativar o fundo personalizado durante a partida para evitar riscos de crash.',
@@ -590,7 +593,7 @@
       cfg: 'Paramètres', soloDel: 'Délai Solo-Trick', ffDel: 'Délai Fast-Feed', ffDelN: 'Délai Fast-Feed {n}',
       ff: 'Fast-Feed', ffAdd: 'Ajouter Fast-Feed', ffRem: 'Supprimer', trick: 'Trick', secRev: 'AUTO-REV',
       tipRev: 'La cellule cible doit être entièrement visible et non cachée par d\'autres cellules ou les bords. Désactivez la masse, les skins et les pseudos ennemis sous peine de faux déclenchements. Gardez la caméra fixe sans zoomer. Délai de traitement ~10ms avec faible marge d\'erreur.',
-      lock: 'Verrouiller cible', unlock: 'Annuler verrou', revSp: 'Divisions Rev', selRev: 'Choisir Rev', secOpt: 'OPTIMISATION',
+      lock: 'Verrouiller cible', unlock: 'Annuler verrou', revSp: 'Divisions Rev', revNot: 'Notif Rev', posTop: 'Haut', posBot: 'Bas', selRev: 'Choisir Rev', secOpt: 'OPTIMISATION',
       tipOpt: '"Masquage hors écran" arrête le rendu hors écran pour gagner des FPS. "Marge de rendu" crée une zone tampon pour un affichage fluide. Si "Masquage hors écran" est désactivé, la marge est sans effet.',
       cull: 'Masquage hors écran', filt: 'Retirer filtres lourds', marg: 'Marge de rendu', secBg: 'CARTE & FOND',
       tipBg: 'Lorsque le fond fixe est activé, le fond de carte est désactivé et grisé jusqu’à la désactivation du mode fixe. Vous DEVEZ activer le fond personnalisé pendant la partie pour éviter tout risque de crash.',
@@ -606,7 +609,7 @@
       cfg: 'Einstellungen', soloDel: 'Solo-Trick Delay', ffDel: 'Fast-Feed Delay', ffDelN: 'Fast-Feed {n} Delay',
       ff: 'Fast-Feed', ffAdd: 'Fast-Feed hinzufügen', ffRem: 'Entfernen', trick: 'Trick', secRev: 'AUTO-REV',
       tipRev: 'Die Zielzelle muss vollständig sichtbar sein und darf nicht verdeckt werden. Masseanzeige, Skins und gegnerische Namen MÜSSEN deaktiviert sein, sonst kommt es zu Fehlauslösungen. Kamera ruhig halten und nicht zoomen. ~10ms Verarbeitungsverzögerung, funktioniert zuverlässig in zukünftigen Updates.',
-      lock: 'Ziel fixieren', unlock: 'Fixierung lösen', revSp: 'Rev Splits', selRev: 'Rev wählen', secOpt: 'OPTIMIERUNG',
+      lock: 'Ziel fixieren', unlock: 'Fixierung lösen', revSp: 'Rev Splits', revNot: 'Rev-Hinweis', posTop: 'Oben', posBot: 'Unten', selRev: 'Rev wählen', secOpt: 'OPTIMIERUNG',
       tipOpt: '"Ausblendung außerhalb" deaktiviert das Rendering außerhalb des Bildschirms für mehr FPS. "Sicht-Puffer" erstellt eine Pufferzone für flüssiges Erscheinen. Wenn "Ausblendung außerhalb" aus ist, hat der Sicht-Puffer keine Wirkung.',
       cull: 'Ausblendung außerhalb', filt: 'Schwere Filter entfernen', marg: 'Sicht-Puffer', secBg: 'KARTE & HINTERGRUND',
       tipBg: 'Wenn der feste Hintergrund aktiv ist, wird der Kartenhintergrund deaktiviert und ausgegraut, bis der feste Modus aus ist. Der eigene Hintergrund MUSS zwingend während des Spiels eingeschaltet werden, um Abstürze zu vermeiden.',
@@ -622,7 +625,7 @@
       cfg: 'Impostazioni', soloDel: 'Ritardo Solo-Trick', ffDel: 'Ritardo Fast-Feed', ffDelN: 'Ritardo Fast-Feed {n}',
       ff: 'Fast-Feed', ffAdd: 'Aggiungi Fast-Feed', ffRem: 'Rimuovi', trick: 'Trick', secRev: 'AUTO-REV',
       tipRev: 'La cella bersaglio deve essere visibile per intero e non coperta da altre celle o dai bordi. Disattiva massa, skin e nomi nemici o si attiverà per errore. Tieni la visuale ferma senza zoomare. Ritardo di ~10ms con minimo margine di errore, compatibile con futuri aggiornamenti.',
-      lock: 'Blocca bersaglio', unlock: 'Annulla blocco', revSp: 'Split Rev', selRev: 'Seleziona Rev', secOpt: 'OTTIMIZZAZIONE',
+      lock: 'Blocca bersaglio', unlock: 'Annulla blocco', revSp: 'Split Rev', revNot: 'Avviso Rev', posTop: 'Alto', posBot: 'Basso', selRev: 'Seleziona Rev', secOpt: 'OTTIMIZZAZIONE',
       tipOpt: '"Taglio fuori schermo" interrompe il rendering fuori schermo per aumentare gli FPS. "Margine di taglio" imposta una zona cuscinetto per far apparire le celle senza scatti. Se "Taglio fuori schermo" è spento, il margine non ha effetto.',
       cull: 'Taglio fuori schermo', filt: 'Rimuovi filtri pesanti', marg: 'Margine di taglio', secBg: 'MAPPA E SFONDO',
       tipBg: 'Quando lo sfondo fisso è attivo, lo sfondo della mappa si disattiva e diventa grigio finché non disattivi la modalità fissa. Lo sfondo personalizzato va attivato OBBLIGATORIAMENTE durante la partita per evitare crash.',
@@ -638,7 +641,7 @@
       cfg: 'Ustawienia', soloDel: 'Opóźnienie Solo-Trick', ffDel: 'Opóźnienie Fast-Feed', ffDelN: 'Opóźnienie Fast-Feed {n}',
       ff: 'Fast-Feed', ffAdd: 'Dodaj Fast-Feed', ffRem: 'Usuń', trick: 'Trick', secRev: 'AUTO-REV',
       tipRev: 'Komórka docelowa musi być w pełni widoczna i niezasłonięta przez inne komórki ani krawędzie ekranu. WYŁĄCZ masę, skiny i nicki wrogów, inaczej skrypt będzie działać błędnie. Nie ruszaj kamerą ani zoomem podczas użycia. Opóźnienie ~10ms z małym marginesem błędu.',
-      lock: 'Zablokuj cel', unlock: 'Anuluj cel', revSp: 'Podziały Rev', selRev: 'Wybierz Rev', secOpt: 'OPTYMALIZACJA',
+      lock: 'Zablokuj cel', unlock: 'Anuluj cel', revSp: 'Podziały Rev', revNot: 'Powiad. Rev', posTop: 'Góra', posBot: 'Dół', selRev: 'Wybierz Rev', secOpt: 'OPTYMALIZACJA',
       tipOpt: '"Odcinanie poza ekranem" wyłącza renderowanie obiektów poza widokiem dla większego FPS. "Margines odcinania" tworzy bufor dla płynnego pojawiania się komórek. Gdy "Odcinanie poza ekranem" jest wyłączone, margines nie działa.',
       cull: 'Odcinanie poza ekranem', filt: 'Usuń ciężkie filtry', marg: 'Margines odcinania', secBg: 'MAPA I TŁO',
       tipBg: 'Gdy stałe tło jest włączone, tło mapy jest wyłączone i wyszarzone do czasu wyłączenia trybu stałego. Własne tło NALEŻY włączać podczas samej gry, aby uniknąć ryzyka crasha.',
@@ -654,7 +657,7 @@
       cfg: 'Instellingen', soloDel: 'Solo-Trick Vertraging', ffDel: 'Fast-Feed Vertraging', ffDelN: 'Fast-Feed {n} Vertraging',
       ff: 'Fast-Feed', ffAdd: 'Fast-Feed toevoegen', ffRem: 'Verwijderen', trick: 'Trick', secRev: 'AUTO-REV',
       tipRev: 'De doelcel moet volledig zichtbaar zijn zonder bedekking door andere cellen of schermranden. Schakel massaweergave, skins en vijandelijke namen UIT, anders faalt het script direct. Houd de camera stil en zoom niet. ~10ms vertraging met stabiele werking.',
-      lock: 'Doel vergrendelen', unlock: 'Vergrendeling opheffen', revSp: 'Rev Splits', selRev: 'Kies Rev', secOpt: 'OPTIMALISATIE',
+      lock: 'Doel vergrendelen', unlock: 'Vergrendeling opheffen', revSp: 'Rev Splits', revNot: 'Rev Melding', posTop: 'Boven', posBot: 'Onder', selRev: 'Kies Rev', secOpt: 'OPTIMALISATIE',
       tipOpt: '"Buiten scherm verbergen" stopt het renderen buiten het scherm voor hogere FPS. "Verberg-marge" voegt een bufferzone toe zodat cellen soepel verschijnen. Als "Buiten scherm verbergen" UIT staat, heeft de marge geen effect.',
       cull: 'Buiten scherm verbergen', filt: 'Zware filters strippen', marg: 'Verberg-marge', secBg: 'KAART & ACHTERGROND',
       tipBg: 'Wanneer vaste achtergrond is ingeschakeld, is de kaartachtergrond uitgeschakeld en grijs totdat vaste modus wordt uitgezet. Aangepaste achtergrond MOET tijdens het spelen worden ingeschakeld om crashrisico te voorkomen.',
@@ -670,7 +673,7 @@
       cfg: 'Setări', soloDel: 'Întârziere Solo-Trick', ffDel: 'Întârziere Fast-Feed', ffDelN: 'Întârziere Fast-Feed {n}',
       ff: 'Fast-Feed', ffAdd: 'Adaugă Fast-Feed', ffRem: 'Elimină', trick: 'Trick', secRev: 'AUTO-REV',
       tipRev: 'Celula țintă trebuie să fie complet vizibilă și neacoperită de alte celule sau de marginile ecranului. Dezactivează masa, skin-urile și numele inamicilor pentru a evita declanșările false. Ține camera nemișcată fără zoom. Întârziere ~10ms cu funcționare stabilă.',
-      lock: 'Blochează ținta', unlock: 'Anulează blocarea', revSp: 'Splitări Rev', selRev: 'Alege Rev', secOpt: 'OPTIMIZARE',
+      lock: 'Blochează ținta', unlock: 'Anulează blocarea', revSp: 'Splitări Rev', revNot: 'Notif. Rev', posTop: 'Sus', posBot: 'Jos', selRev: 'Alege Rev', secOpt: 'OPTIMIZARE',
       tipOpt: '"Ascundere în afara ecranului" oprește randarea entităților din afara ecranului pentru FPS mai mare. "Marjă randare" adaugă o zonă tampon pentru apariție lină. Dacă "Ascundere în afara ecranului" este oprită, marja nu are efect.',
       cull: 'Ascundere în afara ecranului', filt: 'Elimină filtrele grele', marg: 'Marjă randare', secBg: 'HARTĂ ȘI FUNDAL',
       tipBg: 'Când fundalul fix este activ, fundalul hărții este dezactivat și devine gri până la oprirea modului fix. Fundalul personalizat TREBUIE activat în timpul jocului pentru a evita riscul de crash.',
@@ -686,7 +689,7 @@
       cfg: 'Ayarlar', soloDel: 'Solo-Trick Gecikmesi', ffDel: 'Fast-Feed Gecikmesi', ffDelN: 'Fast-Feed {n} Gecikmesi',
       ff: 'Fast-Feed', ffAdd: 'Fast-Feed Ekle', ffRem: 'Kaldır', trick: 'Trick', secRev: 'AUTO-REV',
       tipRev: 'Hedef hücre tamamen görünür olmalı ve diğer hücreler veya ekran kenarları tarafından gizlenmemelidir. Kütle gösterimini, skinleri ve rakip isimlerini KAPATMALISINIZ, aksi halde hatalı tetiklenir. Kamerayı sabit tutun ve yakınlaştırmayın. ~10ms işlem gecikmesi vardır.',
-      lock: 'Hedefi Kilitle', unlock: 'Kilidi İptal Et', revSp: 'Rev Bölme', selRev: 'Rev Seç', secOpt: 'OPTİMİZASYON',
+      lock: 'Hedefi Kilitle', unlock: 'Kilidi İptal Et', revSp: 'Rev Bölme', revNot: 'Rev Bildirimi', posTop: 'Üst', posBot: 'Alt', selRev: 'Rev Seç', secOpt: 'OPTİMİZASYON',
       tipOpt: '"Ekran Dışı Gizleme", FPS artırmak için ekran dışındaki nesneleri çizmeyi durdurur. "Görüş Payı" hücrelerin akıcı görünmesi için ön yükleme alanı ekler. "Ekran Dışı Gizleme" kapalıysa payın etkisi olmaz.',
       cull: 'Ekran Dışı Gizleme', filt: 'Ağır Filtreleri Kaldır', marg: 'Görüş Payı', secBg: 'HARİTA VE ARKA PLAN',
       tipBg: 'Sabit Arka Plan etkinken Harita Arka Planı devre dışı kalır ve sabit mod kapatılana kadar gri görünür. Çökme riskini önlemek için özel arka planı MUTLAKA oyun içindeyken açın.',
@@ -702,7 +705,7 @@
       cfg: 'الإعدادات', soloDel: 'تأخير Solo-Trick', ffDel: 'تأخير Fast-Feed', ffDelN: 'تأخير Fast-Feed {n}',
       ff: 'Fast-Feed', ffAdd: 'إضافة Fast-Feed', ffRem: 'إزالة', trick: 'تريك', secRev: 'AUTO-REV',
       tipRev: 'يجب أن تكون الخلية المستهدفة مرئية بالكامل وغير مغطاة بخلايا أخرى أو حواف الشاشة. يجب تعطيل عرض الكتلة والسكينات وأسماء الخصوم وإلا سيفشل السكربت. ثبت الكاميرا ولا تقم بالتكبير أثناء الاستخدام. يوجد تأخير معالجة ~10ms ويعمل بثبات في التحديثات القادمة.',
-      lock: 'تثبيت الهدف', unlock: 'إلغاء التثبيت', revSp: 'تقسيمات Rev', selRev: 'اختيار Rev', secOpt: 'التحسين',
+      lock: 'تثبيت الهدف', unlock: 'إلغاء التثبيت', revSp: 'تقسيمات Rev', revNot: 'إشعار Rev', posTop: 'أعلى', posBot: 'أسفل', selRev: 'اختيار Rev', secOpt: 'التحسين',
       tipOpt: '"إخفاء خارج الشاشة" يوقف رسم الكائنات خارج الشاشة لرفع FPS. "هامش الإخفاء" يضيف منطقة إضافية لظهور الخلايا بسلاسة. إذا كان "إخفاء خارج الشاشة" مغلقًا فلن يؤثر الهامش.',
       cull: 'إخفاء خارج الشاشة', filt: 'إزالة الفلاتر الثقيلة', marg: 'هامش الإخفاء', secBg: 'الخريطة والخلفية',
       tipBg: 'عند تفعيل الخلفية الثابتة يتم تعطيل خلفية الخريطة وتتحول للرمادي حتى إيقاف الوضع الثابت. يجب تفعيل الخلفية المخصصة أثناء اللعب الفعلي داخل الخريطة فقط لتجنب خطر الانهيار.',
@@ -718,7 +721,7 @@
       cfg: 'सेटिंग्स', soloDel: 'Solo-Trick देरी', ffDel: 'Fast-Feed देरी', ffDelN: 'Fast-Feed {n} देरी',
       ff: 'Fast-Feed', ffAdd: 'Fast-Feed जोड़ें', ffRem: 'हटाएँ', trick: 'ट्रिक', secRev: 'AUTO-REV',
       tipRev: 'लक्ष्य सेल पूरी तरह दिखनी चाहिए और दूसरी सेल या स्क्रीन के किनारों से ढकी नहीं होनी चाहिए। मास डिस्प्ले, स्किन और दुश्मन के नाम बंद करना ज़रूरी है, वरना गलत ट्रिगर होगा। कैमरा स्थिर रखें और ज़ूम न करें। ~10ms प्रोसेसिंग देरी के साथ सभी अपडेट में स्थिर काम करता है।',
-      lock: 'लक्ष्य लॉक करें', unlock: 'लॉक रद्द करें', revSp: 'Rev स्प्लिट्स', selRev: 'Rev चुनें', secOpt: 'ऑप्टिमाइज़ेशन',
+      lock: 'लक्ष्य लॉक करें', unlock: 'लॉक रद्द करें', revSp: 'Rev स्प्लिट्स', revNot: 'Rev सूचना', posTop: 'ऊपर', posBot: 'नीचे', selRev: 'Rev चुनें', secOpt: 'ऑप्टिमाइज़ेशन',
       tipOpt: '"स्क्रीन के बाहर छिपाएँ" FPS बढ़ाने के लिए स्क्रीन के बाहर के ऑब्जेक्ट रेंडर करना रोकता है। "छिपाने की सीमा" सेल को स्मूथ दिखाने के लिए अतिरिक्त बफ़र देती है। अगर "स्क्रीन के बाहर छिपाएँ" बंद है तो सीमा काम नहीं करेगी।',
       cull: 'स्क्रीन के बाहर छिपाएँ', filt: 'भारी फ़िल्टर हटाएँ', marg: 'छिपाने की सीमा', secBg: 'मैप और बैकग्राउंड',
       tipBg: 'फिक्स्ड बैकग्राउंड चालू होने पर मैप बैकग्राउंड बंद और ग्रे हो जाता है, और बंद करने पर फिर काम करता है। क्रैश से बचने के लिए कस्टम बैकग्राउंड को केवल गेम के दौरान ही चालू करना अनिवार्य है।',
@@ -734,7 +737,7 @@
       cfg: '设置', soloDel: '单人 Trick 延迟', ffDel: 'Fast-Feed 延迟', ffDelN: 'Fast-Feed {n} 延迟',
       ff: 'Fast-Feed', ffAdd: '添加 Fast-Feed', ffRem: '移除', trick: 'Trick', secRev: 'AUTO-REV',
       tipRev: '目标细胞必须完全可见，不能被其他细胞或屏幕边缘遮挡。必须关闭质量显示、皮肤和敌方昵称，否则脚本会立刻误判触发。保持镜头静止且不要缩放。约有 ~10ms 处理延迟及轻微误差，但在后续更新中保持稳定。',
-      lock: '锁定目标', unlock: '取消锁定', revSp: 'Rev 分身数', selRev: '选择 Rev', secOpt: '性能优化',
+      lock: '锁定目标', unlock: '取消锁定', revSp: 'Rev 分身数', revNot: 'Rev 提示', posTop: '顶部', posBot: '底部', selRev: '选择 Rev', secOpt: '性能优化',
       tipOpt: '"视锥剔除"会停止渲染屏幕外的实体以提升 FPS。"剔除边距"用于设置预加载缓冲区，使细胞平滑出现。关闭"视锥剔除"后，"剔除边距"不会生效。',
       cull: '视锥剔除', filt: '移除高耗滤镜', marg: '剔除边距', secBg: '地图与背景',
       tipBg: '开启固定背景时，地图背景会被禁用并变灰，关闭固定模式后恢复。为避免崩溃风险，必须在游戏过程中开启自定义背景。',
@@ -750,7 +753,7 @@
       cfg: '設定', soloDel: 'Solo-Trick 遅延', ffDel: 'Fast-Feed 遅延', ffDelN: 'Fast-Feed {n} 遅延',
       ff: 'Fast-Feed', ffAdd: 'Fast-Feed 追加', ffRem: '削除', trick: 'Trick', secRev: 'AUTO-REV',
       tipRev: '対象セルは画面端や他のセルに隠れず全体が見える必要があります。質量表示・スキン・敵ニックネームを必ず無効にしてください。カメラを静止させズームも控えてください。約10msの処理遅延はありますが今後のアップデートでも安定動作します。',
-      lock: 'ターゲット固定', unlock: '固定解除', revSp: 'Rev 分裂数', selRev: 'Rev 選択', secOpt: '最適化',
+      lock: 'ターゲット固定', unlock: '固定解除', revSp: 'Rev 分裂数', revNot: 'Rev 通知', posTop: '上', posBot: '下', selRev: 'Rev 選択', secOpt: '最適化',
       tipOpt: '"画面外カリング"は画面外の描画を止めてFPSを向上させます。"カリング余白"はセルが滑らかに表示される予備領域です。"画面外カリング"がOFFの場合、余白は無効になります。',
       cull: '画面外カリング', filt: '重いフィルター削除', marg: 'カリング余白', secBg: 'マップ＆背景',
       tipBg: '固定背景を有効にするとマップ背景は無効になり、固定モードを解除するまで灰色になります。クラッシュを避けるため、カスタム背景はゲーム中に必ず有効にしてください。',
@@ -766,7 +769,7 @@
       cfg: '설정', soloDel: 'Solo-Trick 지연', ffDel: 'Fast-Feed 지연', ffDelN: 'Fast-Feed {n} 지연',
       ff: 'Fast-Feed', ffAdd: 'Fast-Feed 추가', ffRem: '삭제', trick: 'Trick', secRev: 'AUTO-REV',
       tipRev: '대상 세포가 다른 세포나 화면 가장자리에 가리지 않고 완전히 보여야 합니다. 질량 표시, 스킨, 상대 닉네임을 반드시 끄세요. 카메라를 고정하고 줌을 변경하지 마세요. ~10ms 처리 지연이 있지만 업데이트와 무관하게 안정적으로 작동합니다.',
-      lock: '대상 고정', unlock: '고정 해제', revSp: 'Rev 분열', selRev: 'Rev 선택', secOpt: '최적화',
+      lock: '대상 고정', unlock: '고정 해제', revSp: 'Rev 분열', revNot: 'Rev 알림', posTop: '위', posBot: '아래', selRev: 'Rev 선택', secOpt: '최적화',
       tipOpt: '"화면 밖 컬링"은 화면 밖 엔티티 렌더링을 꺼서 FPS를 높입니다. "컬링 여백"은 세포가 부드럽게 나타나도록 여유 버퍼를 줍니다. "화면 밖 컬링"이 꺼져 있으면 여백이 적용되지 않습니다.',
       cull: '화면 밖 컬링', filt: '무거운 필터 제거', marg: '컬링 여백', secBg: '맵 및 배경',
       tipBg: '고정 배경이 활성화되면 맵 배경이 비활성화되어 회색으로 표시됩니다. 충돌 위험을 방지하려면 게임 중에 커스텀 배경을 반드시 활성화하세요.',
@@ -782,7 +785,7 @@
       cfg: 'Pengaturan', soloDel: 'Jeda Solo-Trick', ffDel: 'Jeda Fast-Feed', ffDelN: 'Jeda Fast-Feed {n}',
       ff: 'Fast-Feed', ffAdd: 'Tambah Fast-Feed', ffRem: 'Hapus', trick: 'Trik', secRev: 'AUTO-REV',
       tipRev: 'Sel target harus terlihat penuh dan tidak tertutup sel lain atau tepi layar. WAJIB matikan tampilan massa, skin, dan nama musuh agar tidak salah pemicu. Jaga kamera tetap diam dan jangan zoom. Ada jeda proses ~10ms dengan sedikit toleransi, tetap stabil di update mendatang.',
-      lock: 'Kunci Target', unlock: 'Batal Kunci', revSp: 'Split Rev', selRev: 'Pilih Rev', secOpt: 'OPTIMASI',
+      lock: 'Kunci Target', unlock: 'Batal Kunci', revSp: 'Split Rev', revNot: 'Notif Rev', posTop: 'Atas', posBot: 'Bawah', selRev: 'Pilih Rev', secOpt: 'OPTIMASI',
       tipOpt: '"Sembunyikan Luar Layar" menghentikan render objek di luar layar untuk menaikkan FPS. "Batas Jarak" menambah zona penyangga agar sel muncul mulus. Jika "Sembunyikan Luar Layar" mati, batas jarak tidak berpengaruh.',
       cull: 'Sembunyikan Luar Layar', filt: 'Hapus Filter Berat', marg: 'Batas Jarak', secBg: 'PETA & LATAR',
       tipBg: 'Saat latar tetap aktif, latar peta dinonaktifkan dan menjadi abu-abu hingga mode tetap dimatikan. Latar kustom WAJIB diaktifkan selama permainan untuk menghindari risiko crash.',
@@ -798,7 +801,7 @@
       cfg: 'Cài đặt', soloDel: 'Độ trễ Solo-Trick', ffDel: 'Độ trễ Fast-Feed', ffDelN: 'Độ trễ Fast-Feed {n}',
       ff: 'Fast-Feed', ffAdd: 'Thêm Fast-Feed', ffRem: 'Xóa', trick: 'Trick', secRev: 'AUTO-REV',
       tipRev: 'Tế bào mục tiêu phải hiển thị đầy đủ, không bị che bởi tế bào khác hay mép màn hình. BẮT BUỘC tắt hiển thị khối lượng, skin và tên địch để tránh kích hoạt nhầm. Giữ camera đứng yên và không zoom. Có độ trễ xử lý ~10ms nhưng hoạt động ổn định qua các bản cập nhật.',
-      lock: 'Khóa mục tiêu', unlock: 'Hủy khóa', revSp: 'Số lần Rev', selRev: 'Chọn Rev', secOpt: 'TỐI ƯU HÓA',
+      lock: 'Khóa mục tiêu', unlock: 'Hủy khóa', revSp: 'Số lần Rev', revNot: 'Thông báo Rev', posTop: 'Trên', posBot: 'Dưới', selRev: 'Chọn Rev', secOpt: 'TỐI ƯU HÓA',
       tipOpt: '"Ẩn ngoài màn hình" ngừng vẽ các vật thể ngoài màn hình để tăng FPS. "Vùng đệm" giúp tế bào xuất hiện mượt mà hơn. Nếu tắt "Ẩn ngoài màn hình", vùng đệm sẽ không có tác dụng.',
       cull: 'Ẩn ngoài màn hình', filt: 'Bỏ bộ lọc nặng', marg: 'Vùng đệm', secBg: 'BẢN ĐỒ & NỀN',
       tipBg: 'Khi bật Nền cố định, Nền bản đồ sẽ tạm tắt và chuyển màu xám cho đến khi tắt chế độ cố định. BẮT BUỘC bật nền tùy chỉnh trong trận đấu để tránh nguy cơ văng game.',
@@ -814,7 +817,7 @@
       cfg: 'การตั้งค่า', soloDel: 'หน่วงเวลา Solo-Trick', ffDel: 'หน่วงเวลา Fast-Feed', ffDelN: 'หน่วงเวลา Fast-Feed {n}',
       ff: 'Fast-Feed', ffAdd: 'เพิ่ม Fast-Feed', ffRem: 'ลบ', trick: 'ทริก', secRev: 'AUTO-REV',
       tipRev: 'เซลล์เป้าหมายต้องมองเห็นได้เต็มวง ไม่ถูกบังด้วยเซลล์อื่นหรือขอบจอ ต้องปิดการแสดงมวล สกิน และชื่อศัตรู มิฉะนั้นจะทำงานผิดพลาด ให้นิ่งกล้องไว้และอย่าซูมระหว่างใช้งาน มีดีเลย์ประมวลผล ~10ms แต่เสถียรกับทุกอัปเดต',
-      lock: 'ล็อกเป้าหมาย', unlock: 'ยกเลิกล็อก', revSp: 'จำนวนแบ่ง Rev', selRev: 'เลือก Rev', secOpt: 'ปรับแต่งประสิทธิภาพ',
+      lock: 'ล็อกเป้าหมาย', unlock: 'ยกเลิกล็อก', revSp: 'จำนวนแบ่ง Rev', revNot: 'แจ้งเตือน Rev', posTop: 'บน', posBot: 'ล่าง', selRev: 'เลือก Rev', secOpt: 'ปรับแต่งประสิทธิภาพ',
       tipOpt: '"ซ่อนนอกหน้าจอ" จะหยุดเรนเดอร์วัตถุนอกจอเพื่อเพิ่ม FPS "ขอบเขตเผื่อ" ช่วยให้เซลล์ปรากฏอย่างลื่นไหล หากปิด "ซ่อนนอกหน้าจอ" ค่าขอบเขตจะไม่มีผล',
       cull: 'ซ่อนนอกหน้าจอ', filt: 'ปิดฟิลเตอร์หนัก', marg: 'ขอบเขตเผื่อ', secBg: 'แผนที่และพื้นหลัง',
       tipBg: 'เมื่อเปิดพื้นหลังคงที่ พื้นหลังแผนที่จะถูกปิดและเป็นสีเทาจนกว่าจะปิดโหมดพื้นหลังคงที่ ต้องเปิดพื้นหลังแบบกำหนดเองระหว่างเล่นเกม เพื่อป้องกันความเสี่ยงเกมแครช',
@@ -3633,6 +3636,8 @@
   const c6RmP3xW = new Set();
   let q9EnvOk = 0;
 
+  let r9RevNotFn = null, r9RevNotClr = null;
+
   function q8WnM4tL(c) {
     if (!q9EnvOk) return;
     if (!c) return;
@@ -3667,6 +3672,7 @@
         k6RebuildPlans();
         x3QnK8wR();
         r8QnM4tL();
+        if (r9RevNotFn) r9RevNotFn(m9TvL2sP.revSplits);
         return;
       }
     }
@@ -4193,10 +4199,10 @@
   }
 
   const y4WpS9vT = [
-    { id: 'keyT2', label: 'Trick 2 (1x)' }, { id: 'keyT4', label: 'Trick 4 (2x)' },
-    { id: 'keyT8', label: 'Trick 8 (3x)' }, { id: 'keyT16', label: 'Trick 16 (4x)' },
-    { id: 'keyT32', label: 'Trick 32 (5x)' }, { id: 'keyT64', label: 'Trick 64 (6x)' },
-    { id: 'keyT128', label: 'Trick 128 (7x)' }, { id: 'keyT256', label: 'Trick 256 (8x)' }
+    { id: 'keyT2', label: 'Trick 1x (2c)' }, { id: 'keyT4', label: 'Trick 2x (4c)' },
+    { id: 'keyT8', label: 'Trick 3x (8c)' }, { id: 'keyT16', label: 'Trick 4x (16c)' },
+    { id: 'keyT32', label: 'Trick 5x (32c)' }, { id: 'keyT64', label: 'Trick 6x (64c)' },
+    { id: 'keyT128', label: 'Trick 7x (128c)' }, { id: 'keyT256', label: 'Trick 8x (256c)' }
   ];
 
   const w9QnL2xM = [
@@ -4204,10 +4210,10 @@
   ];
 
   const k5TxM8wL = [
-    { id: 'keyRevSplit1', label: 'Select Rev 2 (1x)' }, { id: 'keyRevSplit2', label: 'Select Rev 4 (2x)' },
-    { id: 'keyRevSplit3', label: 'Select Rev 8 (3x)' }, { id: 'keyRevSplit4', label: 'Select Rev 16 (4x)' },
-    { id: 'keyRevSplit5', label: 'Select Rev 32 (5x)' }, { id: 'keyRevSplit6', label: 'Select Rev 64 (6x)' },
-    { id: 'keyRevSplit7', label: 'Select Rev 128 (7x)' }, { id: 'keyRevSplit8', label: 'Select Rev 256 (8x)' }
+    { id: 'keyRevSplit1', label: 'Select Rev 1x (2c)' }, { id: 'keyRevSplit2', label: 'Select Rev 2x (4c)' },
+    { id: 'keyRevSplit3', label: 'Select Rev 3x (8c)' }, { id: 'keyRevSplit4', label: 'Select Rev 4x (16c)' },
+    { id: 'keyRevSplit5', label: 'Select Rev 5x (32c)' }, { id: 'keyRevSplit6', label: 'Select Rev 6x (64c)' },
+    { id: 'keyRevSplit7', label: 'Select Rev 7x (128c)' }, { id: 'keyRevSplit8', label: 'Select Rev 8x (256c)' }
   ];
 
   function b2WzL7vP(tk, val) {
@@ -4561,6 +4567,19 @@
     const tSc = document.getElementById('macro-toggle-sync-scale');
     if (tPx) tPx.checked = Boolean(m9TvL2sP.plexusEnabled);
     if (tSc) tSc.checked = Boolean(m9TvL2sP.syncScale);
+    const tRn = document.getElementById('macro-toggle-revnot');
+    const cRn = document.getElementById('macro-revnot-cur');
+    const pRn = document.getElementById('macro-revnot-pop');
+    const nEl = document.getElementById('macro-revnot-toast');
+    if (tRn) tRn.checked = Boolean(m9TvL2sP.revNotify);
+    const pKey = m9TvL2sP.revNotifyPos === 'bottom' ? 'bottom' : 'top';
+    if (cRn) cRn.textContent = k3Tr(pKey === 'bottom' ? 'posBot' : 'posTop');
+    if (pRn) {
+      pRn.querySelectorAll('.macro-pos-opt').forEach(o => {
+        o.classList.toggle('active', o.getAttribute('data-pos') === pKey);
+      });
+    }
+    if (nEl) nEl.classList.toggle('pos-bottom', pKey === 'bottom');
     const tSt = document.getElementById('macro-toggle-seltxt');
     if (tSt) tSt.checked = Boolean(m9TvL2sP.selectableText);
     k9SyncTxtMode();
@@ -4922,6 +4941,35 @@
       .macro-lang-opt.active .macro-lang-name{font-weight:700}
       .macro-lang-code{flex-shrink:0;font-size:0.78em;font-weight:700;letter-spacing:0.04em;padding:0.14em 0.42em;border-radius:0.26em;background:var(--macro-btn-bg,#242424);border:1px solid var(--macro-btn-border,#363636);color:var(--macro-btn-muted,#888);transition:background 0.14s,border-color 0.14s,color 0.14s}
       .macro-lang-opt.active .macro-lang-code{background:var(--macro-accent,#f2f2f4);border-color:var(--macro-accent,#f2f2f4);color:var(--macro-accent-text,#111114)}
+      .macro-win-body .macro-row,.macro-win-body .macro-section-header,.macro-win-body .macro-sep,.macro-win-body .macro-textarea,.macro-win-body .macro-menu-bind-wrap,.macro-win-body .macro-reset-all-btn,.macro-win-body .macro-tutorial-btn,.macro-win-body .macro-upd-banner{transition:opacity 0.18s ease,color 0.18s ease,text-shadow 0.18s ease}
+      .macro-win-body.macro-pal-dim .macro-row,.macro-win-body.macro-pal-dim .macro-section-header,.macro-win-body.macro-pal-dim .macro-sep,.macro-win-body.macro-pal-dim .macro-textarea,.macro-win-body.macro-pal-dim .macro-menu-bind-wrap,.macro-win-body.macro-pal-dim .macro-reset-all-btn,.macro-win-body.macro-pal-dim .macro-tutorial-btn,.macro-win-body.macro-pal-dim .macro-upd-banner{opacity:0.24;pointer-events:none}
+      .macro-win-body.macro-pal-dim .macro-row.macro-pal-active{opacity:1;pointer-events:auto;position:relative;z-index:49}
+      .macro-win-body.macro-pal-dim .macro-row.macro-pal-active>span{color:var(--macro-title-color,#fff);text-shadow:var(--macro-pal-glow,0 0 8px rgba(255,255,255,0.28))}
+      .macro-pos-btn{display:inline-flex;align-items:center;justify-content:space-between;gap:0.35em;width:6.2em;box-sizing:border-box;background:var(--macro-btn-bg,#242424);border:1px solid var(--macro-btn-border,#383838);color:var(--macro-btn-text,#eee);border-radius:0.35em;padding:0.36em 0.55em;font-family:inherit;font-size:0.9em;font-weight:600;cursor:pointer;transition:border-color 0.16s,filter 0.14s,color 0.28s ease}
+      .macro-pos-btn:hover{filter:brightness(1.14)}
+      .macro-pos-btn.open{border-color:var(--macro-accent-muted,rgba(255,255,255,0.48))}
+      .macro-pos-btn .macro-lang-chev{width:0.9em;height:0.9em}
+      .macro-pos-pop{display:none;position:absolute;left:auto;top:auto;box-sizing:border-box;padding:0.22em;background:var(--macro-lang-bg,rgba(24,24,24,0.98));border:1px solid var(--macro-border,#2e2e2e);border-radius:0.5em;box-shadow:0 14px 36px rgba(0,0,0,0.88);z-index:52;opacity:0;visibility:hidden;pointer-events:none;transform-origin:top center;transform:scale(0.95) translateY(-4px);transition:opacity 0.18s cubic-bezier(0.22,1,0.36,1),transform 0.2s cubic-bezier(0.22,1,0.36,1),visibility 0s linear 0.2s}
+      .macro-pos-pop.drop-up{transform-origin:bottom center;transform:scale(0.95) translateY(4px)}
+      #macro-window.open:not(.settings-open) .macro-pos-pop.open{opacity:1;visibility:visible;pointer-events:auto;transform:scale(1) translateY(0);transition:opacity 0.18s cubic-bezier(0.22,1,0.36,1),transform 0.2s cubic-bezier(0.22,1,0.36,1),visibility 0s linear 0s}
+      .macro-pos-opt{width:100%;display:flex;align-items:center;gap:0.4em;padding:0.36em 0.44em;border:none;border-radius:0.34em;background:transparent;color:var(--macro-text,#d2d2d2);font-family:inherit;font-size:0.88em;cursor:pointer;text-align:left;transition:background 0.14s,color 0.14s}
+      .macro-pos-opt:hover{background:rgba(128,128,128,0.14);color:var(--macro-title-color,#fff)}
+      .macro-pos-opt.active{background:var(--macro-opt-act-bg,rgba(255,255,255,0.1));color:var(--macro-title-color,#fff);font-weight:700}
+      .macro-pos-opt.active .macro-lang-bar{opacity:1;transform:scaleY(1)}
+      #macro-revnot-toast{position:fixed;top:6px;bottom:auto;left:0;opacity:0;pointer-events:none !important;user-select:none !important;-webkit-user-select:none !important;z-index:999998;font-family:'Ubuntu',sans-serif,Arial;line-height:1.25;letter-spacing:normal;text-shadow:none;-webkit-font-smoothing:antialiased;transition:opacity 0.16s ease,top 0.2s cubic-bezier(0.22,1,0.36,1),bottom 0.2s cubic-bezier(0.22,1,0.36,1)}
+      #macro-revnot-toast,#macro-revnot-toast *{box-sizing:border-box;text-shadow:none}
+      #macro-revnot-toast.pos-bottom{top:auto;bottom:6px}
+      #macro-revnot-toast.open{top:14px;opacity:1}
+      #macro-revnot-toast.pos-bottom.open{top:auto;bottom:14px}
+      .macro-revnot-box{position:relative;display:inline-flex;align-items:center;gap:10px;padding:7px 12px;background:var(--macro-win-bg,rgba(20,20,20,0.94));backdrop-filter:blur(8px);border:1px solid var(--macro-border,#333);border-radius:8px;box-shadow:0 10px 28px rgba(0,0,0,0.72);overflow:hidden}
+      .macro-revnot-tag{font-size:10px;font-weight:700;line-height:1.2;letter-spacing:0.8px;text-transform:uppercase;color:var(--macro-muted-text,#9aa0a6)}
+      .macro-revnot-sep{width:1px;height:14px;background:var(--macro-sep,rgba(255,255,255,0.12))}
+      .macro-revnot-lbl{font-size:12px;font-weight:500;line-height:1.2;color:var(--macro-text,#ddd)}
+      .macro-revnot-val{display:inline-flex;align-items:center;justify-content:center;min-width:28px;padding:3px 8px;border-radius:4px;background:var(--macro-accent,#f2f2f4);color:var(--macro-accent-text,#111114);font-size:12px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+      .macro-revnot-mult{font-size:11px;font-weight:700;line-height:1.2;color:var(--macro-muted-text,#8e949c);font-variant-numeric:tabular-nums}
+      .macro-revnot-bar{position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--macro-accent,rgba(242,242,244,0.8));opacity:0.75;transform-origin:left center}
+      .macro-revnot-bar.run{animation:macroRevNotShrink 1.6s linear forwards}
+      @keyframes macroRevNotShrink{from{transform:scaleX(1)}to{transform:scaleX(0)}}
       #macro-window:not(.open),#macro-window:not(.open) *{pointer-events:none !important}
       #macro-window *:not(input):not(textarea)::selection{background:transparent}
       #macro-window input,#macro-window textarea{user-select:text !important;-webkit-user-select:text !important;cursor:text}
@@ -5028,10 +5076,23 @@
           <div class="macro-info-wrap"><span class="macro-info-icon"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.6a1 1 0 0 1 1 1v5.1a1 1 0 1 1-2 0V3.6a1 1 0 0 1 1-1Zm0 8.55a1.15 1.15 0 1 1 0 2.3 1.15 1.15 0 0 1 0-2.3Z"/></svg></span><div class="macro-info-tooltip" data-i18n="tipRev">${k3Tr('tipRev')}</div></div>
         </div>
         ${mkR(w9QnL2xM)}
+        <div class="macro-row" id="macro-row-revnot">
+          <span data-i18n="revNot">${k3Tr('revNot')}</span>
+          <div class="macro-controls-group">
+            <button type="button" class="macro-pos-btn" id="macro-revnot-btn">
+              <span class="macro-lang-cur" id="macro-revnot-cur">${k3Tr(m9TvL2sP.revNotifyPos === 'bottom' ? 'posBot' : 'posTop')}</span>
+              <svg class="macro-lang-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <label class="macro-switch">
+              <input type="checkbox" id="macro-toggle-revnot">
+              <span class="macro-switch-slider"></span>
+            </label>
+          </div>
+        </div>
         <div class="macro-row">
           <span data-i18n="revSp">${k3Tr('revSp')}</span>
           <div class="macro-chips-container">
-            ${[2, 4, 8, 16, 32, 64, 128, 256].map(s => `<button type="button" class="macro-split-chip" data-split="${s}">${s}</button>`).join('')}
+            ${[2, 4, 8, 16, 32, 64, 128, 256].map((s, i) => `<button type="button" class="macro-split-chip" data-split="${s}">${i + 1}x</button>`).join('')}
           </div>
         </div>
         ${mkR(k5TxM8wL)}
@@ -5138,6 +5199,12 @@
         </div>
         <button class="macro-reset-all-btn" id="macro-btn-all-reset" data-i18n="rstAll">${k3Tr('rstAll')}</button>
         <a href="https://kuksikoid.github.io/gota-multibox-guide/" target="_blank" class="macro-tutorial-btn" data-i18n="tut">${k3Tr('tut')}</a>
+        <div class="macro-pos-pop" id="macro-revnot-pop">
+          <div class="macro-lang-list">
+            <button type="button" class="macro-pos-opt${m9TvL2sP.revNotifyPos !== 'bottom' ? ' active' : ''}" data-pos="top"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="posTop">${k3Tr('posTop')}</span></button>
+            <button type="button" class="macro-pos-opt${m9TvL2sP.revNotifyPos === 'bottom' ? ' active' : ''}" data-pos="bottom"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="posBot">${k3Tr('posBot')}</span></button>
+          </div>
+        </div>
           </div>
         </div>
         <div class="macro-pane-settings">
@@ -5208,6 +5275,57 @@
     c1XnL4vP.id = 'macro-plexus-canvas';
     g9QmV3xR.insertBefore(c1XnL4vP, g9QmV3xR.firstChild);
     document.body.appendChild(win);
+    const rnToast = document.createElement('div');
+    rnToast.id = 'macro-revnot-toast';
+    if (m9TvL2sP.revNotifyPos === 'bottom') rnToast.classList.add('pos-bottom');
+    rnToast.innerHTML = `
+      <div class="macro-revnot-box">
+        <span class="macro-revnot-tag">Auto-Rev</span>
+        <span class="macro-revnot-sep"></span>
+        <span class="macro-revnot-lbl">Splits</span>
+        <span class="macro-revnot-val" id="macro-revnot-val">2x</span>
+        <span class="macro-revnot-mult" id="macro-revnot-mult">(4c)</span>
+        <div class="macro-revnot-bar" id="macro-revnot-bar"></div>
+      </div>
+    `;
+    document.body.appendChild(rnToast);
+    const rnValEl = document.getElementById('macro-revnot-val');
+    const rnMultEl = document.getElementById('macro-revnot-mult');
+    const rnBarEl = document.getElementById('macro-revnot-bar');
+    let rnHideTm = 0;
+
+    function r9CenterToast() {
+      const vpW = document.documentElement.clientWidth || window.innerWidth;
+      const w = rnToast.offsetWidth;
+      if (w > 0) rnToast.style.left = Math.round((vpW - w) * 0.5) + 'px';
+    }
+    window.addEventListener('resize', () => {
+      if (rnToast.classList.contains('open')) r9CenterToast();
+    });
+
+    r9RevNotClr = () => {
+      clearTimeout(rnHideTm);
+      rnToast.classList.remove('open');
+      if (rnBarEl) rnBarEl.classList.remove('run');
+    };
+
+    r9RevNotFn = sp => {
+      if (!m9TvL2sP.revNotify) return;
+      const val = parseInt(sp, 10) || 4;
+      const pw = Math.max(1, Math.min(8, Math.round(Math.log2(val))));
+      rnToast.classList.toggle('pos-bottom', m9TvL2sP.revNotifyPos === 'bottom');
+      if (rnValEl) rnValEl.textContent = pw + 'x';
+      if (rnMultEl) rnMultEl.textContent = '(' + val + 'c)';
+      r9CenterToast();
+      if (rnBarEl) {
+        rnBarEl.classList.remove('run');
+        void rnBarEl.offsetWidth;
+        rnBarEl.classList.add('run');
+      }
+      rnToast.classList.add('open');
+      clearTimeout(rnHideTm);
+      rnHideTm = setTimeout(() => rnToast.classList.remove('open'), 1600);
+    };
     f4KzP9wL(win);
     win.querySelectorAll('input:not([type="checkbox"]), textarea').forEach(b3EdBind);
     ['keydown', 'keyup', 'keypress', 'copy', 'cut', 'paste', 'selectstart', 'contextmenu'].forEach(ev => {
@@ -5742,6 +5860,7 @@
     win.querySelectorAll('.macro-split-chip').forEach(ch => {
       ch.addEventListener('click', e => {
         e.stopPropagation(); m9TvL2sP.revSplits = parseInt(ch.getAttribute('data-split'), 10); x3QnK8wR(); r8QnM4tL();
+        if (r9RevNotFn) r9RevNotFn(m9TvL2sP.revSplits);
       });
     });
 
@@ -5801,6 +5920,7 @@
       });
       g5LkW8nP.addEventListener('click', e => {
         e.stopPropagation();
+        c7CloseRevPos(true);
         win.classList.toggle('settings-open');
         if (!win.classList.contains('settings-open')) {
           c7ClosePal();
@@ -6184,11 +6304,15 @@
         pill.style.setProperty('--macro-border', brd);
         pill.style.background = `rgb(${hr},${hg},${hb})`;
         pill.style.color = lt ? '#0a0a0a' : '#eee';
+        ['--macro-win-bg', '--macro-border', '--macro-text', '--macro-muted-text', '--macro-sep', '--macro-accent', '--macro-accent-text'].forEach(p => {
+          rnToast.style.setProperty(p, win.style.getPropertyValue(p));
+        });
       } else {
         ['--macro-win-bg', '--macro-hdr-bg', '--macro-hdr-border', '--macro-border', '--macro-text', '--macro-title-color', '--macro-muted-text', '--macro-sep', '--macro-pal-glow', '--macro-accent', '--macro-accent-text', '--macro-accent-muted', '--macro-sw-on-bg', '--macro-sw-on-brd', '--macro-sw-on-knob', '--macro-opt-act-bg', '--macro-lang-bg'].forEach(p => win.style.removeProperty(p));
         pill.style.removeProperty('--macro-border');
         pill.style.background = '';
         pill.style.color = '';
+        ['--macro-win-bg', '--macro-border', '--macro-text', '--macro-muted-text', '--macro-sep', '--macro-accent', '--macro-accent-text'].forEach(p => rnToast.style.removeProperty(p));
       }
       qM7wK2vP(win);
       v6WpL2sT(pill);
@@ -6570,9 +6694,112 @@
       if (pSet && !keepDim && !z5QpL8wH) pSet.classList.remove('macro-pal-dim');
     }
 
+    const rnRow = document.getElementById('macro-row-revnot');
+    const rnBtn = document.getElementById('macro-revnot-btn');
+    const rnPop = document.getElementById('macro-revnot-pop');
+    const rnTgl = document.getElementById('macro-toggle-revnot');
+    let rnPopHideT = 0;
+
+    function j4PosRevNot() {
+      if (!rnPop || !rnBtn || !b7NmQ2xL) return;
+      const pRect = b7NmQ2xL.getBoundingClientRect();
+      const bRect = rnBtn.getBoundingClientRect();
+      const fz = parseFloat(getComputedStyle(win).fontSize) || 12;
+      const gap = Math.max(3, Math.round(0.28 * fz));
+      rnPop.style.width = Math.round(bRect.width) + 'px';
+      rnPop.style.left = Math.round(bRect.left - pRect.left) + 'px';
+      const popH = rnPop.offsetHeight || Math.round(4.6 * fz);
+      const up = (pRect.bottom - bRect.bottom) < popH + gap + 6 && (bRect.top - pRect.top) > popH + gap + 6;
+      rnPop.classList.toggle('drop-up', up);
+      rnPop.style.top = up
+        ? Math.round((bRect.top - pRect.top) + b7NmQ2xL.scrollTop - popH - gap) + 'px'
+        : Math.round((bRect.bottom - pRect.top) + b7NmQ2xL.scrollTop + gap) + 'px';
+      rnPop.style.right = 'auto';
+      rnPop.style.bottom = 'auto';
+    }
+
+    function c7CloseRevPos(instant) {
+      if (rnPopHideT) { clearTimeout(rnPopHideT); rnPopHideT = 0; }
+      if (rnBtn) rnBtn.classList.remove('open');
+      if (rnPop) {
+        rnPop.classList.remove('open');
+        if (instant) {
+          rnPop.style.display = 'none';
+        } else {
+          rnPopHideT = setTimeout(() => {
+            rnPopHideT = 0;
+            if (rnPop && !rnPop.classList.contains('open')) rnPop.style.display = 'none';
+          }, 210);
+        }
+      }
+      if (rnRow) rnRow.classList.remove('macro-pal-active');
+      if (b7NmQ2xL) b7NmQ2xL.classList.remove('macro-pal-dim');
+    }
+
+    if (rnTgl) {
+      rnTgl.addEventListener('change', e => {
+        m9TvL2sP.revNotify = e.target.checked;
+        x3QnK8wR();
+        if (m9TvL2sP.revNotify) {
+          if (r9RevNotFn) r9RevNotFn(m9TvL2sP.revSplits);
+        } else if (r9RevNotClr) {
+          r9RevNotClr();
+        }
+        e.target.blur();
+      });
+    }
+
+    if (rnBtn && rnPop) {
+      rnBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        const op = !rnPop.classList.contains('open');
+        if (op) {
+          if (rnPopHideT) { clearTimeout(rnPopHideT); rnPopHideT = 0; }
+          rnPop.style.display = 'block';
+          j4PosRevNot();
+          void rnPop.offsetWidth;
+          if (b7NmQ2xL) b7NmQ2xL.classList.add('macro-pal-dim');
+          if (rnRow) rnRow.classList.add('macro-pal-active');
+          rnBtn.classList.add('open');
+          rnPop.classList.add('open');
+        } else {
+          c7CloseRevPos();
+        }
+      });
+
+      rnPop.addEventListener('click', e => {
+        const opt = e.target && e.target.closest ? e.target.closest('.macro-pos-opt') : null;
+        if (!opt) return;
+        e.stopPropagation();
+        const pos = opt.getAttribute('data-pos') === 'bottom' ? 'bottom' : 'top';
+        m9TvL2sP.revNotifyPos = pos;
+        x3QnK8wR();
+        r8QnM4tL();
+        c7CloseRevPos();
+        if (m9TvL2sP.revNotify && r9RevNotFn) r9RevNotFn(m9TvL2sP.revSplits);
+      });
+    }
+
+    if (window.ResizeObserver && b7NmQ2xL) {
+      new ResizeObserver(() => {
+        if (rnPop && rnPop.classList.contains('open')) j4PosRevNot();
+      }).observe(b7NmQ2xL);
+    }
+    window.addEventListener('resize', () => {
+      if (rnPop && rnPop.classList.contains('open')) j4PosRevNot();
+    });
+    window.addEventListener('mousedown', e => {
+      if (!win.classList.contains('open')) return;
+      if (!rnPop || !rnPop.classList.contains('open')) return;
+      const t = e.target;
+      if (t && t.closest && t.closest('#macro-revnot-pop, #macro-revnot-btn, .macro-custom-scroll-track, #macro-toggle-pill')) return;
+      c7CloseRevPos();
+    }, true);
+
     g4PopClsFn = () => {
       c7ClosePal(true);
       c7CloseLang(true);
+      c7CloseRevPos(true);
       if (pSet) pSet.classList.remove('macro-pal-dim');
     };
 
@@ -6615,11 +6842,11 @@
       });
       win.querySelectorAll('[data-i18n-trick]').forEach(el => {
         const idx = parseInt(el.getAttribute('data-i18n-trick'), 10);
-        el.textContent = `${k3Tr('trick')} ${1 << idx} (${idx}x)`;
+        el.textContent = `${k3Tr('trick')} ${idx}x (${1 << idx}c)`;
       });
       win.querySelectorAll('[data-i18n-selrev]').forEach(el => {
         const idx = parseInt(el.getAttribute('data-i18n-selrev'), 10);
-        el.textContent = `${k3Tr('selRev')} ${1 << idx} (${idx}x)`;
+        el.textContent = `${k3Tr('selRev')} ${idx}x (${1 << idx}c)`;
       });
       win.querySelectorAll('[data-ff-del-lbl]').forEach(el => {
         el.textContent = k3Tr('ffDelN', el.getAttribute('data-ff-del-lbl'));
@@ -6730,6 +6957,8 @@
       v8PalHist.plexus = {};
       c7ClosePal();
       c7CloseLang();
+      c7CloseRevPos(true);
+      if (r9RevNotClr) r9RevNotClr();
       k8QmN3vR();
       f4KzP9wL(win);
       x3QnK8wR();
