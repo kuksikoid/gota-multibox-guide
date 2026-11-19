@@ -584,6 +584,7 @@
     crosshairEnabled: false,
     crosshairStyle: "plus",
     cursorArrow: false,
+    softColors: false,
     plexusEnabled: true,
     syncScale: false,
     pillTransparent: false,
@@ -717,6 +718,7 @@
   m9TvL2sP.crosshairStyle =
     m9TvL2sP.crosshairStyle === "cross" ? "cross" : "plus";
   m9TvL2sP.cursorArrow = Boolean(m9TvL2sP.cursorArrow);
+  m9TvL2sP.softColors = Boolean(m9TvL2sP.softColors);
   m9TvL2sP.extraFastFeeds = Array.isArray(m9TvL2sP.extraFastFeeds)
     ? m9TvL2sP.extraFastFeeds
         .filter((x) => x && typeof x === "object")
@@ -2186,6 +2188,32 @@
       updRec: "มีอัปเดตใหม่: v{n} (แนะนำ)",
     },
   };
+
+  const k2SoftTr = {
+    en: "Soft Colors",
+    ru: "Мягкие цвета",
+    uk: "М'які кольори",
+    es: "Colores suaves",
+    pt: "Cores suaves",
+    fr: "Couleurs douces",
+    de: "Weiche Farben",
+    it: "Colori tenui",
+    pl: "Miękkie kolory",
+    nl: "Zachte kleuren",
+    ro: "Culori moi",
+    tr: "Yumuşak Renkler",
+    ar: "ألوان ناعمة",
+    hi: "सॉफ्ट कलर्स",
+    zh: "柔和颜色",
+    ja: "ソフトカラー",е
+    ko: "부드러운 색상",
+    id: "Warna Lembut",
+    vi: "Màu dịu mắt",
+    th: "สีซอฟต์",
+  };
+  for (const k in k2SoftTr) {
+    if (t3LangDict[k]) t3LangDict[k].softCol = k2SoftTr[k];
+  }
 
   if (typeof m9TvL2sP.lang !== "string" || !t3LangDict[m9TvL2sP.lang])
     m9TvL2sP.lang = "en";
@@ -4883,6 +4911,303 @@
     }
   }
 
+  const n5SoftCache = new Map();
+  const g7SoftTint = new WeakMap();
+  const g7SoftSet = new Set();
+  const g7SoftGfx = new WeakMap();
+  const g7SoftGfxSet = new Set();
+  const g7SoftPrt = new WeakMap();
+  const g7SoftPrtSet = new Set();
+
+  let p9GlSoftAct = false;
+
+  function n5SoftNum(col) {
+    if (typeof col !== "number" || !Number.isFinite(col)) return col;
+    const ci = col & 0xffffff;
+    if (ci === 0 || ci === 0xffffff) return ci;
+    const hit = n5SoftCache.get(ci);
+    if (hit !== undefined) return hit;
+    const rn = ((ci >> 16) & 255) / 255;
+    const gn = ((ci >> 8) & 255) / 255;
+    const bn = (ci & 255) / 255;
+    const mx = Math.max(rn, gn, bn);
+    const mn = Math.min(rn, gn, bn);
+    const d = mx - mn;
+    const l = (mx + mn) * 0.5;
+    const sV = mx > 0 ? d / mx : 0;
+    const sL = d > 0 ? d / (1 - Math.abs(2 * l - 1)) : 0;
+    let out = ci;
+    if (
+      d >= 0.14 &&
+      (sV >= 0.2 || sL >= 0.22) &&
+      !(mx > 0.9 && mn > 0.78) &&
+      mx >= 0.63 &&
+      l >= 0.34
+    ) {
+      const ns = sV * 0.54;
+      const nv = mx + (1 - mx) * 0.35;
+      const nr = Math.max(
+        0,
+        Math.min(255, Math.round((1 - ns + ns * ((rn - mn) / d)) * nv * 255)),
+      );
+      const ng = Math.max(
+        0,
+        Math.min(255, Math.round((1 - ns + ns * ((gn - mn) / d)) * nv * 255)),
+      );
+      const nb = Math.max(
+        0,
+        Math.min(255, Math.round((1 - ns + ns * ((bn - mn) / d)) * nv * 255)),
+      );
+      out = (nr << 16) | (ng << 8) | nb;
+    }
+    if (n5SoftCache.size > 1024) n5SoftCache.clear();
+    n5SoftCache.set(ci, out);
+    return out;
+  }
+
+  function k2ReadTint(nd) {
+    const t = nd.tint;
+    if (typeof t === "number") return t & 0xffffff;
+    if (t && typeof t.toNumber === "function") return t.toNumber() & 0xffffff;
+    return -1;
+  }
+
+  function k2IsBorder(nd) {
+    if (!nd || typeof nd.getLocalBounds !== "function") return false;
+    const b = m7Box(nd.getLocalBounds());
+    return Boolean(b && (b.w >= 3800 || b.h >= 3800));
+  }
+
+  function k2SoftStyle(st, owner, kind) {
+    if (!st || typeof st.color !== "number") return false;
+    const cc = st.color & 0xffffff;
+    let rec = g7SoftGfx.get(st);
+    if (!rec) {
+      const sc = n5SoftNum(cc);
+      if (sc !== cc) {
+        rec = { raw: cc, soft: sc, owner, kind };
+        g7SoftGfx.set(st, rec);
+        g7SoftGfxSet.add(st);
+        st.color = sc;
+        return true;
+      }
+      return false;
+    }
+    if (cc !== rec.soft) {
+      rec.raw = cc;
+      rec.soft = n5SoftNum(cc);
+    }
+    if (rec.soft !== cc) {
+      st.color = rec.soft;
+      return true;
+    }
+    return false;
+  }
+
+  function k2SoftNode(nd) {
+    const tc = k2ReadTint(nd);
+    if (tc >= 0) {
+      let rec = g7SoftTint.get(nd);
+      if (!rec) {
+        const sc = n5SoftNum(tc);
+        if (sc !== tc) {
+          rec = { raw: tc, soft: sc };
+          g7SoftTint.set(nd, rec);
+          g7SoftSet.add(nd);
+          nd.tint = sc;
+        }
+      } else {
+        if (tc !== rec.soft) {
+          rec.raw = tc;
+          rec.soft = n5SoftNum(tc);
+        }
+        if (rec.soft !== tc) nd.tint = rec.soft;
+      }
+    }
+    if (
+      nd.context &&
+      Array.isArray(nd.context.instructions) &&
+      !k2IsBorder(nd)
+    ) {
+      const ins = nd.context.instructions;
+      let chg = false;
+      for (let i = 0; i < ins.length; i++) {
+        const it = ins[i];
+        if (
+          it &&
+          (it.action === "fill" || it.action === "stroke") &&
+          it.data &&
+          it.data.style
+        ) {
+          if (k2SoftStyle(it.data.style, nd.context, 1)) chg = true;
+        }
+      }
+      if (chg && typeof nd.context.onUpdate === "function")
+        nd.context.onUpdate();
+    } else if (
+      nd.geometry &&
+      Array.isArray(nd.geometry.graphicsData) &&
+      !k2IsBorder(nd)
+    ) {
+      const gd = nd.geometry.graphicsData;
+      let chg = false;
+      for (let i = 0; i < gd.length; i++) {
+        const g = gd[i];
+        if (!g) continue;
+        if (g.fillStyle && k2SoftStyle(g.fillStyle, nd.geometry, 2)) chg = true;
+        if (g.lineStyle && k2SoftStyle(g.lineStyle, nd.geometry, 2)) chg = true;
+      }
+      if (chg && typeof nd.geometry.invalidate === "function")
+        nd.geometry.invalidate();
+    }
+  }
+
+  function k2SoftWalk(nd, dp) {
+    if (
+      !nd ||
+      nd.destroyed ||
+      nd.visible === false ||
+      nd.isMask ||
+      typeof nd.text === "string"
+    )
+      return;
+    if (dp > 3) return;
+    if (nd.isParticleContainer && Array.isArray(nd.particleChildren)) {
+      const ps = nd.particleChildren;
+      for (let i = 0; i < ps.length; i++) {
+        const p = ps[i];
+        if (!p || typeof p.color !== "number") continue;
+        const pc = p.color & 0xffffff;
+        const pa = p.color & 0xff000000;
+        let rec = g7SoftPrt.get(p);
+        if (!rec) {
+          const sc = n5SoftNum(pc);
+          if (sc !== pc) {
+            rec = { raw: pc, soft: sc };
+            g7SoftPrt.set(p, rec);
+            g7SoftPrtSet.add(p);
+            p.color = (pa | sc) >>> 0;
+          }
+        } else {
+          if (pc !== rec.soft) {
+            rec.raw = pc;
+            rec.soft = n5SoftNum(pc);
+          }
+          if (rec.soft !== pc) p.color = (pa | rec.soft) >>> 0;
+        }
+      }
+      return;
+    }
+    k2SoftNode(nd);
+    const ch = nd.children;
+    if (ch && ch.length) {
+      for (let i = 0; i < ch.length; i++) k2SoftWalk(ch[i], dp + 1);
+    }
+  }
+
+  function k2SoftFrame(wld) {
+    if (!m9TvL2sP.softColors || p9GlSoftAct) {
+      if (g7SoftSet.size || g7SoftGfxSet.size || g7SoftPrtSet.size) j2RstSoft();
+      return;
+    }
+    if (!wld || !wld.children) return;
+    let cam = wld;
+    const wt = wld.worldTransform;
+    if (
+      wt &&
+      Math.abs(wt.a - 1) < 1e-4 &&
+      Math.abs(wt.d - 1) < 1e-4 &&
+      Math.abs(wt.tx) < 0.5 &&
+      Math.abs(wt.ty) < 0.5
+    ) {
+      for (let i = 0; i < wld.children.length; i++) {
+        const c = wld.children[i];
+        const cwt = c && c.worldTransform;
+        if (
+          c &&
+          c.children &&
+          c.children.length &&
+          cwt &&
+          cwt.a > 0.002 &&
+          cwt.a < 25 &&
+          (Math.abs(cwt.a - 1) > 1e-4 ||
+            Math.abs(cwt.tx) > 0.5 ||
+            Math.abs(cwt.ty) > 0.5)
+        ) {
+          cam = c;
+          break;
+        }
+      }
+    }
+    const ch = cam.children;
+    if (!ch || !ch.length) return;
+    for (let i = 0; i < ch.length; i++) {
+      const c = ch[i];
+      if (
+        !c ||
+        c.destroyed ||
+        c.visible === false ||
+        typeof c.text === "string"
+      )
+        continue;
+      if (c.isParticleContainer) {
+        k2SoftWalk(c, 0);
+        continue;
+      }
+      const sub = c.children;
+      if (sub && sub.length) {
+        if (
+          sub.length <= 16 &&
+          !sub.some((k) => k && k.children && k.children.length > 0) &&
+          k2IsBorder(c)
+        )
+          continue;
+        for (let j = 0; j < sub.length; j++) k2SoftWalk(sub[j], 0);
+      } else if (!k2IsBorder(c)) {
+        k2SoftWalk(c, 0);
+      }
+    }
+  }
+
+  function j2RstSoft() {
+    g7SoftSet.forEach((nd) => {
+      const rec = g7SoftTint.get(nd);
+      if (rec && nd && !nd.destroyed && k2ReadTint(nd) === rec.soft) {
+        nd.tint = rec.raw;
+      }
+      g7SoftTint.delete(nd);
+    });
+    g7SoftSet.clear();
+
+    const upd = new Set();
+    g7SoftGfxSet.forEach((st) => {
+      const rec = g7SoftGfx.get(st);
+      if (rec && typeof st.color === "number" && (st.color & 0xffffff) === rec.soft) {
+        st.color = rec.raw;
+        if (rec.owner) upd.add(rec);
+      }
+      g7SoftGfx.delete(st);
+    });
+    g7SoftGfxSet.clear();
+    upd.forEach((r) => {
+      try {
+        if (r.kind === 1 && typeof r.owner.onUpdate === "function")
+          r.owner.onUpdate();
+        else if (r.kind === 2 && typeof r.owner.invalidate === "function")
+          r.owner.invalidate();
+      } catch (_) {}
+    });
+
+    g7SoftPrtSet.forEach((p) => {
+      const rec = g7SoftPrt.get(p);
+      if (rec && typeof p.color === "number" && (p.color & 0xffffff) === rec.soft) {
+        p.color = ((p.color & 0xff000000) | rec.raw) >>> 0;
+      }
+      g7SoftPrt.delete(p);
+    });
+    g7SoftPrtSet.clear();
+  }
+
   const c9LmW2xR = new Set();
   let r7DpK4vM = 0;
 
@@ -4906,6 +5231,7 @@
       }
     }
     if (!wld) return;
+    k2SoftFrame(wld);
     if (m9TvL2sP.stripFilters) {
       if (wld.filters && wld.filters.length > 0) wld.filters = null;
       if (st.filters && st.filters.length > 0) st.filters = null;
@@ -5459,23 +5785,212 @@
     };
   };
 
+  const glShType = new WeakMap();
+  const glOrigSrc = new WeakMap();
+  const glPatchedSh = new WeakSet();
+  const glCurProg = new WeakMap();
+  const glSoftLoc = new WeakMap();
+  const glSoftVal = new WeakMap();
+
+  const k2GlslFn = `
+uniform float _uMSoft;
+vec4 _mSoft(vec4 raw) {
+  if (_uMSoft < 0.5 || raw.a <= 0.001) return raw;
+  float rMx = max(raw.r, max(raw.g, raw.b));
+  float pre = (rMx <= raw.a + 0.004 && raw.a < 0.999) ? 1.0 : 0.0;
+  vec3 c = pre > 0.5 ? clamp(raw.rgb / raw.a, 0.0, 1.0) : clamp(raw.rgb, 0.0, 1.0);
+  float mx = max(c.r, max(c.g, c.b));
+  float mn = min(c.r, min(c.g, c.b));
+  float d = mx - mn;
+  float l = (mx + mn) * 0.5;
+  float sV = mx > 0.0001 ? d / mx : 0.0;
+  float sL = (d > 0.0001 && l > 0.0001 && l < 0.9999) ? d / (1.0 - abs(2.0 * l - 1.0)) : 0.0;
+  if (d < 0.14 || (sV < 0.20 && sL < 0.22) || (mx > 0.90 && mn > 0.78) || mx < 0.63 || l < 0.34) return raw;
+  float ns = sV * 0.54;
+  float nv = mx + (1.0 - mx) * 0.35;
+  vec3 nh = (c - vec3(mn)) / d;
+  vec3 sc = mix(vec3(1.0), nh, ns) * nv;
+  return vec4(pre > 0.5 ? sc * raw.a : sc, raw.a);
+}
+`;
+
+  function k2PatchFrag(src) {
+    if (typeof src !== "string" || src.includes("_mSoft")) return null;
+    const mMain = src.match(/\bvoid\s+main\s*\(\s*(?:void\s*)?\)\s*\{/);
+    if (!mMain) return null;
+    const is300 = /^\s*#version\s+300\s+es\b/m.test(src);
+    if (is300) {
+      const mOut = src.match(
+        /(?:layout\s*\([^)]*\)\s*)?\bout\s+(?:(?:highp|mediump|lowp)\s+)?vec4\s+([A-Za-z_]\w*)\s*;/,
+      );
+      if (!mOut) return null;
+      const outN = mOut[1];
+      const idx = mMain.index;
+      const head = src.slice(0, idx);
+      const tail = src.slice(idx).replace(/\bmain\b/, "_mOrigMain");
+      return (
+        head +
+        k2GlslFn +
+        tail +
+        `\nvoid main(){_mOrigMain();${outN}=_mSoft(${outN});}`
+      );
+    }
+    if (!/\bgl_FragColor\b/.test(src) || /\bgl_FragData\b/.test(src))
+      return null;
+    const idx = mMain.index;
+    const head = src.slice(0, idx).replace(/\bgl_FragColor\b/g, "_mFc0");
+    const tail = src
+      .slice(idx)
+      .replace(/\bmain\b/, "_mOrigMain")
+      .replace(/\bgl_FragColor\b/g, "_mFc0");
+    return (
+      head +
+      "\nvec4 _mFc0 = vec4(0.0);\n" +
+      k2GlslFn +
+      tail +
+      "\nvoid main(){_mOrigMain();gl_FragColor=_mSoft(_mFc0);}"
+    );
+  }
+
+  function k2SyncGlSoft(gl) {
+    if (gl.canvas !== (cachedGameCanvas || t8VwM4xK())) return;
+    f4NzQ8vR++;
+    const prog = glCurProg.get(gl);
+    if (!prog) return;
+    const loc = glSoftLoc.get(prog);
+    if (!loc) return;
+    p9GlSoftAct = true;
+    const want = m9TvL2sP.softColors ? 1 : 0;
+    if (glSoftVal.get(prog) !== want) {
+      glSoftVal.set(prog, want);
+      gl.uniform1f(loc, want);
+    }
+  }
+
+  const k2HookGlSoft = (pt) => {
+    if (!pt || pt.__mGlSoft) return;
+    pt.__mGlSoft = true;
+    const ogCrSh = pt.createShader;
+    const ogShSrc = pt.shaderSource;
+    const ogComp = pt.compileShader;
+    const ogUse = pt.useProgram;
+    const ogLink = pt.linkProgram;
+    const ogUnifLoc = pt.getUniformLocation;
+    const ogExt = pt.getExtension;
+
+    if (ogCrSh) {
+      pt.createShader = function (tp) {
+        const sh = ogCrSh.apply(this, arguments);
+        if (sh && tp === 0x8b30) glShType.set(sh, 1);
+        return sh;
+      };
+    }
+    if (ogShSrc) {
+      pt.shaderSource = function (sh, src) {
+        const isFrag =
+          glShType.has(sh) ||
+          (typeof src === "string" &&
+            !/\bgl_Position\b/.test(src) &&
+            (/\bgl_FragColor\b/.test(src) ||
+              /\bout\s+(?:(?:highp|mediump|lowp)\s+)?vec4\b/.test(src)));
+        if (isFrag && typeof src === "string") {
+          const p = k2PatchFrag(src);
+          if (p) {
+            glOrigSrc.set(sh, src);
+            glPatchedSh.add(sh);
+            return ogShSrc.call(this, sh, p);
+          }
+        }
+        glPatchedSh.delete(sh);
+        return ogShSrc.apply(this, arguments);
+      };
+    }
+    if (ogComp) {
+      pt.compileShader = function (sh) {
+        ogComp.apply(this, arguments);
+        if (
+          glPatchedSh.has(sh) &&
+          !this.getShaderParameter(sh, 0x8b81) &&
+          ogShSrc
+        ) {
+          const orig = glOrigSrc.get(sh);
+          glPatchedSh.delete(sh);
+          if (orig) {
+            ogShSrc.call(this, sh, orig);
+            ogComp.call(this, sh);
+          }
+        }
+      };
+    }
+    if (ogUse) {
+      pt.useProgram = function (prog) {
+        glCurProg.set(this, prog || null);
+        return ogUse.apply(this, arguments);
+      };
+    }
+    if (ogLink) {
+      pt.linkProgram = function (prog) {
+        ogLink.apply(this, arguments);
+        if (prog && this.getProgramParameter(prog, 0x8b82) && ogUnifLoc) {
+          const loc = ogUnifLoc.call(this, prog, "_uMSoft");
+          if (loc) {
+            glSoftLoc.set(prog, loc);
+            glSoftVal.set(prog, -1);
+          }
+        }
+      };
+    }
+    if (ogExt) {
+      pt.getExtension = function (nm) {
+        const ext = ogExt.apply(this, arguments);
+        if (
+          ext &&
+          typeof nm === "string" &&
+          nm === "ANGLE_instanced_arrays" &&
+          !ext.__mGlInst
+        ) {
+          ext.__mGlInst = true;
+          const glRef = this;
+          ["drawArraysInstancedANGLE", "drawElementsInstancedANGLE"].forEach(
+            (fn) => {
+              if (!ext[fn]) return;
+              const ogF = ext[fn];
+              ext[fn] = function () {
+                k2SyncGlSoft(glRef);
+                return ogF.apply(this, arguments);
+              };
+            },
+          );
+        }
+        return ext;
+      };
+    }
+  };
+
   const n4GlDrw = (pt) => {
     if (!pt) return;
-    ["drawArrays", "drawElements"].forEach((fn) => {
+    [
+      "drawArrays",
+      "drawElements",
+      "drawArraysInstanced",
+      "drawElementsInstanced",
+    ].forEach((fn) => {
       if (!pt[fn]) return;
       const og = pt[fn];
       pt[fn] = function () {
-        if (this.canvas === (cachedGameCanvas || t8VwM4xK())) f4NzQ8vR++;
+        k2SyncGlSoft(this);
         return og.apply(this, arguments);
       };
     });
   };
 
+  k2HookGlSoft(WebGLRenderingContext.prototype);
   h6LocHook(WebGLRenderingContext.prototype);
   p5QzL9sT(WebGLRenderingContext.prototype);
   y2TvN7wM(WebGLRenderingContext.prototype);
   n4GlDrw(WebGLRenderingContext.prototype);
   if (typeof WebGL2RenderingContext !== "undefined") {
+    k2HookGlSoft(WebGL2RenderingContext.prototype);
     h6LocHook(WebGL2RenderingContext.prototype);
     p5QzL9sT(WebGL2RenderingContext.prototype);
     y2TvN7wM(WebGL2RenderingContext.prototype);
@@ -8048,6 +8563,9 @@
     }
     const tCa = document.getElementById("macro-toggle-curarrow");
     if (tCa) tCa.checked = Boolean(m9TvL2sP.cursorArrow);
+    const tSc2 = document.getElementById("macro-toggle-softcol");
+    if (tSc2) tSc2.checked = Boolean(m9TvL2sP.softColors);
+    if (!m9TvL2sP.softColors) j2RstSoft();
     const tGr = document.getElementById("macro-toggle-map-grid");
     const cGr = document.getElementById("macro-grid-cur");
     const pGr = document.getElementById("macro-grid-pop");
@@ -8210,6 +8728,87 @@
     if (this.canvas && this.canvas.isConnected && v9TxtOn())
       w3ClrArea(this, x, y, w, h, true);
     return p4FillOg.apply(this, arguments);
+  };
+
+  function k2SoftCss(sv) {
+    if (typeof sv !== "string") return null;
+    const s = sv.trim();
+    let num = -1;
+    let a = 1;
+    if (s[0] === "#") {
+      if (s.length === 4) {
+        const r = parseInt(s[1] + s[1], 16);
+        const g = parseInt(s[2] + s[2], 16);
+        const b = parseInt(s[3] + s[3], 16);
+        if (!isNaN(r + g + b)) num = (r << 16) | (g << 8) | b;
+      } else if (s.length === 7) {
+        const v = parseInt(s.slice(1), 16);
+        if (!isNaN(v)) num = v & 0xffffff;
+      }
+    } else if (s.startsWith("rgb")) {
+      const m = s.match(
+        /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\s*\)$/i,
+      );
+      if (m) {
+        if (m[4] !== undefined) a = parseFloat(m[4]);
+        if (a >= 0.85) {
+          const r = Math.max(0, Math.min(255, parseInt(m[1], 10)));
+          const g = Math.max(0, Math.min(255, parseInt(m[2], 10)));
+          const b = Math.max(0, Math.min(255, parseInt(m[3], 10)));
+          num = (r << 16) | (g << 8) | b;
+        }
+      }
+    }
+    if (num < 0) return null;
+    const sn = n5SoftNum(num);
+    if (sn === num) return null;
+    return a < 1
+      ? `rgba(${(sn >> 16) & 255},${(sn >> 8) & 255},${sn & 255},${a})`
+      : "#" + sn.toString(16).padStart(6, "0");
+  }
+
+  const p4C2Fill = CanvasRenderingContext2D.prototype.fill;
+  CanvasRenderingContext2D.prototype.fill = function () {
+    if (
+      m9TvL2sP.softColors &&
+      (!p9PixiOn || performance.now() - p9LastPixiMs > 500) &&
+      this.canvas &&
+      this.canvas === (cachedGameCanvas || t8VwM4xK())
+    ) {
+      const og = this.fillStyle;
+      const sc = k2SoftCss(og);
+      if (sc) {
+        this.fillStyle = sc;
+        try {
+          return p4C2Fill.apply(this, arguments);
+        } finally {
+          this.fillStyle = og;
+        }
+      }
+    }
+    return p4C2Fill.apply(this, arguments);
+  };
+
+  const p4C2Strk = CanvasRenderingContext2D.prototype.stroke;
+  CanvasRenderingContext2D.prototype.stroke = function () {
+    if (
+      m9TvL2sP.softColors &&
+      (!p9PixiOn || performance.now() - p9LastPixiMs > 500) &&
+      this.canvas &&
+      this.canvas === (cachedGameCanvas || t8VwM4xK())
+    ) {
+      const og = this.strokeStyle;
+      const sc = k2SoftCss(og);
+      if (sc) {
+        this.strokeStyle = sc;
+        try {
+          return p4C2Strk.apply(this, arguments);
+        } finally {
+          this.strokeStyle = og;
+        }
+      }
+    }
+    return p4C2Strk.apply(this, arguments);
   };
 
   if (typeof OffscreenCanvasRenderingContext2D !== "undefined") {
@@ -8790,6 +9389,13 @@
           <span data-i18n="curArr">${k3Tr("curArr")}</span>
           <label class="macro-switch">
             <input type="checkbox" id="macro-toggle-curarrow">
+            <span class="macro-switch-slider"></span>
+          </label>
+        </div>
+        <div class="macro-row">
+          <span data-i18n="softCol">${k3Tr("softCol")}</span>
+          <label class="macro-switch">
+            <input type="checkbox" id="macro-toggle-softcol">
             <span class="macro-switch-slider"></span>
           </label>
         </div>
@@ -11124,6 +11730,17 @@
       });
     }
 
+    const scTgl = document.getElementById("macro-toggle-softcol");
+    if (scTgl) {
+      scTgl.addEventListener("change", (e) => {
+        m9TvL2sP.softColors = e.target.checked;
+        x3QnK8wR();
+        if (!m9TvL2sP.softColors) j2RstSoft();
+        e.target.blur();
+        f4RefocusGame();
+      });
+    }
+
     const grTgl = document.getElementById("macro-toggle-map-grid");
     if (grTgl) {
       grTgl.addEventListener("change", (e) => {
@@ -11467,6 +12084,7 @@
         "mapGridEnabled",
         "crosshairEnabled",
         "cursorArrow",
+        "softColors",
         "plexusEnabled",
         "syncScale",
         "revNotify",
