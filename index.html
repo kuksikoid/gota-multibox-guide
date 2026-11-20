@@ -37,6 +37,9 @@
     .item-body .auto-rev-glow{color:#fff}
     .media-wrap{width:100%;aspect-ratio:16/9;background:#070707;border:1px solid #262626;border-radius:4px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
     .media-wrap video{width:100%;height:100%;object-fit:contain;outline:none;display:block}
+    .media-col{display:flex;flex-direction:column;gap:12px;width:100%}
+    .media-slot{display:flex;flex-direction:column;gap:5px}
+    .media-label{font-size:12px;font-weight:700;color:#9aa0a6;letter-spacing:0.3px}
     .vid-empty{display:none;color:#666;font-size:12.5px;text-align:center;padding:14px;user-select:none}
     @media(max-width:940px){
       .item{grid-template-columns:1fr;gap:16px;padding:16px}
@@ -112,9 +115,21 @@
         <div class="item-head" id="t-auto-title"></div>
         <div class="item-body" id="t-auto-desc"></div>
       </div>
-      <div class="media-wrap">
-        <video id="auto-rev-video" src="auto-rev.mp4" controls playsinline preload="metadata"></video>
-        <span class="vid-empty" data-file="auto-rev.mp4"></span>
+      <div class="media-col">
+        <div class="media-slot">
+          <div class="media-label">WebSocket</div>
+          <div class="media-wrap">
+            <video id="auto-rev-ws-video" src="auto-rev-ws.mp4" controls playsinline preload="metadata"></video>
+            <span class="vid-empty" data-file="auto-rev-ws.mp4"></span>
+          </div>
+        </div>
+        <div class="media-slot">
+          <div class="media-label">Pixi</div>
+          <div class="media-wrap">
+            <video id="auto-rev-video" src="auto-rev.mp4" controls playsinline preload="metadata"></video>
+            <span class="vid-empty" data-file="auto-rev.mp4"></span>
+          </div>
+        </div>
       </div>
     </section>
   </div>
@@ -389,7 +404,7 @@
       c6FgW(v);
     });
 
-    ["solo-video", "fast-feed-video", "auto-rev-video"].forEach(id => {
+    ["solo-video", "fast-feed-video", "auto-rev-ws-video", "auto-rev-video"].forEach(id => {
       const v = k8LmQ.getElementById(id);
       if (!v) return;
       v.addEventListener("error", () => {
