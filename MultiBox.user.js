@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Gota.io Multibox Overlay
 // @namespace    http://tampermonkey.net/
-// @version      0.4.5
+// @version      0.5.0
 // @description  Rev is not Reverse
 // @author       Kuksik & Judex
 // @match        https://gota.io/camlan/*
@@ -535,7 +535,10 @@
     soloDelay: 800,
     autoDelay: 800,
     keyMenu: "ShiftRight",
+    ffMethod: "manual",
     keyAuto: "KeyE",
+    keyFfLock: "KeyE",
+    keyFfActivate: "KeyE",
     extraFastFeeds: [],
     keyT2: null,
     keyT4: null,
@@ -714,6 +717,7 @@
   m9TvL2sP.revNotify = Boolean(m9TvL2sP.revNotify);
   m9TvL2sP.revNotifyPos = m9TvL2sP.revNotifyPos === "bottom" ? "bottom" : "top";
   m9TvL2sP.revMethod = m9TvL2sP.revMethod === "pixi" ? "pixi" : "ws";
+  m9TvL2sP.ffMethod = m9TvL2sP.ffMethod === "auto" ? "auto" : "manual";
   m9TvL2sP.mapGridEnabled = Boolean(m9TvL2sP.mapGridEnabled);
   m9TvL2sP.mapGridMode = m9TvL2sP.mapGridMode === "over" ? "over" : "bg";
   m9TvL2sP.crosshairEnabled = Boolean(m9TvL2sP.crosshairEnabled);
@@ -2223,6 +2227,172 @@
     if (t3LangDict[k]) t3LangDict[k].revMtd = k2RevMtdTr[k];
   }
 
+  const k2FfTr = {
+    en: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "Lock / Unlock",
+      ffAct: "Activate",
+      ffMan: "Manual",
+      ffAuto: "Auto",
+    },
+    ru: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "Лок / Анлок",
+      ffAct: "Активация",
+      ffMan: "Ручной",
+      ffAuto: "Авто",
+    },
+    uk: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "Лок / Анлок",
+      ffAct: "Активація",
+      ffMan: "Ручний",
+      ffAuto: "Авто",
+    },
+    es: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "Bloquear / Soltar",
+      ffAct: "Activar",
+      ffMan: "Manual",
+      ffAuto: "Auto",
+    },
+    pt: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "Travar / Destravar",
+      ffAct: "Ativar",
+      ffMan: "Manual",
+      ffAuto: "Auto",
+    },
+    fr: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "Verrouiller / Libérer",
+      ffAct: "Activer",
+      ffMan: "Manuel",
+      ffAuto: "Auto",
+    },
+    de: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "Fixieren / Lösen",
+      ffAct: "Aktivieren",
+      ffMan: "Manuell",
+      ffAuto: "Auto",
+    },
+    it: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "Blocca / Sblocca",
+      ffAct: "Attiva",
+      ffMan: "Manuale",
+      ffAuto: "Auto",
+    },
+    pl: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "Zablokuj / Odblokuj",
+      ffAct: "Aktywuj",
+      ffMan: "Ręczny",
+      ffAuto: "Auto",
+    },
+    nl: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "Lock / Unlock",
+      ffAct: "Activeren",
+      ffMan: "Handmatig",
+      ffAuto: "Auto",
+    },
+    ro: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "Blochează / Debloc.",
+      ffAct: "Activează",
+      ffMan: "Manual",
+      ffAuto: "Auto",
+    },
+    tr: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "Kilitle / Aç",
+      ffAct: "Başlat",
+      ffMan: "Manuel",
+      ffAuto: "Oto",
+    },
+    ar: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "قفل / إلغاء القفل",
+      ffAct: "تفعيل",
+      ffMan: "يدوي",
+      ffAuto: "تلقائي",
+    },
+    hi: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "लॉक / अनलॉक",
+      ffAct: "सक्रिय करें",
+      ffMan: "मैनुअल",
+      ffAuto: "ऑटो",
+    },
+    zh: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "锁定 / 解锁",
+      ffAct: "触发",
+      ffMan: "手动",
+      ffAuto: "自动",
+    },
+    ja: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "固定 / 解除",
+      ffAct: "発動",
+      ffMan: "手動",
+      ffAuto: "自動",
+    },
+    ko: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "고정 / 해제",
+      ffAct: "실행",
+      ffMan: "수동",
+      ffAuto: "자동",
+    },
+    id: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "Kunci / Buka",
+      ffAct: "Aktifkan",
+      ffMan: "Manual",
+      ffAuto: "Otomatis",
+    },
+    vi: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "Khóa / Mở khóa",
+      ffAct: "Kích hoạt",
+      ffMan: "Thủ công",
+      ffAuto: "Tự động",
+    },
+    th: {
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "ล็อก / ปลดล็อก",
+      ffAct: "เปิดใช้งาน",
+      ffMan: "กำหนดเอง",
+      ffAuto: "อัตโนมัติ",
+    },
+  };
+  for (const k in k2FfTr) {
+    if (t3LangDict[k]) Object.assign(t3LangDict[k], k2FfTr[k]);
+  }
+
   if (typeof m9TvL2sP.lang !== "string" || !t3LangDict[m9TvL2sP.lang])
     m9TvL2sP.lang = "en";
 
@@ -2643,6 +2813,12 @@
         })
         .catch(() => {});
     }
+    return () => {
+      if (!done) {
+        done = true;
+        cln();
+      }
+    };
   }
 
   function n7KwQ2vL(ms, cb) {
@@ -2664,8 +2840,16 @@
   const v4SeenBuf = new WeakSet();
   let v4MyOid = 0;
   let v4OwnSeen = false;
+  const nFfMinMassPct = 15;
+  const nFfSurgeMs = 805;
+  const nFfSurgeLeadMs = 55;
+  const nFfSurgeReach = 950;
   let v4WsScene = null;
   let v4WsLock = null;
+  let v4FfLock = null;
+  let v4FfAuto = null;
+  let v4FfRadMul = 1;
+  const v4FfVis = { active: false, cx: 0, cy: 0, r: 0, alpha: 0, pop: 1.0 };
   let v4InU8 = false;
 
   (function q7BrdInit() {
@@ -2992,9 +3176,55 @@
       const c = v4WsCells.get(v4WsLock.cellId);
       if (c && c.tag === 2 && c.oid) v4WsLock.ownerId = c.oid;
     }
+    if (v4FfLock && !v4FfLock.ownerId) {
+      const c = v4WsCells.get(v4FfLock.cellId);
+      if (c && c.tag === 2 && c.oid) v4FfLock.ownerId = c.oid;
+    }
 
     const delSet = new Set(dels);
     const remSet = new Set(remPlrs);
+    const prevFfLk = v4FfLock ? v4WsCells.get(v4FfLock.cellId) : null;
+    let newFfCid = 0;
+    if (
+      v4FfLock &&
+      v4FfLock.ownerId &&
+      !delSet.has(v4FfLock.cellId) &&
+      !remSet.has(v4FfLock.ownerId) &&
+      prevFfLk &&
+      prevFfLk.tag === 2 &&
+      prevFfLk.r > 0
+    ) {
+      let lkUpd = null;
+      for (let i = 0; i < upds.length; i++) {
+        if (upds[i].tag === 2 && upds[i].cid === v4FfLock.cellId) {
+          lkUpd = upds[i];
+          break;
+        }
+      }
+      if (
+        lkUpd &&
+        lkUpd.r < prevFfLk.r &&
+        1 - (lkUpd.r * lkUpd.r) / (prevFfLk.r * prevFfLk.r) >= 0.25
+      ) {
+        const maxD = Math.max(
+          prevFfLk.r * v4FfRadMul * 1.6,
+          prevFfLk.r * v4FfRadMul + 180,
+        );
+        let bestScore = Infinity;
+        for (let i = 0; i < adds.length; i++) {
+          const a = adds[i];
+          if (a.tag !== 2 || a.oid !== v4FfLock.ownerId || v4WsCells.has(a.cid))
+            continue;
+          const d = Math.hypot(a.x - lkUpd.x, a.y - lkUpd.y);
+          if (d > maxD) continue;
+          const score = d + Math.abs(a.r - lkUpd.r) * 3;
+          if (score < bestScore) {
+            bestScore = score;
+            newFfCid = a.cid;
+          }
+        }
+      }
+    }
     let triggered = false;
 
     if (m9TvL2sP.revMethod === "ws" && v4WsLock && v4WsLock.ownerId) {
@@ -3044,7 +3274,21 @@
         if (c.tag === 2 && remSet.has(c.oid)) v4WsCells.delete(cid);
       }
     }
-    for (let i = 0; i < adds.length; i++) v4WsCells.set(adds[i].cid, adds[i]);
+    let gotFfSplit = false;
+    for (let i = 0; i < adds.length; i++) {
+      const a = adds[i];
+      if (
+        v4FfAuto &&
+        a.tag === 2 &&
+        a.oid === v4FfAuto.initOid &&
+        !v4FfAuto.preCids.has(a.cid) &&
+        !v4FfAuto.splitConfirmed
+      ) {
+        v4FfAuto.splitConfirmed = true;
+        gotFfSplit = true;
+      }
+      v4WsCells.set(a.cid, a);
+    }
     for (let i = 0; i < upds.length; i++) {
       const u = upds[i];
       const ex = v4WsCells.get(u.cid);
@@ -3052,6 +3296,32 @@
         ex.x = u.x;
         ex.y = u.y;
         ex.r = u.r;
+      }
+    }
+
+    if (newFfCid && v4FfLock) {
+      v4FfLock.cellId = newFfCid;
+      if (v4FfAuto) v4FfAuto.targetCid = newFfCid;
+    } else if (
+      v4FfLock &&
+      !remSet.has(v4FfLock.ownerId) &&
+      !v4WsCells.has(v4FfLock.cellId) &&
+      prevFfLk
+    ) {
+      let mCid = 0;
+      let mBestD = Infinity;
+      const prevR = prevFfLk.r * v4FfRadMul;
+      for (const c of v4WsCells.values()) {
+        if (c.tag !== 2 || c.oid !== v4FfLock.ownerId) continue;
+        const d = Math.hypot(c.x - prevFfLk.x, c.y - prevFfLk.y);
+        if (d <= prevR + c.r * v4FfRadMul + 300 && d < mBestD) {
+          mBestD = d;
+          mCid = c.cid;
+        }
+      }
+      if (mCid) {
+        v4FfLock.cellId = mCid;
+        if (v4FfAuto) v4FfAuto.targetCid = mCid;
       }
     }
 
@@ -3065,6 +3335,49 @@
         !v4WsCells.has(v4WsLock.cellId)
       ) {
         q2WnS7xM(true);
+      }
+    }
+
+    if (v4FfLock) {
+      if (
+        k2WsDead() ||
+        (v4FfLock.ownerId && remSet.has(v4FfLock.ownerId)) ||
+        !v4WsCells.has(v4FfLock.cellId)
+      ) {
+        k4FfCancel(true);
+      }
+    }
+
+    if (v4FfAuto && gotFfSplit) {
+      if (v4FfAuto.cancelFire) v4FfAuto.cancelFire();
+      const hudPing = g5ReadPingMs();
+      const rttEst = performance.now() - v4FfAuto.t0;
+      const pingEst = hudPing > 0 ? hudPing : Math.max(30, rttEst - 20);
+      const delayFromAdd1 = Math.max(
+        360,
+        nFfSurgeMs - pingEst - nFfSurgeLeadMs + v4FfAuto.radBoost,
+      );
+      const genSnap = v4FfAuto.gen;
+      v4FfAuto.cancelFire = k7RunDelay(
+        delayFromAdd1,
+        () => k4FfOnTimer(genSnap),
+        50,
+      );
+    }
+
+    if (v4FfAuto && v4FfAuto.waitReach) {
+      if (k2WsDead() || !v4FfLock) {
+        k4FfCancel(true);
+      } else {
+        const dtNow = performance.now() - v4FfAuto.t0;
+        const minGap = w4FfMinGap(v4FfAuto.initOid, v4FfAuto.targetCid);
+        const reachLim =
+          dtNow > 1200
+            ? 300
+            : Math.max(nFfSurgeReach, v4FfAuto.preMaxR * 0.72 + 250);
+        if (Number.isFinite(minGap) && minGap <= reachLim) {
+          k4FfFire2(v4FfAuto.gen);
+        }
       }
     }
     return true;
@@ -3105,6 +3418,7 @@
       v4PtyOids.clear();
       if (m9TvL2sP.revMethod === "ws") q2WnS7xM(false);
       else v4WsLock = null;
+      k4FfCancel(false);
       return true;
     }
     if (op === 0x29 && len >= 3) {
@@ -3265,6 +3579,59 @@
     if (!lk || !scn) return null;
     if (lk.node.u !== lk.model || lk.model.lX !== lk.cellId) return null;
     return w4ToNative(lk.node, scn);
+  }
+
+  function w4GetCurSelfOid() {
+    const id = parseInt(g5ReadPid(), 10);
+    if (Number.isSafeInteger(id) && id > 0) return id;
+    return v4MyOid;
+  }
+
+  function w4ReadFfLocked() {
+    const lk = v4FfLock,
+      scn = v4WsScene;
+    if (!lk || !scn || !scn.models) return null;
+    const m = scn.models.get(lk.cellId);
+    const nd = m && m._$;
+    if (!nd) return null;
+    const res = w4ToNative(nd, scn);
+    if (res) {
+      lk.model = m;
+      lk.node = nd;
+    }
+    return res;
+  }
+
+  function w4FindFfTarget(x, y) {
+    const scn = v4WsScene;
+    if (!scn || performance.now() - scn.at > 250) return null;
+    const curSelf = w4GetCurSelfOid();
+    if (!curSelf) return null;
+    let best = null,
+      bestOrd = null;
+    for (const m of scn.models.values()) {
+      const node = m && m._$;
+      if (!node) continue;
+      const c = w4ToNative(node, scn);
+      if (!c) continue;
+      if (Math.hypot(x - c.cx, y - c.cy) > c.r) continue;
+      const wc = v4WsCells.get(c.cellId);
+      if (!wc || wc.tag !== 2 || !wc.oid || wc.oid === curSelf) continue;
+      const ord = w4OrderPath(node, scn.root);
+      if (!best || w4IsAbove(ord, bestOrd)) {
+        bestOrd = ord;
+        best = {
+          cellId: c.cellId,
+          cx: c.cx,
+          cy: c.cy,
+          r: c.r,
+          oid: wc.oid,
+          node: c.node,
+          model: c.model,
+        };
+      }
+    }
+    return best;
   }
 
   function w4FindEnemy(x, y) {
@@ -4088,6 +4455,81 @@
     return m ? parseInt(m[1], 10) || 0 : 0;
   }
 
+  function k4ExecSecondSplit(startId, startSw, runGen, onDone) {
+    function runSecond(tries) {
+      if (m9MbSt.matchGen !== runGen) {
+        if (onDone) onDone();
+        return;
+      }
+      if (!h4HasPeerTab() && m4IsMbOn() && g2BindTbl.sw > 0) {
+        const curId = g5ReadPid();
+        const swDelta = (m9MbSt.swSeq - startSw) & 1;
+        const pidSwitched = Boolean(
+          startId &&
+          startId !== "0" &&
+          curId &&
+          curId !== "0" &&
+          curId !== startId &&
+          m9MbSt.swSeq !== startSw,
+        );
+        if (swDelta === 1 || pidSwitched) {
+          if (k4MbBusy && tries < 16) {
+            d2TinyWait(15, () => runSecond(tries + 1));
+            return;
+          }
+          const hudHid = m4HudHidden();
+          const hadFeed = Boolean(hSt2xK9m) || m4EjPhys.down;
+          w5SetMbBusy(true);
+          if (hadFeed) {
+            k4FeedLock = true;
+            m4SendEj(false);
+          }
+          w5PzR8tM(g2BindTbl.sw, 1);
+          w3WaitPidFlip(curId, hudHid ? 35 : 45, () => {
+            if (m9MbSt.matchGen !== runGen) {
+              k4FeedLock = false;
+              w5SetMbBusy(false);
+              if (onDone) onDone();
+              return;
+            }
+            if (Boolean(hSt2xK9m) || m4EjPhys.down) {
+              k4FeedLock = true;
+              m4SendEj(false);
+            }
+            s7PzR(5);
+            const backFrom = g5ReadPid();
+            d2TinyWait(25, () => {
+              if (m9MbSt.matchGen !== runGen) {
+                k4FeedLock = false;
+                w5SetMbBusy(false);
+                if (onDone) onDone();
+                return;
+              }
+              w5PzR8tM(g2BindTbl.sw, 1);
+              w3WaitPidFlip(backFrom, hudHid ? 35 : 45, () => {
+                k4FeedLock = false;
+                w5SetMbBusy(false);
+                if (
+                  m9MbSt.matchGen === runGen &&
+                  (Boolean(hSt2xK9m) || m4EjPhys.down)
+                )
+                  m4SendEj(true);
+                if (onDone) onDone();
+              });
+            });
+          });
+          return;
+        }
+      }
+      try {
+        s7PzR(5);
+      } finally {
+        if (onDone) onDone();
+      }
+    }
+    runSecond(0);
+  }
+
   function k4MbFastFeed(delayMs, onDone) {
     const mbInit = !h4HasPeerTab() && m4IsMbOn();
     const startId = mbInit ? g5ReadPid() : "";
@@ -4095,79 +4537,140 @@
     const runGen = m9MbSt.matchGen;
     s7PzR(5);
     z7PxM4wK(delayMs, () => {
-      function runSecond(tries) {
-        if (m9MbSt.matchGen !== runGen) {
-          if (onDone) onDone();
-          return;
-        }
-        if (!h4HasPeerTab() && m4IsMbOn() && g2BindTbl.sw > 0) {
-          const curId = g5ReadPid();
-          const swDelta = (m9MbSt.swSeq - startSw) & 1;
-          const pidSwitched = Boolean(
-            startId &&
-            startId !== "0" &&
-            curId &&
-            curId !== "0" &&
-            curId !== startId &&
-            m9MbSt.swSeq !== startSw,
-          );
-          if (swDelta === 1 || pidSwitched) {
-            if (k4MbBusy && tries < 16) {
-              d2TinyWait(15, () => runSecond(tries + 1));
-              return;
-            }
-            const hudHid = m4HudHidden();
-            const hadFeed = Boolean(hSt2xK9m) || m4EjPhys.down;
-            w5SetMbBusy(true);
-            if (hadFeed) {
-              k4FeedLock = true;
-              m4SendEj(false);
-            }
-            w5PzR8tM(g2BindTbl.sw, 1);
-            w3WaitPidFlip(curId, hudHid ? 35 : 45, () => {
-              if (m9MbSt.matchGen !== runGen) {
-                k4FeedLock = false;
-                w5SetMbBusy(false);
-                if (onDone) onDone();
-                return;
-              }
-              if (Boolean(hSt2xK9m) || m4EjPhys.down) {
-                k4FeedLock = true;
-                m4SendEj(false);
-              }
-              s7PzR(5);
-              const backFrom = g5ReadPid();
-              d2TinyWait(25, () => {
-                if (m9MbSt.matchGen !== runGen) {
-                  k4FeedLock = false;
-                  w5SetMbBusy(false);
-                  if (onDone) onDone();
-                  return;
-                }
-                w5PzR8tM(g2BindTbl.sw, 1);
-                w3WaitPidFlip(backFrom, hudHid ? 35 : 45, () => {
-                  k4FeedLock = false;
-                  w5SetMbBusy(false);
-                  if (
-                    m9MbSt.matchGen === runGen &&
-                    (Boolean(hSt2xK9m) || m4EjPhys.down)
-                  )
-                    m4SendEj(true);
-                  if (onDone) onDone();
-                });
-              });
-            });
-            return;
-          }
-        }
-        try {
-          s7PzR(5);
-        } finally {
-          if (onDone) onDone();
-        }
-      }
-      runSecond(0);
+      k4ExecSecondSplit(startId, startSw, runGen, onDone);
     });
+  }
+
+  function k4FfStopAutoOnly() {
+    if (!v4FfAuto) return;
+    if (v4FfAuto.cancelTm) v4FfAuto.cancelTm();
+    if (v4FfAuto.cancelFire) v4FfAuto.cancelFire();
+    v4FfAuto = null;
+  }
+
+  function k4FfCancel(keepVisFade) {
+    k4FfStopAutoOnly();
+    v4FfLock = null;
+    if (!keepVisFade) {
+      v4FfVis.active = false;
+      v4FfVis.alpha = 0;
+    }
+  }
+
+  function w4FfMinGap(initOid, targetCid) {
+    const tc = v4WsCells.get(targetCid);
+    if (!tc) return Infinity;
+    const owns = [];
+    let curMaxR = 0;
+    for (const c of v4WsCells.values()) {
+      if (c.tag !== 2 || c.oid !== initOid) continue;
+      const cr = c.r * v4FfRadMul;
+      if (cr > curMaxR) curMaxR = cr;
+      owns.push(c);
+    }
+    if (!owns.length) return Infinity;
+    const minR2 = curMaxR * curMaxR * (nFfMinMassPct / 100);
+    const tr = tc.r * v4FfRadMul;
+    let minGap = Infinity;
+    for (let i = 0; i < owns.length; i++) {
+      const c = owns[i];
+      const cr = c.r * v4FfRadMul;
+      if (cr * cr < minR2) continue;
+      const g = Math.hypot(tc.x - c.x, tc.y - c.y) - (cr + tr);
+      if (g < minGap) minGap = g;
+    }
+    return minGap;
+  }
+
+  function k4FfFire2(genSnap) {
+    const act = v4FfAuto;
+    if (!act || act.gen !== genSnap) return;
+    if (act.clrLock) k4FfCancel(true);
+    else k4FfStopAutoOnly();
+    if (k2WsDead()) return;
+    k4ExecSecondSplit(act.startId, act.startSw, genSnap, null);
+  }
+
+  function k4FfOnTimer(genSnap) {
+    if (!v4FfAuto || v4FfAuto.gen !== genSnap) return;
+    v4FfAuto.cancelFire = null;
+    if (k2WsDead() || !v4FfLock || !v4WsCells.has(v4FfAuto.targetCid)) {
+      k4FfCancel(true);
+      return;
+    }
+    const minGap = w4FfMinGap(v4FfAuto.initOid, v4FfAuto.targetCid);
+    const dynReach = Math.max(nFfSurgeReach, v4FfAuto.preMaxR * 0.72 + 250);
+    if (Number.isFinite(minGap) && minGap <= dynReach) {
+      k4FfFire2(genSnap);
+    } else {
+      v4FfAuto.waitReach = true;
+    }
+  }
+
+  function k4FfStart(clearLockOnFinish) {
+    if (v4FfAuto || b9TxK4mP || k4MbBusy || k2WsDead() || !v4FfLock) return;
+    const tWs = v4WsCells.get(v4FfLock.cellId);
+    const selfOid = w4GetCurSelfOid();
+    if (!tWs || !selfOid || tWs.oid === selfOid) return;
+
+    const px = w4ReadFfLocked();
+    if (px && tWs.r > 0 && px.model && px.model.G > 0) {
+      const raw = px.model.G / tWs.r;
+      v4FfRadMul = Math.abs(raw - 1) < 0.12 ? 1 : raw;
+    }
+
+    const preCids = new Set();
+    let preMaxR = 0;
+    for (const c of v4WsCells.values()) {
+      if (c.tag !== 2 || c.oid !== selfOid) continue;
+      preCids.add(c.cid);
+      const r = c.r * v4FfRadMul;
+      if (r > preMaxR) preMaxR = r;
+    }
+
+    const mbInit = !h4HasPeerTab() && m4IsMbOn();
+    const startId = mbInit ? g5ReadPid() : "";
+    const startSw = m9MbSt.swSeq;
+    const runGen = m9MbSt.matchGen;
+    const hudPing = g5ReadPingMs();
+    const pingEst = hudPing > 0 ? hudPing : 50;
+    const radBoost = Math.min(50, Math.max(0, (preMaxR - 1400) * 0.06));
+    const fbDelay = Math.max(
+      380,
+      nFfSurgeMs - pingEst * 0.5 - nFfSurgeLeadMs + radBoost,
+    );
+
+    const cancelTm = k7RunDelay(
+      3000,
+      () => {
+        if (v4FfAuto && v4FfAuto.gen === runGen) {
+          if (v4FfAuto.clrLock) k4FfCancel(true);
+          else k4FfStopAutoOnly();
+        }
+      },
+      50,
+    );
+    const cancelFire = k7RunDelay(fbDelay, () => k4FfOnTimer(runGen), 50);
+
+    v4FfAuto = {
+      initOid: selfOid,
+      targetCid: v4FfLock.cellId,
+      targetOid: v4FfLock.ownerId,
+      t0: performance.now(),
+      splitConfirmed: false,
+      waitReach: false,
+      preMaxR,
+      radBoost,
+      preCids,
+      startId,
+      startSw,
+      gen: runGen,
+      clrLock: clearLockOnFinish,
+      cancelTm,
+      cancelFire,
+    };
+
+    s7PzR(5);
   }
 
   function k4MbTrick(spCnt) {
@@ -4347,6 +4850,7 @@
             m9MbSt.activeBox = 0;
             m9MbSt.matchGen++;
             v4OwnSeen = false;
+            k4FfCancel(false);
           },
           true,
         );
@@ -7767,112 +8271,179 @@ vec4 _mSoft(vec4 raw) {
       }
     }
 
-    if (!x5QzL2wT.active || x5QzL2wT.alpha <= 0.01) {
+    if (v4FfLock) {
+      if (k2WsDead() || !v4WsCells.has(v4FfLock.cellId)) {
+        k4FfCancel(true);
+      } else {
+        const curFf = w4ReadFfLocked();
+        if (curFf) {
+          v4FfVis.alpha += (1.0 - v4FfVis.alpha) * (1 - Math.exp(-18 * dtSec));
+          v4FfVis.pop += (1.0 - v4FfVis.pop) * (1 - Math.exp(-14 * dtSec));
+          v4FfVis.active = true;
+          v4FfVis.cx = curFf.cx;
+          v4FfVis.cy = curFf.cy;
+          v4FfVis.r = curFf.r;
+        }
+      }
+    } else if (v4FfVis.active) {
+      v4FfVis.alpha *= Math.exp(-15 * dtSec);
+      v4FfVis.pop += (1.06 - v4FfVis.pop) * (1 - Math.exp(-10 * dtSec));
+      if (v4FfVis.alpha < 0.01) {
+        v4FfVis.active = false;
+        v4FfVis.alpha = 0;
+      }
+    }
+
+    const revOn = x5QzL2wT.active && x5QzL2wT.alpha > 0.01;
+    const ffOn = v4FfVis.active && v4FfVis.alpha > 0.01;
+    if (!revOn && !ffOn) {
       k9LwP2xM(m4WnL7sT);
       return;
     }
 
-    const gCv = (x5QzL2wT.isVp && v4WsScene && v4WsScene.canvas) || t8VwM4xK();
-    if (!gCv) {
-      k9LwP2xM(m4WnL7sT);
-      return;
-    }
-    const cRc = gCv.getBoundingClientRect();
-    let tX, tY, tRad;
-    if (x5QzL2wT.isVp) {
-      tX = x5QzL2wT.cx;
-      tY = x5QzL2wT.cy;
-      tRad = Math.max(6, x5QzL2wT.r * x5QzL2wT.pop);
-    } else {
-      const scX = cRc.width / gCv.width,
-        scY = cRc.height / gCv.height;
-      const zm = k3WnL8vR();
-      tX = cRc.left + x5QzL2wT.cx * scX;
-      tY = cRc.top + x5QzL2wT.cy * scY;
-      tRad = Math.max(
-        6,
-        x5QzL2wT.worldR * zm * ((scX + scY) * 0.5) * x5QzL2wT.pop,
-      );
-    }
-    const a = x5QzL2wT.alpha;
     const pulse = 0.5 + 0.5 * Math.sin(nw * 0.006);
 
-    const grad = w4TvN8wL.createLinearGradient(midX, midY, tX, tY);
-    grad.addColorStop(0, `rgba(0, 165, 255, ${0.14 * a})`);
-    grad.addColorStop(0.6, `rgba(0, 215, 255, ${0.58 * a})`);
-    grad.addColorStop(1, `rgba(130, 242, 255, ${0.95 * a})`);
+    function d4DrawTargetFx(gCv, tX, tY, tRad, a, isYellow) {
+      const cRc = gCv.getBoundingClientRect();
+      const grad = w4TvN8wL.createLinearGradient(midX, midY, tX, tY);
+      if (isYellow) {
+        grad.addColorStop(0, `rgba(255, 195, 20, ${0.18 * a})`);
+        grad.addColorStop(0.6, `rgba(255, 215, 45, ${0.68 * a})`);
+        grad.addColorStop(1, `rgba(255, 242, 130, ${0.98 * a})`);
+      } else {
+        grad.addColorStop(0, `rgba(0, 165, 255, ${0.14 * a})`);
+        grad.addColorStop(0.6, `rgba(0, 215, 255, ${0.58 * a})`);
+        grad.addColorStop(1, `rgba(130, 242, 255, ${0.95 * a})`);
+      }
 
-    o4Drty = true;
-    w4TvN8wL.save();
-    w4TvN8wL.beginPath();
-    w4TvN8wL.moveTo(midX, midY);
-    w4TvN8wL.lineTo(tX, tY);
-    w4TvN8wL.strokeStyle = grad;
-    w4TvN8wL.lineWidth = 2.0 + 0.6 * a;
-    w4TvN8wL.shadowColor = "rgba(0, 215, 255, 0.85)";
-    w4TvN8wL.shadowBlur = 8 + 4 * pulse;
-    w4TvN8wL.stroke();
-
-    w4TvN8wL.beginPath();
-    w4TvN8wL.arc(tX, tY, 6.2, 0, Math.PI * 2);
-    w4TvN8wL.strokeStyle = `rgba(0, 225, 255, ${0.65 * a})`;
-    w4TvN8wL.lineWidth = 1.4;
-    w4TvN8wL.stroke();
-
-    w4TvN8wL.beginPath();
-    w4TvN8wL.arc(tX, tY, 2.8, 0, Math.PI * 2);
-    w4TvN8wL.fillStyle = `rgba(180, 250, 255, ${0.95 * a})`;
-    w4TvN8wL.fill();
-
-    w4TvN8wL.beginPath();
-    w4TvN8wL.rect(cRc.left, cRc.top, cRc.width, cRc.height);
-    w4TvN8wL.clip();
-
-    w4TvN8wL.beginPath();
-    w4TvN8wL.arc(tX, tY, tRad, 0, Math.PI * 2);
-    w4TvN8wL.strokeStyle = `rgba(0, 200, 255, ${0.28 * a})`;
-    w4TvN8wL.lineWidth = 5.0;
-    w4TvN8wL.shadowColor = "#00DCFF";
-    w4TvN8wL.shadowBlur = 12 + 4 * pulse;
-    w4TvN8wL.stroke();
-
-    w4TvN8wL.shadowBlur = 0;
-    w4TvN8wL.shadowColor = "transparent";
-
-    w4TvN8wL.beginPath();
-    w4TvN8wL.arc(tX, tY, tRad, 0, Math.PI * 2);
-    w4TvN8wL.strokeStyle = `rgba(110, 240, 255, ${0.92 * a})`;
-    w4TvN8wL.lineWidth = 1.8;
-    w4TvN8wL.stroke();
-
-    const outerR = tRad + Math.max(4, Math.min(12, tRad * 0.055));
-    const rot1 = nw * 0.0014;
-    const arcSpan = 0.72;
-    w4TvN8wL.lineCap = "round";
-    w4TvN8wL.lineWidth = 2.4;
-    w4TvN8wL.strokeStyle = `rgba(0, 225, 255, ${(0.72 + 0.2 * pulse) * a})`;
-    for (let i = 0; i < 4; i++) {
-      const a0 = rot1 + i * Math.PI * 0.5 - arcSpan * 0.5;
-      w4TvN8wL.beginPath();
-      w4TvN8wL.arc(tX, tY, outerR, a0, a0 + arcSpan);
-      w4TvN8wL.stroke();
-    }
-
-    if (tRad > 18) {
-      const innerR = Math.max(6, tRad - Math.max(4, Math.min(10, tRad * 0.05)));
+      o4Drty = true;
       w4TvN8wL.save();
-      w4TvN8wL.translate(tX, tY);
-      w4TvN8wL.rotate(-nw * 0.0009);
-      w4TvN8wL.setLineDash([6, 8]);
       w4TvN8wL.beginPath();
-      w4TvN8wL.arc(0, 0, innerR, 0, Math.PI * 2);
-      w4TvN8wL.strokeStyle = `rgba(155, 245, 255, ${0.38 * a})`;
-      w4TvN8wL.lineWidth = 1.2;
+      w4TvN8wL.moveTo(midX, midY);
+      w4TvN8wL.lineTo(tX, tY);
+      w4TvN8wL.strokeStyle = grad;
+      w4TvN8wL.lineWidth = (isYellow ? 2.2 : 2.0) + 0.6 * a;
+      w4TvN8wL.shadowColor = isYellow
+        ? "rgba(255, 195, 25, 0.85)"
+        : "rgba(0, 215, 255, 0.85)";
+      w4TvN8wL.shadowBlur = 8 + 4 * pulse;
       w4TvN8wL.stroke();
+
+      w4TvN8wL.beginPath();
+      w4TvN8wL.arc(tX, tY, 6.2, 0, Math.PI * 2);
+      w4TvN8wL.strokeStyle = isYellow
+        ? `rgba(255, 215, 40, ${0.72 * a})`
+        : `rgba(0, 225, 255, ${0.65 * a})`;
+      w4TvN8wL.lineWidth = 1.4;
+      w4TvN8wL.stroke();
+
+      w4TvN8wL.beginPath();
+      w4TvN8wL.arc(tX, tY, 2.8, 0, Math.PI * 2);
+      w4TvN8wL.fillStyle = isYellow
+        ? `rgba(255, 246, 175, ${0.96 * a})`
+        : `rgba(180, 250, 255, ${0.95 * a})`;
+      w4TvN8wL.fill();
+
+      w4TvN8wL.beginPath();
+      w4TvN8wL.rect(cRc.left, cRc.top, cRc.width, cRc.height);
+      w4TvN8wL.clip();
+
+      w4TvN8wL.beginPath();
+      w4TvN8wL.arc(tX, tY, tRad, 0, Math.PI * 2);
+      w4TvN8wL.strokeStyle = isYellow
+        ? `rgba(255, 185, 20, ${0.3 * a})`
+        : `rgba(0, 200, 255, ${0.28 * a})`;
+      w4TvN8wL.lineWidth = 5.0;
+      w4TvN8wL.shadowColor = isYellow ? "#FFC414" : "#00DCFF";
+      w4TvN8wL.shadowBlur = 12 + 4 * pulse;
+      w4TvN8wL.stroke();
+
+      w4TvN8wL.shadowBlur = 0;
+      w4TvN8wL.shadowColor = "transparent";
+
+      w4TvN8wL.beginPath();
+      w4TvN8wL.arc(tX, tY, tRad, 0, Math.PI * 2);
+      w4TvN8wL.strokeStyle = isYellow
+        ? `rgba(255, 224, 75, ${0.94 * a})`
+        : `rgba(110, 240, 255, ${0.92 * a})`;
+      w4TvN8wL.lineWidth = 1.8;
+      w4TvN8wL.stroke();
+
+      const outerR = tRad + Math.max(4, Math.min(12, tRad * 0.055));
+      const rot1 = nw * (isYellow ? -0.0014 : 0.0014);
+      const arcSpan = 0.72;
+      w4TvN8wL.lineCap = "round";
+      w4TvN8wL.lineWidth = 2.4;
+      w4TvN8wL.strokeStyle = isYellow
+        ? `rgba(255, 212, 45, ${(0.76 + 0.2 * pulse) * a})`
+        : `rgba(0, 225, 255, ${(0.72 + 0.2 * pulse) * a})`;
+      for (let i = 0; i < 4; i++) {
+        const a0 = rot1 + i * Math.PI * 0.5 - arcSpan * 0.5;
+        w4TvN8wL.beginPath();
+        w4TvN8wL.arc(tX, tY, outerR, a0, a0 + arcSpan);
+        w4TvN8wL.stroke();
+      }
+
+      if (tRad > 18) {
+        const innerR = Math.max(
+          6,
+          tRad - Math.max(4, Math.min(10, tRad * 0.05)),
+        );
+        w4TvN8wL.save();
+        w4TvN8wL.translate(tX, tY);
+        w4TvN8wL.rotate(nw * (isYellow ? 0.0009 : -0.0009));
+        w4TvN8wL.setLineDash([6, 8]);
+        w4TvN8wL.beginPath();
+        w4TvN8wL.arc(0, 0, innerR, 0, Math.PI * 2);
+        w4TvN8wL.strokeStyle = isYellow
+          ? `rgba(255, 240, 150, ${0.42 * a})`
+          : `rgba(155, 245, 255, ${0.38 * a})`;
+        w4TvN8wL.lineWidth = 1.2;
+        w4TvN8wL.stroke();
+        w4TvN8wL.restore();
+      }
+
       w4TvN8wL.restore();
     }
 
-    w4TvN8wL.restore();
+    if (revOn) {
+      const gCv =
+        (x5QzL2wT.isVp && v4WsScene && v4WsScene.canvas) || t8VwM4xK();
+      if (gCv) {
+        let tX, tY, tRad;
+        if (x5QzL2wT.isVp) {
+          tX = x5QzL2wT.cx;
+          tY = x5QzL2wT.cy;
+          tRad = Math.max(6, x5QzL2wT.r * x5QzL2wT.pop);
+        } else {
+          const cRc = gCv.getBoundingClientRect();
+          const scX = cRc.width / gCv.width,
+            scY = cRc.height / gCv.height;
+          const zm = k3WnL8vR();
+          tX = cRc.left + x5QzL2wT.cx * scX;
+          tY = cRc.top + x5QzL2wT.cy * scY;
+          tRad = Math.max(
+            6,
+            x5QzL2wT.worldR * zm * ((scX + scY) * 0.5) * x5QzL2wT.pop,
+          );
+        }
+        d4DrawTargetFx(gCv, tX, tY, tRad, x5QzL2wT.alpha, false);
+      }
+    }
+
+    if (ffOn) {
+      const gCv = (v4WsScene && v4WsScene.canvas) || t8VwM4xK();
+      if (gCv) {
+        d4DrawTargetFx(
+          gCv,
+          v4FfVis.cx,
+          v4FfVis.cy,
+          Math.max(6, v4FfVis.r * v4FfVis.pop),
+          v4FfVis.alpha,
+          true,
+        );
+      }
+    }
 
     k9LwP2xM(m4WnL7sT);
   }
@@ -7915,24 +8486,76 @@ vec4 _mSoft(vec4 raw) {
       q2WnS7xM(true);
       return;
     }
-    if (c === m9TvL2sP.keyAuto) {
-      if (b9TxK4mP || k4MbBusy) return;
-      b9TxK4mP = true;
-      k4MbFastFeed(m9TvL2sP.autoDelay, () => {
-        b9TxK4mP = false;
-      });
-      return;
-    }
-    if (Array.isArray(m9TvL2sP.extraFastFeeds)) {
-      for (let i = 0; i < m9TvL2sP.extraFastFeeds.length; i++) {
-        const ff = m9TvL2sP.extraFastFeeds[i];
-        if (ff && ff.key === c) {
-          if (c6RmP3xW.has(ff) || k4MbBusy) return;
-          c6RmP3xW.add(ff);
-          k4MbFastFeed(ff.delay, () => {
-            c6RmP3xW.delete(ff);
-          });
-          return;
+    if (m9TvL2sP.ffMethod === "auto") {
+      if (
+        m9TvL2sP.keyFfLock &&
+        m9TvL2sP.keyFfLock === m9TvL2sP.keyFfActivate &&
+        c === m9TvL2sP.keyFfLock
+      ) {
+        if (v4FfAuto || b9TxK4mP || k4MbBusy || k2WsDead()) return;
+        const t = w4FindFfTarget(t2QnL9wP, b8VmK3xT);
+        if (!t) return;
+        v4FfLock = {
+          cellId: t.cellId,
+          ownerId: t.oid,
+          model: t.model,
+          node: t.node,
+        };
+        v4FfVis.active = true;
+        v4FfVis.cx = t.cx;
+        v4FfVis.cy = t.cy;
+        v4FfVis.r = t.r;
+        v4FfVis.alpha = 0;
+        v4FfVis.pop = 1.22;
+        k4FfStart(true);
+        return;
+      }
+      if (m9TvL2sP.keyFfLock && c === m9TvL2sP.keyFfLock) {
+        if (v4FfLock) {
+          k4FfCancel(true);
+        } else if (!k2WsDead()) {
+          const t = w4FindFfTarget(t2QnL9wP, b8VmK3xT);
+          if (t) {
+            v4FfLock = {
+              cellId: t.cellId,
+              ownerId: t.oid,
+              model: t.model,
+              node: t.node,
+            };
+            v4FfVis.active = true;
+            v4FfVis.cx = t.cx;
+            v4FfVis.cy = t.cy;
+            v4FfVis.r = t.r;
+            v4FfVis.alpha = 0;
+            v4FfVis.pop = 1.22;
+          }
+        }
+        return;
+      }
+      if (m9TvL2sP.keyFfActivate && c === m9TvL2sP.keyFfActivate) {
+        if (v4FfLock && v4WsCells.has(v4FfLock.cellId)) k4FfStart(false);
+        return;
+      }
+    } else {
+      if (c === m9TvL2sP.keyAuto) {
+        if (b9TxK4mP || k4MbBusy) return;
+        b9TxK4mP = true;
+        k4MbFastFeed(m9TvL2sP.autoDelay, () => {
+          b9TxK4mP = false;
+        });
+        return;
+      }
+      if (Array.isArray(m9TvL2sP.extraFastFeeds)) {
+        for (let i = 0; i < m9TvL2sP.extraFastFeeds.length; i++) {
+          const ff = m9TvL2sP.extraFastFeeds[i];
+          if (ff && ff.key === c) {
+            if (c6RmP3xW.has(ff) || k4MbBusy) return;
+            c6RmP3xW.add(ff);
+            k4MbFastFeed(ff.delay, () => {
+              c6RmP3xW.delete(ff);
+            });
+            return;
+          }
         }
       }
     }
@@ -7981,13 +8604,17 @@ vec4 _mSoft(vec4 raw) {
 
   function d5TxL2wV(c) {
     if (!c) return false;
-    if (
-      Array.isArray(m9TvL2sP.extraFastFeeds) &&
-      m9TvL2sP.extraFastFeeds.some((f) => f && f.key === c)
-    )
-      return true;
+    if (m9TvL2sP.ffMethod === "auto") {
+      if (c === m9TvL2sP.keyFfLock || c === m9TvL2sP.keyFfActivate) return true;
+    } else {
+      if (c === m9TvL2sP.keyAuto) return true;
+      if (
+        Array.isArray(m9TvL2sP.extraFastFeeds) &&
+        m9TvL2sP.extraFastFeeds.some((f) => f && f.key === c)
+      )
+        return true;
+    }
     return (
-      c === m9TvL2sP.keyAuto ||
       c === m9TvL2sP.keyT2 ||
       c === m9TvL2sP.keyT4 ||
       c === m9TvL2sP.keyT8 ||
@@ -9151,6 +9778,26 @@ vec4 _mSoft(vec4 raw) {
       });
     }
 
+    const ffAutoOn = m9TvL2sP.ffMethod === "auto";
+    const ffManWrap = document.getElementById("macro-ff-manual-wrap");
+    const ffAutoWrap = document.getElementById("macro-ff-auto-wrap");
+    if (ffManWrap) ffManWrap.style.display = ffAutoOn ? "none" : "block";
+    if (ffAutoWrap) ffAutoWrap.style.display = ffAutoOn ? "block" : "none";
+    const cFm = document.getElementById("macro-ffmtd-cur");
+    const pFm = document.getElementById("macro-ffmtd-pop");
+    if (cFm) cFm.textContent = k3Tr(ffAutoOn ? "ffAuto" : "ffMan");
+    if (pFm) {
+      pFm.querySelectorAll(".macro-pos-opt").forEach((o) => {
+        o.classList.toggle(
+          "active",
+          o.getAttribute("data-ffmtd") === (ffAutoOn ? "auto" : "manual"),
+        );
+      });
+    }
+    const fLBtn = document.getElementById("macro-btn-keyFfLock");
+    if (fLBtn) fLBtn.textContent = p7TvM3wL(m9TvL2sP.keyFfLock);
+    const fABtn = document.getElementById("macro-btn-keyFfActivate");
+    if (fABtn) fABtn.textContent = p7TvM3wL(m9TvL2sP.keyFfActivate);
     const aBtn = document.getElementById("macro-btn-keyAuto");
     if (aBtn) aBtn.textContent = p7TvM3wL(m9TvL2sP.keyAuto);
     const mBtn = document.getElementById("macro-btn-keyMenu");
@@ -9772,7 +10419,7 @@ vec4 _mSoft(vec4 raw) {
       .macro-ff-anim.macro-ff-entering,.macro-ff-anim.macro-ff-leaving{grid-template-rows:0fr;opacity:0;pointer-events:none}
       .macro-ff-anim-inner{overflow:hidden;min-height:0}
       .macro-ff-anim-inner>.macro-row{margin-bottom:0;padding-bottom:0.7em}
-      #macro-ff-delays .macro-ff-anim-inner>.macro-row{margin-bottom:0;padding-top:0.7em;padding-bottom:0}
+      #macro-ff-delays .macro-ff-anim-inner>.macro-row{margin-bottom:0;padding-top:0;padding-bottom:0.7em}
       .macro-settings-body .macro-row,.macro-settings-body .macro-section-header,.macro-settings-body .macro-sep{transition:opacity 0.18s ease,color 0.18s ease,text-shadow 0.18s ease}
       .macro-settings-body.macro-pal-dim .macro-row,.macro-settings-body.macro-pal-dim .macro-section-header,.macro-settings-body.macro-pal-dim .macro-sep,.macro-settings-body.macro-pal-dim .macro-textarea,.macro-settings-body.macro-pal-dim .macro-cfg-btns{opacity:0.32;pointer-events:none}
       .macro-settings-body.macro-pal-dim .macro-row.macro-pal-active{opacity:1;pointer-events:auto}
@@ -9825,7 +10472,7 @@ vec4 _mSoft(vec4 raw) {
       .macro-rev-hdr-r{display:inline-flex;align-items:center;gap:0.45em}
       .macro-rev-mtd-lbl{font-size:1em;font-weight:500;color:var(--macro-muted-text,#9aa0a6);text-transform:none;letter-spacing:0;white-space:nowrap;transition:color 0.28s ease}
       .macro-section-header .macro-pos-btn{width:auto;min-width:0;font-size:0.95em;padding:0.26em 0.52em;text-transform:none;letter-spacing:0;white-space:nowrap}
-      #macro-revmtd-pop{width:max-content;min-width:7.2em;max-width:12em}
+      #macro-revmtd-pop,#macro-ffmtd-pop{width:max-content;min-width:7.2em;max-width:12em}
             .macro-win-body.macro-pal-dim .macro-section-header.macro-pal-active{opacity:1;pointer-events:auto;position:relative;z-index:49}
             .macro-win-body.macro-pal-dim .macro-section-header.macro-pal-active>span{color:var(--macro-title-color,#fff);text-shadow:var(--macro-pal-glow,0 0 8px rgba(255,255,255,0.28))}
       .macro-pos-btn{display:inline-flex;align-items:center;justify-content:space-between;gap:0.35em;width:6.2em;box-sizing:border-box;background:var(--macro-btn-bg,#242424);border:1px solid var(--macro-btn-border,#383838);color:var(--macro-btn-text,#eee);border-radius:0.35em;padding:0.36em 0.55em;font-family:inherit;font-size:0.9em;font-weight:600;cursor:pointer;transition:border-color 0.16s,filter 0.14s,color 0.28s ease}
@@ -9932,37 +10579,70 @@ vec4 _mSoft(vec4 raw) {
         <div class="macro-pane-main">
           <div class="macro-win-body">
         <a id="macro-ver-banner" class="macro-upd-banner" href="https://raw.githubusercontent.com/kuksikoid/gota-multibox-guide/main/MultiBox.user.js" target="_blank" rel="noopener noreferrer"></a>
-        ${["soloDelay", "autoDelay"]
-          .map((k) => {
-            const p = k === "soloDelay" ? "solo" : "auto";
-            const dk = k === "soloDelay" ? "soloDel" : "ffDel";
-            return `
-          <div class="macro-row"${k === "autoDelay" ? ' style="margin-bottom:0"' : ""}>
-            <span data-i18n="${dk}">${k3Tr(dk)}</span>
-            <div class="macro-controls-group">
-              <div class="macro-slider-track" id="macro-track-${p}" data-key="${k}"><div class="macro-slider-fill"></div></div>
-              <div class="macro-num-wrap">
-                <button type="button" class="macro-step-btn" id="macro-dec-${p}"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
-                <input type="text" inputmode="numeric" class="macro-num-input" id="macro-num-${p}" data-min="50" data-max="3000" data-step="10" value="${m9TvL2sP[k]}" spellcheck="false">
-                <button type="button" class="macro-step-btn" id="macro-inc-${p}"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
-              </div>
-            </div>
-          </div>`;
-          })
-          .join("")}
-        <div id="macro-ff-delays"></div>
-        <div class="macro-sep"></div>
-        <div class="macro-row">
-          <div class="macro-ff-label-wrap">
-            <span data-i18n="ff">${k3Tr("ff")}</span>
-            <div role="button" tabindex="0" class="macro-ff-add-btn" id="macro-ff-add-btn" title="${k3Tr("ffAdd")}" aria-label="${k3Tr("ffAdd")}" data-i18n-title="ffAdd" data-i18n-aria="ffAdd"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9"/></svg></div>
-          </div>
-          <div class="macro-btn-group">
-            <button class="macro-bind-btn" id="macro-btn-keyAuto" data-id="keyAuto">${p7TvM3wL(m9TvL2sP.keyAuto)}</button>
-            <button class="macro-rst-btn" data-reset="keyAuto" data-i18n="rst">${k3Tr("rst")}</button>
+        <div class="macro-section-header" id="macro-hdr-ff">
+          <span data-i18n="secFf">${k3Tr("secFf")}</span>
+          <div class="macro-rev-hdr-r">
+            <span class="macro-rev-mtd-lbl" data-i18n="revMtd">${k3Tr("revMtd")}</span>
+            <button type="button" class="macro-pos-btn" id="macro-ffmtd-btn">
+              <span class="macro-lang-cur" id="macro-ffmtd-cur">${k3Tr(m9TvL2sP.ffMethod === "auto" ? "ffAuto" : "ffMan")}</span>
+              <svg class="macro-lang-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
           </div>
         </div>
-        <div id="macro-ff-binds"></div>
+        <div id="macro-ff-manual-wrap">
+          <div class="macro-row">
+            <span data-i18n="ffDel">${k3Tr("ffDel")}</span>
+            <div class="macro-controls-group">
+              <div class="macro-slider-track" id="macro-track-auto" data-key="autoDelay"><div class="macro-slider-fill"></div></div>
+              <div class="macro-num-wrap">
+                <button type="button" class="macro-step-btn" id="macro-dec-auto"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+                <input type="text" inputmode="numeric" class="macro-num-input" id="macro-num-auto" data-min="50" data-max="3000" data-step="10" value="${m9TvL2sP.autoDelay}" spellcheck="false">
+                <button type="button" class="macro-step-btn" id="macro-inc-auto"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+              </div>
+            </div>
+          </div>
+          <div id="macro-ff-delays"></div>
+          <div class="macro-row">
+            <div class="macro-ff-label-wrap">
+              <span data-i18n="ff">${k3Tr("ff")}</span>
+              <div role="button" tabindex="0" class="macro-ff-add-btn" id="macro-ff-add-btn" title="${k3Tr("ffAdd")}" aria-label="${k3Tr("ffAdd")}" data-i18n-title="ffAdd" data-i18n-aria="ffAdd"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9"/></svg></div>
+            </div>
+            <div class="macro-btn-group">
+              <button class="macro-bind-btn" id="macro-btn-keyAuto" data-id="keyAuto">${p7TvM3wL(m9TvL2sP.keyAuto)}</button>
+              <button class="macro-rst-btn" data-reset="keyAuto" data-i18n="rst">${k3Tr("rst")}</button>
+            </div>
+          </div>
+          <div id="macro-ff-binds"></div>
+        </div>
+        <div id="macro-ff-auto-wrap">
+          <div class="macro-row">
+            <span data-i18n="ffLock">${k3Tr("ffLock")}</span>
+            <div class="macro-btn-group">
+              <button class="macro-bind-btn" id="macro-btn-keyFfLock" data-id="keyFfLock">${p7TvM3wL(m9TvL2sP.keyFfLock)}</button>
+              <button class="macro-rst-btn" data-reset="keyFfLock" data-i18n="rst">${k3Tr("rst")}</button>
+            </div>
+          </div>
+          <div class="macro-row">
+            <span data-i18n="ffAct">${k3Tr("ffAct")}</span>
+            <div class="macro-btn-group">
+              <button class="macro-bind-btn" id="macro-btn-keyFfActivate" data-id="keyFfActivate">${p7TvM3wL(m9TvL2sP.keyFfActivate)}</button>
+              <button class="macro-rst-btn" data-reset="keyFfActivate" data-i18n="rst">${k3Tr("rst")}</button>
+            </div>
+          </div>
+        </div>
+        <div class="macro-sep"></div>
+        <div class="macro-section-header"><span data-i18n="secSolo">${k3Tr("secSolo")}</span></div>
+        <div class="macro-row">
+          <span data-i18n="soloDel">${k3Tr("soloDel")}</span>
+          <div class="macro-controls-group">
+            <div class="macro-slider-track" id="macro-track-solo" data-key="soloDelay"><div class="macro-slider-fill"></div></div>
+            <div class="macro-num-wrap">
+              <button type="button" class="macro-step-btn" id="macro-dec-solo"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+              <input type="text" inputmode="numeric" class="macro-num-input" id="macro-num-solo" data-min="50" data-max="3000" data-step="10" value="${m9TvL2sP.soloDelay}" spellcheck="false">
+              <button type="button" class="macro-step-btn" id="macro-inc-solo"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+            </div>
+          </div>
+        </div>
         ${mkR(y4WpS9vT)}
         <div class="macro-sep"></div>
         <div class="macro-section-header" id="macro-hdr-rev">
@@ -10171,6 +10851,12 @@ vec4 _mSoft(vec4 raw) {
                     <button type="button" class="macro-pos-opt${m9TvL2sP.mapGridMode === "over" ? " active" : ""}" data-grid="over"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="gridOver">${k3Tr("gridOver")}</span></button>
                   </div>
                 </div>
+        <div class="macro-pos-pop" id="macro-ffmtd-pop">
+          <div class="macro-lang-list">
+            <button type="button" class="macro-pos-opt${m9TvL2sP.ffMethod !== "auto" ? " active" : ""}" data-ffmtd="manual"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="ffMan">${k3Tr("ffMan")}</span></button>
+            <button type="button" class="macro-pos-opt${m9TvL2sP.ffMethod === "auto" ? " active" : ""}" data-ffmtd="auto"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="ffAuto">${k3Tr("ffAuto")}</span></button>
+          </div>
+        </div>
         <div class="macro-pos-pop" id="macro-revmtd-pop">
           <div class="macro-lang-list">
             <button type="button" class="macro-pos-opt${m9TvL2sP.revMethod !== "pixi" ? " active" : ""}" data-revmtd="ws"><span class="macro-lang-bar"></span><span class="macro-lang-name">WebSocket</span></button>
@@ -12064,6 +12750,14 @@ vec4 _mSoft(vec4 raw) {
         fixW: false,
       },
       {
+        id: "ffmtd",
+        row: document.getElementById("macro-hdr-ff"),
+        btn: document.getElementById("macro-ffmtd-btn"),
+        pop: document.getElementById("macro-ffmtd-pop"),
+        t: 0,
+        fixW: false,
+      },
+      {
         id: "revmtd",
         row: document.getElementById("macro-hdr-rev"),
         btn: document.getElementById("macro-revmtd-btn"),
@@ -12247,6 +12941,16 @@ vec4 _mSoft(vec4 raw) {
       f4RefocusGame();
     });
 
+    b4BindMainPop("ffmtd", (opt) => {
+      const nxt = opt.getAttribute("data-ffmtd") === "auto" ? "auto" : "manual";
+      if (m9TvL2sP.ffMethod !== nxt) k4FfCancel(false);
+      m9TvL2sP.ffMethod = nxt;
+      x3QnK8wR();
+      r8QnM4tL();
+      u4PwM8xQ();
+      f4RefocusGame();
+    });
+
     b4BindMainPop("revmtd", (opt) => {
       const nxt = opt.getAttribute("data-revmtd") === "pixi" ? "pixi" : "ws";
       if (m9TvL2sP.revMethod !== nxt) q2WnS7xM(false);
@@ -12281,7 +12985,7 @@ vec4 _mSoft(vec4 raw) {
           t &&
           t.closest &&
           t.closest(
-            "#macro-revnot-pop, #macro-revnot-btn, #macro-xhair-pop, #macro-xhair-btn, #macro-grid-pop, #macro-grid-btn, #macro-revmtd-pop, #macro-revmtd-btn, .macro-custom-scroll-track, #macro-toggle-pill",
+            "#macro-revnot-pop, #macro-revnot-btn, #macro-xhair-pop, #macro-xhair-btn, #macro-grid-pop, #macro-grid-btn, #macro-revmtd-pop, #macro-revmtd-btn, #macro-ffmtd-pop, #macro-ffmtd-btn, .macro-custom-scroll-track, #macro-toggle-pill",
           )
         )
           return;
@@ -12297,7 +13001,7 @@ vec4 _mSoft(vec4 raw) {
       if (pSet) pSet.classList.remove("macro-pal-dim");
     };
 
-    const m4CurVer = "0.4.5";
+    const m4CurVer = "0.5.0";
     let m4LastVer = "";
     const v8UpdEl = document.getElementById("macro-ver-banner");
     function c3CmpVer(a, b) {
@@ -12532,6 +13236,8 @@ vec4 _mSoft(vec4 raw) {
       [
         "keyMenu",
         "keyAuto",
+        "keyFfLock",
+        "keyFfActivate",
         "keyT2",
         "keyT4",
         "keyT8",
@@ -12608,6 +13314,7 @@ vec4 _mSoft(vec4 raw) {
       cfg.crosshairStyle = cfg.crosshairStyle === "cross" ? "cross" : "plus";
       cfg.revNotifyPos = cfg.revNotifyPos === "bottom" ? "bottom" : "top";
       cfg.revMethod = cfg.revMethod === "pixi" ? "pixi" : "ws";
+      cfg.ffMethod = cfg.ffMethod === "auto" ? "auto" : "manual";
       ["menuColor", "buttonsColor", "plexusColor"].forEach((k) => {
         cfg[k] =
           typeof cfg[k] === "string" && /^#[0-9a-f]{6}$/i.test(cfg[k])
@@ -12677,6 +13384,7 @@ vec4 _mSoft(vec4 raw) {
         }
         hCl2xK9m();
         q2WnS7xM(false);
+        k4FfCancel(false);
         c6RmP3xW.clear();
         m9TvL2sP = n6NormCfg(parsed);
         cfgDirty = false;
@@ -12746,6 +13454,7 @@ vec4 _mSoft(vec4 raw) {
         e.stopPropagation();
         hCl2xK9m();
         q2WnS7xM(false);
+        k4FfCancel(false);
         window.setMapBackground(null);
         window.setFixedBackground(null);
         k2DbClr();
