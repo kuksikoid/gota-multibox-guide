@@ -37,12 +37,15 @@
     .item-body .auto-rev-glow{color:#fff}
     .media-wrap{width:100%;aspect-ratio:16/9;background:#070707;border:1px solid #262626;border-radius:4px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
     .media-wrap video{width:100%;height:100%;object-fit:contain;outline:none;display:block}
-    .media-col{display:flex;flex-direction:column;gap:12px;width:100%}
+    .item.item-auto{display:block}
+    .auto-head-grid,.auto-row{display:grid;grid-template-columns:minmax(0,1fr) 450px;gap:22px;align-items:start}
+    .auto-row+.auto-row{margin-top:12px}
     .media-slot{display:flex;flex-direction:column;gap:5px}
     .media-label{font-size:12px;font-weight:700;color:#9aa0a6;letter-spacing:0.3px}
     .vid-empty{display:none;color:#666;font-size:12.5px;text-align:center;padding:14px;user-select:none}
     @media(max-width:940px){
       .item{grid-template-columns:1fr;gap:16px;padding:16px}
+      .auto-head-grid,.auto-row{grid-template-columns:1fr;gap:14px}
     }
   </style>
 </head>
@@ -110,12 +113,12 @@
       </div>
     </section>
 
-    <section class="item" id="card-auto">
-      <div>
+    <section class="item item-auto" id="card-auto">
+      <div class="auto-head-grid">
         <div class="item-head" id="t-auto-title"></div>
-        <div class="item-body" id="t-auto-desc"></div>
       </div>
-      <div class="media-col">
+      <div class="auto-row">
+        <div class="item-body" id="t-auto-desc"></div>
         <div class="media-slot">
           <div class="media-label">WebSocket</div>
           <div class="media-wrap">
@@ -123,6 +126,9 @@
             <span class="vid-empty" data-file="auto-rev-ws.mp4"></span>
           </div>
         </div>
+      </div>
+      <div class="auto-row">
+        <div class="item-body" id="t-auto-pixi"></div>
         <div class="media-slot">
           <div class="media-label">Pixi</div>
           <div class="media-wrap">
@@ -368,6 +374,7 @@
     const r9TvB = k8LmQ.getElementById("t-fast-desc");
     const t2YxC = k8LmQ.getElementById("t-auto-title");
     const y4HuN = k8LmQ.getElementById("t-auto-desc");
+    const k3PxN = k8LmQ.getElementById("t-auto-pixi");
     const m6QcL = k8LmQ.getElementById("t-code-link");
     const v8JsM = Object.keys(d4PxN);
 
@@ -382,7 +389,14 @@
       e5KpM.textContent = d.fastTitle;
       r9TvB.innerHTML = d.fastDesc;
       t2YxC.textContent = d.autoTitle;
-      y4HuN.innerHTML = d.autoDesc;
+      const pIdx = d.autoDesc.indexOf("<p><strong>Pixi");
+      if (pIdx !== -1) {
+        y4HuN.innerHTML = d.autoDesc.slice(0, pIdx);
+        if (k3PxN) k3PxN.innerHTML = d.autoDesc.slice(pIdx);
+      } else {
+        y4HuN.innerHTML = d.autoDesc;
+        if (k3PxN) k3PxN.innerHTML = "";
+      }
       if (m6QcL) m6QcL.textContent = d.codeLink;
       s2VnK.value = code;
       k8LmQ.querySelectorAll(".vid-empty").forEach(el => {
