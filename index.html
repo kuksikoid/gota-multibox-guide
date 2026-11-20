@@ -40,6 +40,8 @@
     .item.item-auto{display:block}
     .auto-head-grid,.auto-row{display:grid;grid-template-columns:minmax(0,1fr) 450px;gap:22px;align-items:start}
     .auto-row+.auto-row{margin-top:12px}
+    .fast-text-col{display:flex;flex-direction:column;gap:10px;min-width:0}
+    .media-stack{display:flex;flex-direction:column;gap:14px;min-width:0}
     .media-slot{display:flex;flex-direction:column;gap:5px}
     .media-label{font-size:12px;font-weight:700;color:#9aa0a6;letter-spacing:0.3px}
     .vid-empty{display:none;color:#666;font-size:12.5px;text-align:center;padding:14px;user-select:none}
@@ -107,22 +109,24 @@
         <div class="item-head" id="t-fast-title"></div>
       </div>
       <div class="auto-row">
-        <div class="item-body" id="t-fast-desc"></div>
-        <div class="media-slot">
-          <div class="media-label" id="t-fast-auto-lbl"></div>
-          <div class="media-wrap">
-            <video id="fast-feed-auto-video" src="fast-feed-auto.mp4" controls playsinline preload="metadata"></video>
-            <span class="vid-empty" data-file="fast-feed-auto.mp4"></span>
-          </div>
+        <div class="fast-text-col">
+          <div class="item-body" id="t-fast-desc"></div>
+          <div class="item-body" id="t-fast-manual"></div>
         </div>
-      </div>
-      <div class="auto-row">
-        <div class="item-body" id="t-fast-manual"></div>
-        <div class="media-slot">
-          <div class="media-label" id="t-fast-man-lbl"></div>
-          <div class="media-wrap">
-            <video id="fast-feed-video" src="fast-feed.mp4" controls playsinline preload="metadata"></video>
-            <span class="vid-empty" data-file="fast-feed.mp4"></span>
+        <div class="media-stack">
+          <div class="media-slot">
+            <div class="media-label" id="t-fast-auto-lbl"></div>
+            <div class="media-wrap">
+              <video id="fast-feed-auto-video" src="fast-feed-auto.mp4" controls playsinline preload="metadata"></video>
+              <span class="vid-empty" data-file="fast-feed-auto.mp4"></span>
+            </div>
+          </div>
+          <div class="media-slot">
+            <div class="media-label" id="t-fast-man-lbl"></div>
+            <div class="media-wrap">
+              <video id="fast-feed-video" src="fast-feed.mp4" controls playsinline preload="metadata"></video>
+              <span class="vid-empty" data-file="fast-feed.mp4"></span>
+            </div>
           </div>
         </div>
       </div>
