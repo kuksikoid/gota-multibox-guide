@@ -557,6 +557,7 @@
     keyRevSplit8: null,
     keyHoldSpam: null,
     revSplits: 4,
+    revMethod: "ws",
     pillX: null,
     pillY: null,
     winX: null,
@@ -712,6 +713,7 @@
   m9TvL2sP.pillTransparent = Boolean(m9TvL2sP.pillTransparent);
   m9TvL2sP.revNotify = Boolean(m9TvL2sP.revNotify);
   m9TvL2sP.revNotifyPos = m9TvL2sP.revNotifyPos === "bottom" ? "bottom" : "top";
+  m9TvL2sP.revMethod = m9TvL2sP.revMethod === "pixi" ? "pixi" : "ws";
   m9TvL2sP.mapGridEnabled = Boolean(m9TvL2sP.mapGridEnabled);
   m9TvL2sP.mapGridMode = m9TvL2sP.mapGridMode === "over" ? "over" : "bg";
   m9TvL2sP.crosshairEnabled = Boolean(m9TvL2sP.crosshairEnabled);
@@ -794,8 +796,7 @@
       marg: "Cull Margin",
       rScale: "Render Scale (%)",
       secBg: "MAP & BACKGROUND",
-      tipBg:
-        "When Fixed Background is enabled, Map Background is disabled and turns gray until Fixed mode is turned off. You MUST enable custom background during the game itself to avoid crash risks.",
+
       mapBg: "Map Background",
       fixBg: "Fixed Background",
       fFile: "File",
@@ -865,8 +866,7 @@
       marg: "Отступ отсечения",
       rScale: "Масштаб рендера (%)",
       secBg: "КАРТА И ФОН",
-      tipBg:
-        "Когда включён статичный фон, фон карты отключается и становится серым до выключения статичного режима. Кастомный фон ОБЯЗАТЕЛЬНО нужно включать во время самой игры, чтобы исключить риски краша.",
+
       mapBg: "Фон карты",
       fixBg: "Статичный фон",
       fFile: "Файл",
@@ -936,8 +936,7 @@
       marg: "Запас відсікання",
       rScale: "Масштаб рендеру (%)",
       secBg: "МАПА ТА ФОН",
-      tipBg:
-        "Коли увімкнено фіксований фон, фон мапи вимикається та стає сірим до вимкнення фіксованого режиму. Кастомний фон ОБОВ’ЯЗКОВО потрібно вмикати під час самої гри, щоб виключити ризик крашу.",
+
       mapBg: "Фон мапи",
       fixBg: "Фіксований фон",
       fFile: "Файл",
@@ -1007,8 +1006,7 @@
       marg: "Margen de recorte",
       rScale: "Escala de render (%)",
       secBg: "MAPA Y FONDO",
-      tipBg:
-        "Cuando el fondo fijo está activo, el fondo del mapa se desactiva y se vuelve gris hasta apagar el modo fijo. Es OBLIGATORIO activar el fondo personalizado durante la partida para evitar riesgos de cierre.",
+
       mapBg: "Fondo del mapa",
       fixBg: "Fondo fijo",
       fFile: "Archivo",
@@ -1078,8 +1076,7 @@
       marg: "Margem de recorte",
       rScale: "Escala de render (%)",
       secBg: "MAPA E FUNDO",
-      tipBg:
-        "Quando o fundo fixo está ativado, o fundo do mapa é desativado e fica cinza até desligar o modo fixo. É OBRIGATÓRIO ativar o fundo personalizado durante a partida para evitar riscos de crash.",
+
       mapBg: "Fundo do mapa",
       fixBg: "Fundo fixo",
       fFile: "Arquivo",
@@ -1149,8 +1146,7 @@
       marg: "Marge de rendu",
       rScale: "Échelle de rendu (%)",
       secBg: "CARTE & FOND",
-      tipBg:
-        "Lorsque le fond fixe est activé, le fond de carte est désactivé et grisé jusqu’à la désactivation du mode fixe. Vous DEVEZ activer le fond personnalisé pendant la partie pour éviter tout risque de crash.",
+
       mapBg: "Fond de carte",
       fixBg: "Fond fixe",
       fFile: "Fichier",
@@ -1220,8 +1216,7 @@
       marg: "Sicht-Puffer",
       rScale: "Render-Skala (%)",
       secBg: "KARTE & HINTERGRUND",
-      tipBg:
-        "Wenn der feste Hintergrund aktiv ist, wird der Kartenhintergrund deaktiviert und ausgegraut, bis der feste Modus aus ist. Der eigene Hintergrund MUSS zwingend während des Spiels eingeschaltet werden, um Abstürze zu vermeiden.",
+
       mapBg: "Kartenhintergrund",
       fixBg: "Fester Hintergrund",
       fFile: "Datei",
@@ -1291,8 +1286,7 @@
       marg: "Margine di taglio",
       rScale: "Scala rendering (%)",
       secBg: "MAPPA E SFONDO",
-      tipBg:
-        "Quando lo sfondo fisso è attivo, lo sfondo della mappa si disattiva e diventa grigio finché non disattivi la modalità fissa. Lo sfondo personalizzato va attivato OBBLIGATORIAMENTE durante la partita per evitare crash.",
+
       mapBg: "Sfondo mappa",
       fixBg: "Sfondo fisso",
       fFile: "File",
@@ -1362,8 +1356,7 @@
       marg: "Margines odcinania",
       rScale: "Skala renderowania (%)",
       secBg: "MAPA I TŁO",
-      tipBg:
-        "Gdy stałe tło jest włączone, tło mapy jest wyłączone i wyszarzone do czasu wyłączenia trybu stałego. Własne tło NALEŻY włączać podczas samej gry, aby uniknąć ryzyka crasha.",
+
       mapBg: "Tło mapy",
       fixBg: "Stałe tło",
       fFile: "Plik",
@@ -1433,8 +1426,7 @@
       marg: "Verberg-marge",
       rScale: "Renderschaal (%)",
       secBg: "KAART & ACHTERGROND",
-      tipBg:
-        "Wanneer vaste achtergrond is ingeschakeld, is de kaartachtergrond uitgeschakeld en grijs totdat vaste modus wordt uitgezet. Aangepaste achtergrond MOET tijdens het spelen worden ingeschakeld om crashrisico te voorkomen.",
+
       mapBg: "Kaartachtergrond",
       fixBg: "Vaste achtergrond",
       fFile: "Bestand",
@@ -1504,8 +1496,7 @@
       marg: "Marjă randare",
       rScale: "Scară randare (%)",
       secBg: "HARTĂ ȘI FUNDAL",
-      tipBg:
-        "Când fundalul fix este activ, fundalul hărții este dezactivat și devine gri până la oprirea modului fix. Fundalul personalizat TREBUIE activat în timpul jocului pentru a evita riscul de crash.",
+
       mapBg: "Fundal hartă",
       fixBg: "Fundal fix",
       fFile: "Fișier",
@@ -1575,8 +1566,7 @@
       marg: "Görüş Payı",
       rScale: "Render Ölçeği (%)",
       secBg: "HARİTA VE ARKA PLAN",
-      tipBg:
-        "Sabit Arka Plan etkinken Harita Arka Planı devre dışı kalır ve sabit mod kapatılana kadar gri görünür. Çökme riskini önlemek için özel arka planı MUTLAKA oyun içindeyken açın.",
+
       mapBg: "Harita Arka Planı",
       fixBg: "Sabit Arka Plan",
       fFile: "Dosya",
@@ -1646,8 +1636,7 @@
       marg: "هامش الإخفاء",
       rScale: "دقة العرض (%)",
       secBg: "الخريطة والخلفية",
-      tipBg:
-        "عند تفعيل الخلفية الثابتة يتم تعطيل خلفية الخريطة وتتحول للرمادي حتى إيقاف الوضع الثابت. يجب تفعيل الخلفية المخصصة أثناء اللعب الفعلي داخل الخريطة فقط لتجنب خطر الانهيار.",
+
       mapBg: "خلفية الخريطة",
       fixBg: "خلفية ثابتة",
       fFile: "ملف",
@@ -1717,8 +1706,7 @@
       marg: "छिपाने की सीमा",
       rScale: "रेंडर स्केल (%)",
       secBg: "मैप और बैकग्राउंड",
-      tipBg:
-        "फिक्स्ड बैकग्राउंड चालू होने पर मैप बैकग्राउंड बंद और ग्रे हो जाता है, और बंद करने पर फिर काम करता है। क्रैश से बचने के लिए कस्टम बैकग्राउंड को केवल गेम के दौरान ही चालू करना अनिवार्य है।",
+
       mapBg: "मैप बैकग्राउंड",
       fixBg: "फिक्स्ड बैकग्राउंड",
       fFile: "फ़ाइल",
@@ -1788,8 +1776,7 @@
       marg: "剔除边距",
       rScale: "渲染分辨率 (%)",
       secBg: "地图与背景",
-      tipBg:
-        "开启固定背景时，地图背景会被禁用并变灰，关闭固定模式后恢复。为避免崩溃风险，必须在游戏过程中开启自定义背景。",
+
       mapBg: "地图背景",
       fixBg: "固定背景",
       fFile: "文件",
@@ -1859,8 +1846,7 @@
       marg: "カリング余白",
       rScale: "描画スケール (%)",
       secBg: "マップ＆背景",
-      tipBg:
-        "固定背景を有効にするとマップ背景は無効になり、固定モードを解除するまで灰色になります。クラッシュを避けるため、カスタム背景はゲーム中に必ず有効にしてください。",
+
       mapBg: "マップ背景",
       fixBg: "固定背景",
       fFile: "ファイル",
@@ -1930,8 +1916,7 @@
       marg: "컬링 여백",
       rScale: "렌더 스케일 (%)",
       secBg: "맵 및 배경",
-      tipBg:
-        "고정 배경이 활성화되면 맵 배경이 비활성화되어 회색으로 표시됩니다. 충돌 위험을 방지하려면 게임 중에 커스텀 배경을 반드시 활성화하세요.",
+
       mapBg: "맵 배경",
       fixBg: "고정 배경",
       fFile: "파일",
@@ -2001,8 +1986,7 @@
       marg: "Batas Jarak",
       rScale: "Skala Render (%)",
       secBg: "PETA & LATAR",
-      tipBg:
-        "Saat latar tetap aktif, latar peta dinonaktifkan dan menjadi abu-abu hingga mode tetap dimatikan. Latar kustom WAJIB diaktifkan selama permainan untuk menghindari risiko crash.",
+
       mapBg: "Latar Peta",
       fixBg: "Latar Tetap",
       fFile: "Berkas",
@@ -2072,8 +2056,7 @@
       marg: "Vùng đệm",
       rScale: "Tỷ lệ render (%)",
       secBg: "BẢN ĐỒ & NỀN",
-      tipBg:
-        "Khi bật Nền cố định, Nền bản đồ sẽ tạm tắt và chuyển màu xám cho đến khi tắt chế độ cố định. BẮT BUỘC bật nền tùy chỉnh trong trận đấu để tránh nguy cơ văng game.",
+
       mapBg: "Nền bản đồ",
       fixBg: "Nền cố định",
       fFile: "Tệp",
@@ -2143,8 +2126,7 @@
       marg: "ขอบเขตเผื่อ",
       rScale: "สเกลเรนเดอร์ (%)",
       secBg: "แผนที่และพื้นหลัง",
-      tipBg:
-        "เมื่อเปิดพื้นหลังคงที่ พื้นหลังแผนที่จะถูกปิดและเป็นสีเทาจนกว่าจะปิดโหมดพื้นหลังคงที่ ต้องเปิดพื้นหลังแบบกำหนดเองระหว่างเล่นเกม เพื่อป้องกันความเสี่ยงเกมแครช",
+
       mapBg: "พื้นหลังแผนที่",
       fixBg: "พื้นหลังคงที่",
       fFile: "ไฟล์",
@@ -2213,6 +2195,32 @@
   };
   for (const k in k2SoftTr) {
     if (t3LangDict[k]) t3LangDict[k].softCol = k2SoftTr[k];
+  }
+
+  const k2RevMtdTr = {
+    en: "Method",
+    ru: "Метод",
+    uk: "Метод",
+    es: "Método",
+    pt: "Método",
+    fr: "Méthode",
+    de: "Methode",
+    it: "Metodo",
+    pl: "Metoda",
+    nl: "Methode",
+    ro: "Metodă",
+    tr: "Yöntem",
+    ar: "الطريقة",
+    hi: "तरीका",
+    zh: "方法",
+    ja: "方式",
+    ko: "방식",
+    id: "Metode",
+    vi: "Phương thức",
+    th: "วิธี",
+  };
+  for (const k in k2RevMtdTr) {
+    if (t3LangDict[k]) t3LangDict[k].revMtd = k2RevMtdTr[k];
   }
 
   if (typeof m9TvL2sP.lang !== "string" || !t3LangDict[m9TvL2sP.lang])
@@ -2370,12 +2378,6 @@
 
   window.setFixedBackground = function (src) {
     u4TkQ = d4XwN(u4TkQ, src);
-    if (b7DrawFn) b7DrawFn();
-  };
-  window.toggleFixedBackground = function (st) {
-    m9TvL2sP.fixedBackgroundEnabled = Boolean(st);
-    x3QnK8wR();
-    if (document.getElementById("macro-window")) r8QnM4tL();
     if (b7DrawFn) b7DrawFn();
   };
 
@@ -2653,6 +2655,649 @@
 
   function d2TinyWait(ms, cb) {
     k7RunDelay(Math.max(1, Number(ms) || 1), cb, 1);
+  }
+
+  const v4OrigU8 = window.Uint8Array;
+  const v4WsCells = new Map();
+  const v4PtyOids = new Set();
+  const v4SelfOids = new Set();
+  const v4SeenBuf = new WeakSet();
+  let v4MyOid = 0;
+  let v4OwnSeen = false;
+  let v4WsScene = null;
+  let v4WsLock = null;
+  let v4InU8 = false;
+
+  (function q7BrdInit() {
+    const hsh =
+      "fc1c02916d532db38b73b46298b57618b8c75a77e21ef4828f9134d53c2c2e23";
+    const rAnc = String.raw`Jg['\x79\x75'][aj(0x1da)](Jg['\x6f\x4d']);`;
+    const iAnc = "HI[GX(0x409)](new fd(T7));";
+    const rHk =
+      "try{nU.gotaClientTracking?.observeFrame({root:JK,camera:JD,canvas:Jg.yu.canvas,screenWidth:Jg.yu.screen.width,screenHeight:Jg.yu.screen.height,models:YW.Of});}catch(_){}";
+    const iHk = "try{nU.gotaClientProtocol?.observeIncoming(T7);}catch(_){}";
+    const isTgt = (t) =>
+      typeof t === "string" &&
+      t.length >= 500000 &&
+      t.length <= 700000 &&
+      t.includes(rAnc) &&
+      t.includes(iAnc) &&
+      !t.includes("gotaClientTracking");
+
+    async function pBnd(t, dg) {
+      if (!isTgt(t)) return { ok: false };
+      const dt = new TextEncoder().encode(t);
+      if (
+        dt.length !== 638931 ||
+        t.split(rAnc).length !== 2 ||
+        t.split(iAnc).length !== 2
+      ) {
+        return { ok: false };
+      }
+      const res = Array.from(new v4OrigU8(await dg(dt)), (n) =>
+        n.toString(16).padStart(2, "0"),
+      ).join("");
+      if (res !== hsh) return { ok: false };
+      return {
+        ok: true,
+        t: t.replace(rAnc, rAnc + rHk).replace(iAnc, iAnc + iHk),
+      };
+    }
+
+    if (typeof window.Worker !== "function" || !window.crypto?.subtle) return;
+    const NW = window.Worker;
+    const ME = window.MessageEvent;
+    const addL = NW.prototype.addEventListener;
+    const disp = NW.prototype.dispatchEvent;
+    const term = NW.prototype.terminate;
+    const stp = window.Event.prototype.stopImmediatePropagation;
+    const dgM = window.crypto.subtle.digest.bind(window.crypto.subtle);
+    const dg = (d) => dgM("SHA-256", d);
+    const trm = new WeakSet();
+    const fwd = new WeakSet();
+
+    function obsW(w) {
+      addL.call(
+        w,
+        "message",
+        (ev) => {
+          if (fwd.has(ev)) return;
+          const d = ev.data;
+          if (
+            !d ||
+            typeof d !== "object" ||
+            !Object.hasOwn(d, "p") ||
+            !isTgt(d.t)
+          )
+            return;
+          stp.call(ev);
+          let sent = false;
+          const send = (v) => {
+            if (sent || trm.has(w)) return;
+            sent = true;
+            const rp = new ME("message", {
+              data: v,
+              origin: ev.origin,
+              lastEventId: ev.lastEventId,
+              source: ev.source,
+              ports: ev.ports,
+            });
+            fwd.add(rp);
+            disp.call(w, rp);
+          };
+          let tm;
+          const to = new Promise((_, rj) => {
+            tm = setTimeout(() => rj(new Error("timeout")), 1500);
+          });
+          Promise.race([pBnd(d.t, dg), to])
+            .then((r) => send(r.ok ? { ...d, t: r.t } : d))
+            .catch(() => send(d))
+            .finally(() => clearTimeout(tm));
+        },
+        true,
+      );
+    }
+
+    window.Worker = class Worker extends NW {
+      constructor(...a) {
+        super(...a);
+        obsW(this);
+      }
+      terminate() {
+        trm.add(this);
+        return term.call(this);
+      }
+    };
+  })();
+
+  function q9ReadSelfOid() {
+    const el = document.getElementById("playerId");
+    if (!el) return 0;
+    const id = parseInt((el.textContent || "").trim(), 10);
+    if (Number.isSafeInteger(id) && id > 0) {
+      v4SelfOids.add(id);
+      return id;
+    }
+    return 0;
+  }
+
+  function q9CntParts(oid) {
+    if (!oid) return 0;
+    let c = 0;
+    for (const v of v4WsCells.values()) {
+      if (v.tag === 2 && v.oid === oid) c++;
+    }
+    return c;
+  }
+
+  function k2WsDead() {
+    const mp = document.getElementById("main-panel");
+    if (mp && window.getComputedStyle(mp).display !== "none") return true;
+    const sp =
+      s8XnL3wP && document.contains(s8XnL3wP)
+        ? s8XnL3wP
+        : (s8XnL3wP =
+            document.getElementById("score-panel") ||
+            document.getElementById("stats") ||
+            document.querySelector('[id*="score"]') ||
+            document.querySelector(".main-bottom-stats"));
+    if (sp) {
+      const m = (sp.textContent || "").match(/Mass\s*:\s*([0-9\s,]+)/i);
+      if (m) {
+        const val = parseInt(m[1].replace(/[\s,]/g, ""), 10);
+        if (val <= 0 || isNaN(val)) return true;
+      }
+    }
+    if (v4OwnSeen && v4SelfOids.size > 0) {
+      let own = 0;
+      for (const oid of v4SelfOids) own += q9CntParts(oid);
+      if (own === 0) return true;
+    }
+    return false;
+  }
+
+  function q9SkU16(vw, p, len) {
+    while (true) {
+      if (p + 2 > len) return -1;
+      const ch = vw.getUint16(p, true);
+      p += 2;
+      if (ch === 0) return p;
+    }
+  }
+
+  function q9SkU8(vw, p, len) {
+    while (true) {
+      if (p + 1 > len) return -1;
+      if (vw.getUint8(p++) === 0) return p;
+    }
+  }
+
+  function p9WsWorld(u8, vw, len) {
+    let p = 1;
+    if (p + 2 > len) return false;
+    const remN = vw.getUint16(p, true);
+    p += 2;
+    if (p + remN * 2 > len) return false;
+    const remPlrs = [];
+    for (let i = 0; i < remN; i++) {
+      remPlrs.push(vw.getUint16(p, true));
+      p += 2;
+    }
+
+    if (p + 2 > len) return false;
+    const delN = vw.getUint16(p, true);
+    p += 2;
+    if (p + delN * 2 > len) return false;
+    const dels = [];
+    for (let i = 0; i < delN; i++) {
+      dels.push(vw.getUint16(p, true));
+      p += 2;
+    }
+
+    while (true) {
+      if (p + 2 > len) return false;
+      const oid = vw.getUint16(p, true);
+      p += 2;
+      if (oid === 0) break;
+      if (p + 3 > len) return false;
+      p += 3;
+      p = q9SkU16(vw, p, len);
+      if (p < 0) return false;
+      p = q9SkU8(vw, p, len);
+      if (p < 0 || p + 1 > len) return false;
+      const pEx = vw.getUint8(p++);
+      if (pEx === 0x02) {
+        if (p + 5 > len) return false;
+        p += 5;
+      } else if (pEx !== 0x00) {
+        return false;
+      }
+    }
+
+    const adds = [];
+    while (true) {
+      if (p + 1 > len) return false;
+      const tag = vw.getUint8(p++);
+      if (tag === 0) break;
+      if (tag === 6) {
+        while (true) {
+          if (p + 2 > len) return false;
+          const cid = vw.getUint16(p, true);
+          p += 2;
+          if (cid === 0) break;
+          if (p + 4 > len) return false;
+          p += 4;
+        }
+      } else if (tag === 1) {
+        while (true) {
+          if (p + 2 > len) return false;
+          const cid = vw.getUint16(p, true);
+          p += 2;
+          if (cid === 0) break;
+          if (p + 10 > len) return false;
+          adds.push({
+            cid,
+            tag: 1,
+            oid: 0,
+            x: vw.getInt16(p, true),
+            y: vw.getInt16(p + 2, true),
+            r: vw.getUint16(p + 4, true),
+          });
+          p += 10;
+        }
+      } else if (tag === 3 || tag === 4) {
+        while (true) {
+          if (p + 2 > len) return false;
+          const cid = vw.getUint16(p, true);
+          p += 2;
+          if (cid === 0) break;
+          if (p + 6 > len) return false;
+          adds.push({
+            cid,
+            tag,
+            oid: 0,
+            x: vw.getInt16(p, true),
+            y: vw.getInt16(p + 2, true),
+            r: vw.getUint16(p + 4, true),
+          });
+          p += 6;
+        }
+      } else if (tag === 2) {
+        while (true) {
+          if (p + 2 > len) return false;
+          const oid = vw.getUint16(p, true);
+          p += 2;
+          if (oid === 0) break;
+          while (true) {
+            if (p + 2 > len) return false;
+            const cid = vw.getUint16(p, true);
+            p += 2;
+            if (cid === 0) break;
+            if (p + 6 > len) return false;
+            adds.push({
+              cid,
+              tag: 2,
+              oid,
+              x: vw.getInt16(p, true),
+              y: vw.getInt16(p + 2, true),
+              r: vw.getUint16(p + 4, true),
+            });
+            p += 6;
+          }
+        }
+      } else {
+        return false;
+      }
+    }
+
+    const upds = [];
+    while (true) {
+      if (p + 1 > len) return false;
+      const uTag = vw.getUint8(p++);
+      if (uTag === 0) break;
+      if (uTag === 2 || uTag === 3 || uTag === 4) {
+        while (true) {
+          if (p + 2 > len) return false;
+          const cid = vw.getUint16(p, true);
+          p += 2;
+          if (cid === 0) break;
+          if (p + 6 > len) return false;
+          upds.push({
+            cid,
+            tag: uTag,
+            x: vw.getInt16(p, true),
+            y: vw.getInt16(p + 2, true),
+            r: vw.getUint16(p + 4, true),
+          });
+          p += 6;
+        }
+      } else if (uTag === 1 || uTag === 6) {
+        while (true) {
+          if (p + 2 > len) return false;
+          const cid = vw.getUint16(p, true);
+          p += 2;
+          if (cid === 0) break;
+          if (p + 4 > len) return false;
+          p += 4;
+        }
+      } else {
+        return false;
+      }
+    }
+
+    if (len - p !== 2 || (vw.getUint8(p) | vw.getUint8(p + 1)) !== 0)
+      return false;
+
+    if (v4WsLock && !v4WsLock.ownerId) {
+      const c = v4WsCells.get(v4WsLock.cellId);
+      if (c && c.tag === 2 && c.oid) v4WsLock.ownerId = c.oid;
+    }
+
+    const delSet = new Set(dels);
+    const remSet = new Set(remPlrs);
+    let triggered = false;
+
+    if (m9TvL2sP.revMethod === "ws" && v4WsLock && v4WsLock.ownerId) {
+      if (k2WsDead() || remSet.has(v4WsLock.ownerId)) {
+        q2WnS7xM(true);
+      } else {
+        const newCells = [];
+        for (let i = 0; i < adds.length; i++) {
+          const a = adds[i];
+          if (
+            a.tag === 2 &&
+            a.oid === v4WsLock.ownerId &&
+            !v4WsCells.has(a.cid)
+          ) {
+            newCells.push(a);
+          }
+        }
+        if (newCells.length > 0) {
+          let hit = false;
+          for (let i = 0; i < upds.length; i++) {
+            const u = upds[i];
+            if (u.tag !== 2) continue;
+            const prev = v4WsCells.get(u.cid);
+            if (!prev || prev.tag !== 2 || prev.oid !== v4WsLock.ownerId)
+              continue;
+            if (delSet.has(u.cid) || prev.r <= 0 || u.r >= prev.r) continue;
+            if (1 - (u.r * u.r) / (prev.r * prev.r) < 0.25) continue;
+            const maxD = Math.max(prev.r * 6, prev.r + 900);
+            if (
+              newCells.some((a) => Math.hypot(a.x - u.x, a.y - u.y) <= maxD)
+            ) {
+              hit = true;
+              break;
+            }
+          }
+          if (hit) {
+            h8WpM2vQ();
+            triggered = true;
+          }
+        }
+      }
+    }
+
+    for (let i = 0; i < dels.length; i++) v4WsCells.delete(dels[i]);
+    if (remSet.size > 0) {
+      for (const [cid, c] of v4WsCells) {
+        if (c.tag === 2 && remSet.has(c.oid)) v4WsCells.delete(cid);
+      }
+    }
+    for (let i = 0; i < adds.length; i++) v4WsCells.set(adds[i].cid, adds[i]);
+    for (let i = 0; i < upds.length; i++) {
+      const u = upds[i];
+      const ex = v4WsCells.get(u.cid);
+      if (ex) {
+        ex.x = u.x;
+        ex.y = u.y;
+        ex.r = u.r;
+      }
+    }
+
+    const sOid = q9ReadSelfOid() || v4MyOid;
+    if (sOid && q9CntParts(sOid) > 0) v4OwnSeen = true;
+
+    if (!triggered && m9TvL2sP.revMethod === "ws" && v4WsLock) {
+      if (
+        k2WsDead() ||
+        (v4WsLock.ownerId && q9CntParts(v4WsLock.ownerId) === 0) ||
+        !v4WsCells.has(v4WsLock.cellId)
+      ) {
+        q2WnS7xM(true);
+      }
+    }
+    return true;
+  }
+
+  function p9WsPkt(u8, keyObj = null) {
+    if (!u8 || u8.length === 0) return false;
+    const k = keyObj || u8.buffer;
+    if (k && typeof k === "object") {
+      if (v4SeenBuf.has(k)) return true;
+      v4SeenBuf.add(k);
+    }
+    const len = u8.length;
+    const vw = new DataView(u8.buffer, u8.byteOffset, len);
+    const op = vw.getUint8(0);
+
+    if (op === 0xf0) {
+      if (len < 3) return false;
+      const cnt = vw.getUint8(2);
+      let p = 3;
+      for (let i = 0; i < cnt; i++) {
+        if (p + 4 > len) return false;
+        const sLen = vw.getUint32(p, true);
+        p += 4;
+        if (sLen === 0 || p + sLen > len) return false;
+        p9WsPkt(u8.subarray(p, p + sLen), {});
+        p += sLen;
+      }
+      return true;
+    }
+    if (op === 0x02) return p9WsWorld(u8, vw, len);
+    if (op === 0x40 && len === 16) {
+      v4MyOid = vw.getUint16(1, true);
+      v4SelfOids.clear();
+      if (v4MyOid) v4SelfOids.add(v4MyOid);
+      v4OwnSeen = false;
+      v4WsCells.clear();
+      v4PtyOids.clear();
+      if (m9TvL2sP.revMethod === "ws") q2WnS7xM(false);
+      else v4WsLock = null;
+      return true;
+    }
+    if (op === 0x29 && len >= 3) {
+      const cnt = vw.getUint16(1, true);
+      let p = 3;
+      v4PtyOids.clear();
+      for (let i = 0; i < cnt; i++) {
+        if (p + 3 > len) break;
+        p += 1;
+        const oid = vw.getUint16(p, true);
+        p += 2;
+        p = q9SkU16(vw, p, len);
+        if (p < 0) break;
+        v4PtyOids.add(oid);
+      }
+      return true;
+    }
+    return false;
+  }
+
+  window.Uint8Array = new Proxy(v4OrigU8, {
+    construct(t, a, nt) {
+      const inst = Reflect.construct(t, a, nt === window.Uint8Array ? t : nt);
+      if (!v4InU8) {
+        v4InU8 = true;
+        try {
+          const b0 = a[0];
+          if (
+            a.length === 1 &&
+            b0 &&
+            typeof b0.byteLength === "number" &&
+            !ArrayBuffer.isView(b0) &&
+            Object.prototype.toString.call(b0) === "[object ArrayBuffer]" &&
+            !v4SeenBuf.has(b0)
+          ) {
+            const len = inst.length;
+            if (len > 0 && len < 524288) {
+              const op = inst[0];
+              if (op === 0x02 || op === 0x40 || op === 0xf0 || op === 0x29) {
+                p9WsPkt(inst, b0);
+              }
+            }
+          }
+        } catch (_) {
+        } finally {
+          v4InU8 = false;
+        }
+      }
+      return inst;
+    },
+  });
+
+  window.gotaClientProtocol = Object.freeze({
+    observeIncoming(buf) {
+      if (!buf) return false;
+      const u8 = ArrayBuffer.isView(buf)
+        ? new v4OrigU8(buf.buffer, buf.byteOffset, buf.byteLength)
+        : new v4OrigU8(buf);
+      return p9WsPkt(u8, ArrayBuffer.isView(buf) ? buf.buffer : buf);
+    },
+  });
+
+  window.gotaClientTracking = Object.freeze({
+    observeFrame(frame) {
+      if (
+        !frame ||
+        !frame.canvas ||
+        !frame.root ||
+        !frame.camera ||
+        !frame.models
+      )
+        return false;
+      const wt = frame.camera.worldTransform;
+      if (!wt || ![wt.a, wt.b, wt.c, wt.d, wt.tx, wt.ty].every(Number.isFinite))
+        return false;
+      v4WsScene = {
+        root: frame.root,
+        camera: frame.camera,
+        canvas: frame.canvas,
+        screenWidth:
+          frame.screenWidth || frame.canvas.clientWidth || window.innerWidth,
+        screenHeight:
+          frame.screenHeight || frame.canvas.clientHeight || window.innerHeight,
+        models: frame.models,
+        at: performance.now(),
+      };
+      return true;
+    },
+  });
+
+  function w4Descends(node, root) {
+    for (let i = 0; node && i < 64; i++, node = node.parent) {
+      if (node === root) return true;
+    }
+    return false;
+  }
+
+  function w4OrderPath(node, root) {
+    const path = [];
+    for (
+      let cur = node;
+      cur && cur !== root && path.length < 16;
+      cur = cur.parent
+    ) {
+      const pr = cur.parent;
+      const idx =
+        pr && Array.isArray(pr.children) ? pr.children.indexOf(cur) : 0;
+      const z = typeof cur.zIndex === "number" ? cur.zIndex : 0;
+      path.push([z, idx]);
+    }
+    path.reverse();
+    return path;
+  }
+
+  function w4IsAbove(a, b) {
+    const ln = Math.min(a.length, b.length);
+    for (let i = 0; i < ln; i++) {
+      if (a[i][0] !== b[i][0]) return a[i][0] > b[i][0];
+      if (a[i][1] !== b[i][1]) return a[i][1] > b[i][1];
+    }
+    return a.length > b.length;
+  }
+
+  function w4ToNative(node, scn) {
+    if (
+      !node ||
+      node.destroyed ||
+      node.visible === false ||
+      node.worldVisible === false
+    )
+      return null;
+    const m = node.u;
+    const wt = scn.camera && scn.camera.worldTransform;
+    if (!m || m._$ !== node || !Number.isSafeInteger(m.lX) || m.lX < 0 || !wt)
+      return null;
+    if (scn.models.get(m.lX) !== m || !w4Descends(node, scn.root)) return null;
+    if (
+      ![m.LM, m.JI, m.G, m.WG].every(Number.isFinite) ||
+      m.G <= 0 ||
+      m.WG <= 0
+    )
+      return null;
+    const rc = scn.canvas.getBoundingClientRect();
+    if (!rc.width || !rc.height) return null;
+    const sx = Math.hypot(wt.a, wt.b);
+    const rx = rc.width / scn.screenWidth;
+    const ry = rc.height / scn.screenHeight;
+    const cx = rc.left + (wt.a * m.LM + wt.c * m.JI + wt.tx) * rx;
+    const cy = rc.top + (wt.b * m.LM + wt.d * m.JI + wt.ty) * ry;
+    const r = m.G * sx * ((rx + ry) * 0.5);
+    if (r < 4 || m.WG < 5) return null;
+    return { cellId: m.lX, cx, cy, r, node, model: m };
+  }
+
+  function w4ReadLocked() {
+    const lk = v4WsLock,
+      scn = v4WsScene;
+    if (!lk || !scn) return null;
+    if (lk.node.u !== lk.model || lk.model.lX !== lk.cellId) return null;
+    return w4ToNative(lk.node, scn);
+  }
+
+  function w4FindEnemy(x, y) {
+    const scn = v4WsScene;
+    if (!scn || performance.now() - scn.at > 250) return null;
+    q9ReadSelfOid();
+    let best = null,
+      bestOrd = null;
+    for (const m of scn.models.values()) {
+      const node = m && m._$;
+      if (!node) continue;
+      const c = w4ToNative(node, scn);
+      if (!c) continue;
+      if (Math.hypot(x - c.cx, y - c.cy) > c.r) continue;
+      const wc = v4WsCells.get(c.cellId);
+      if (!wc || wc.tag !== 2 || !wc.oid) continue;
+      const oid = wc.oid;
+      if (v4SelfOids.has(oid) || v4PtyOids.has(oid)) continue;
+      const ord = w4OrderPath(node, scn.root);
+      if (!best || w4IsAbove(ord, bestOrd)) {
+        bestOrd = ord;
+        best = {
+          cellId: c.cellId,
+          cx: c.cx,
+          cy: c.cy,
+          r: c.r,
+          oid,
+          node: c.node,
+          model: c.model,
+        };
+      }
+    }
+    return best;
   }
 
   const u9PxL2wT = new Set();
@@ -2969,6 +3614,8 @@
   function u2SyncPidState() {
     const id = g5ReadPid();
     m9MbSt.activeId = id;
+    const nId = parseInt(id, 10);
+    if (Number.isSafeInteger(nId) && nId > 0) v4SelfOids.add(nId);
     if (!id || id === "0") {
       m9MbSt.activeBox = 0;
       return;
@@ -3699,6 +4346,7 @@
             m9MbSt.box2Id = "";
             m9MbSt.activeBox = 0;
             m9MbSt.matchGen++;
+            v4OwnSeen = false;
           },
           true,
         );
@@ -3716,8 +4364,7 @@
     m8QzV2tL = 1.0;
   let f5TxL9wK = false,
     j2VnL8sT = false;
-  let q7TwM3xP = 0,
-    v4QnK9wL = 0,
+  let v4QnK9wL = 0,
     z8PxL2sT = null,
     d3VwN8mT = null,
     h9TnK4xL = 0,
@@ -3793,23 +4440,43 @@
   function q2WnS7xM(keepVisualFade) {
     f5TxL9wK = false;
     f8WnK3xL.locked = false;
+    v4WsLock = null;
     j2VnL8sT = false;
-    q7TwM3xP = 0;
     v4QnK9wL = 0;
     z8PxL2sT = null;
     p6XvQ2wM = 0;
     m2WpT7vX = false;
     f8WnK3xL.misses = 0;
     f8WnK3xL.worldR = 0;
-    f8WnK3xL.displayMass = 0;
     f8WnK3xL.color = null;
     if (!keepVisualFade) {
       x5QzL2wT.active = false;
+      x5QzL2wT.isVp = false;
       x5QzL2wT.alpha = 0;
     }
   }
 
   function g9PxL3vT() {
+    if (m9TvL2sP.revMethod === "ws") {
+      if (k2WsDead()) return;
+      const t = w4FindEnemy(t2QnL9wP, b8VmK3xT);
+      if (!t) return;
+      v4WsLock = {
+        cellId: t.cellId,
+        ownerId: t.oid,
+        model: t.model,
+        node: t.node,
+      };
+      j2VnL8sT = false;
+      x5QzL2wT.active = true;
+      x5QzL2wT.isVp = true;
+      x5QzL2wT.cx = t.cx;
+      x5QzL2wT.cy = t.cy;
+      x5QzL2wT.r = t.r;
+      x5QzL2wT.alpha = 0;
+      x5QzL2wT.pop = 1.22;
+      return;
+    }
     if (!f8WnK3xL.locked) p3WnK7vT(true);
     if (f8WnK3xL.locked) {
       f5TxL9wK = true;
@@ -3818,8 +4485,8 @@
       lockBaseZm = zm;
       const wRad = f8WnK3xL.worldR || f8WnK3xL.r / Math.max(0.01, zm);
       v4QnK9wL = wRad;
-      q7TwM3xP = Math.max(1, Math.round(Math.pow(wRad / 10, 2)));
       x5QzL2wT.active = false;
+      x5QzL2wT.isVp = false;
       x5QzL2wT.alpha = 0;
       x5QzL2wT.pop = 1.22;
       const cv = t8VwM4xK();
@@ -3832,15 +4499,20 @@
   }
 
   function d4TxN8wL() {
-    f5TxL9wK ? q2WnS7xM(true) : g9PxL3vT();
+    (m9TvL2sP.revMethod === "ws" ? v4WsLock : f5TxL9wK)
+      ? q2WnS7xM(true)
+      : g9PxL3vT();
   }
 
   function h8WpM2vQ() {
     if (j2VnL8sT) return;
     j2VnL8sT = true;
-    const pl = g2BindTbl.rev;
-    w5PzR8tM(pl.kc, pl.n);
-    q2WnS7xM(true);
+    try {
+      const pl = g2BindTbl.rev;
+      w5PzR8tM(pl.kc, pl.n);
+    } finally {
+      q2WnS7xM(true);
+    }
   }
 
   const v9TxtOn = () => Boolean(m9TvL2sP.selectableText);
@@ -5182,7 +5854,11 @@
     const upd = new Set();
     g7SoftGfxSet.forEach((st) => {
       const rec = g7SoftGfx.get(st);
-      if (rec && typeof st.color === "number" && (st.color & 0xffffff) === rec.soft) {
+      if (
+        rec &&
+        typeof st.color === "number" &&
+        (st.color & 0xffffff) === rec.soft
+      ) {
         st.color = rec.raw;
         if (rec.owner) upd.add(rec);
       }
@@ -5200,7 +5876,11 @@
 
     g7SoftPrtSet.forEach((p) => {
       const rec = g7SoftPrt.get(p);
-      if (rec && typeof p.color === "number" && (p.color & 0xffffff) === rec.soft) {
+      if (
+        rec &&
+        typeof p.color === "number" &&
+        (p.color & 0xffffff) === rec.soft
+      ) {
         p.color = ((p.color & 0xff000000) | rec.raw) >>> 0;
       }
       g7SoftPrt.delete(p);
@@ -5523,7 +6203,7 @@
             f8WnK3xL.rawR *= kr;
             z8PxL2sT = null;
           }
-          if (x5QzL2wT.active) {
+          if (x5QzL2wT.active && !x5QzL2wT.isVp) {
             x5QzL2wT.cx *= kx;
             x5QzL2wT.cy *= ky;
           }
@@ -5724,10 +6404,12 @@
     const og = pt.getUniformLocation;
     pt.getUniformLocation = function (pr, nm) {
       const loc = og.apply(this, arguments);
-      if (loc && typeof nm === "string") {
-        if (/proj|tex|uv|color|sampler|filter/i.test(nm)) uLocMap.set(loc, 2);
-        else if (/translation|worldtransform|uworldmatrix/i.test(nm))
-          uLocMap.set(loc, 1);
+      if (
+        loc &&
+        typeof nm === "string" &&
+        /proj|tex|uv|color|sampler|filter/i.test(nm)
+      ) {
+        uLocMap.set(loc, 2);
       }
       return loc;
     };
@@ -6147,9 +6829,7 @@ vec4 _mSoft(vec4 raw) {
     worldR: 0,
     vx: 0,
     vy: 0,
-    vr: 0,
     misses: 0,
-    displayMass: 0,
     lastTimestamp: performance.now(),
     color: null,
   };
@@ -6158,6 +6838,8 @@ vec4 _mSoft(vec4 raw) {
     cx: 0,
     cy: 0,
     worldR: 0,
+    r: 0,
+    isVp: false,
     alpha: 0,
     pop: 1.0,
   };
@@ -6624,7 +7306,7 @@ vec4 _mSoft(vec4 raw) {
   }
 
   function p3WnK7vT(force) {
-    if (!q9EnvOk) return;
+    if (!q9EnvOk || m9TvL2sP.revMethod === "ws") return;
     if (!f5TxL9wK && !force) return;
     const cv = t8VwM4xK();
     if (!cv || cv.width === 0 || cv.height === 0) {
@@ -6888,8 +7570,6 @@ vec4 _mSoft(vec4 raw) {
         (octCount >= 3 &&
           cns.length >= 10 &&
           meanErr <= Math.max(2, ref.r * 0.025)));
-    const cMass = Math.max(1, Math.round(Math.pow(cWR / 10, 2)));
-    f8WnK3xL.displayMass = cMass;
     f8WnK3xL.worldR = cWR;
     if (f5TxL9wK) {
       const dtSec = Math.min(
@@ -6933,7 +7613,6 @@ vec4 _mSoft(vec4 raw) {
         cWR <= v4QnK9wL * 1.45
       ) {
         v4QnK9wL = cWR;
-        q7TwM3xP = cMass;
       }
       if (m2WpT7vX) {
         if (
@@ -6956,7 +7635,6 @@ vec4 _mSoft(vec4 raw) {
       ) {
         const maxDecay = v4QnK9wL * Math.min(0.02, dtSec * 0.12);
         v4QnK9wL = Math.max(cWR, v4QnK9wL - maxDecay);
-        q7TwM3xP = Math.max(1, Math.round(Math.pow(v4QnK9wL / 10, 2)));
       }
     }
     const dt = Math.max(1, nw - f8WnK3xL.lastTimestamp);
@@ -6970,7 +7648,6 @@ vec4 _mSoft(vec4 raw) {
           ((ref.cx - f8WnK3xL.rawCx) / dt) * 0.65 + (f8WnK3xL.vx || 0) * 0.35;
         f8WnK3xL.vy =
           ((ref.cy - f8WnK3xL.rawCy) / dt) * 0.65 + (f8WnK3xL.vy || 0) * 0.35;
-        f8WnK3xL.vr = (ref.r - f8WnK3xL.rawR) / dt;
       }
     } else {
       f8WnK3xL.locked = true;
@@ -6979,7 +7656,6 @@ vec4 _mSoft(vec4 raw) {
       f8WnK3xL.r = ref.r;
       f8WnK3xL.vx = 0;
       f8WnK3xL.vy = 0;
-      f8WnK3xL.vr = 0;
     }
     f8WnK3xL.rawCx = ref.cx;
     f8WnK3xL.rawCy = ref.cy;
@@ -7045,7 +7721,28 @@ vec4 _mSoft(vec4 raw) {
     const midX = y8QzL4sM.width * 0.5,
       midY = y8QzL4sM.height * 0.5;
 
+    if (m9TvL2sP.revMethod === "ws" && v4WsLock) {
+      if (k2WsDead()) {
+        q2WnS7xM(true);
+      } else {
+        const cur = w4ReadLocked();
+        if (!cur) {
+          q2WnS7xM(true);
+        } else {
+          x5QzL2wT.alpha +=
+            (1.0 - x5QzL2wT.alpha) * (1 - Math.exp(-18 * dtSec));
+          x5QzL2wT.pop += (1.0 - x5QzL2wT.pop) * (1 - Math.exp(-14 * dtSec));
+          x5QzL2wT.active = true;
+          x5QzL2wT.isVp = true;
+          x5QzL2wT.cx = cur.cx;
+          x5QzL2wT.cy = cur.cy;
+          x5QzL2wT.r = cur.r;
+        }
+      }
+    }
+
     if (f5TxL9wK && f8WnK3xL.locked) {
+      x5QzL2wT.isVp = false;
       x5QzL2wT.alpha += (1.0 - x5QzL2wT.alpha) * (1 - Math.exp(-18 * dtSec));
       x5QzL2wT.pop += (1.0 - x5QzL2wT.pop) * (1 - Math.exp(-14 * dtSec));
       const pCx = f8WnK3xL.cx + (f8WnK3xL.vx || 0) * Math.min(20, dlt * 0.35);
@@ -7060,11 +7757,12 @@ vec4 _mSoft(vec4 raw) {
         x5QzL2wT.cy += (pCy - x5QzL2wT.cy) * sm;
         x5QzL2wT.worldR += (f8WnK3xL.worldR - x5QzL2wT.worldR) * sm;
       }
-    } else if (x5QzL2wT.active) {
+    } else if (!(m9TvL2sP.revMethod === "ws" && v4WsLock) && x5QzL2wT.active) {
       x5QzL2wT.alpha *= Math.exp(-15 * dtSec);
       x5QzL2wT.pop += (1.06 - x5QzL2wT.pop) * (1 - Math.exp(-10 * dtSec));
       if (x5QzL2wT.alpha < 0.01) {
         x5QzL2wT.active = false;
+        x5QzL2wT.isVp = false;
         x5QzL2wT.alpha = 0;
       }
     }
@@ -7074,21 +7772,28 @@ vec4 _mSoft(vec4 raw) {
       return;
     }
 
-    const gCv = t8VwM4xK();
+    const gCv = (x5QzL2wT.isVp && v4WsScene && v4WsScene.canvas) || t8VwM4xK();
     if (!gCv) {
       k9LwP2xM(m4WnL7sT);
       return;
     }
     const cRc = gCv.getBoundingClientRect();
-    const scX = cRc.width / gCv.width,
-      scY = cRc.height / gCv.height;
-    const zm = k3WnL8vR();
-    const tX = cRc.left + x5QzL2wT.cx * scX,
+    let tX, tY, tRad;
+    if (x5QzL2wT.isVp) {
+      tX = x5QzL2wT.cx;
+      tY = x5QzL2wT.cy;
+      tRad = Math.max(6, x5QzL2wT.r * x5QzL2wT.pop);
+    } else {
+      const scX = cRc.width / gCv.width,
+        scY = cRc.height / gCv.height;
+      const zm = k3WnL8vR();
+      tX = cRc.left + x5QzL2wT.cx * scX;
       tY = cRc.top + x5QzL2wT.cy * scY;
-    const tRad = Math.max(
-      6,
-      x5QzL2wT.worldR * zm * ((scX + scY) * 0.5) * x5QzL2wT.pop,
-    );
+      tRad = Math.max(
+        6,
+        x5QzL2wT.worldR * zm * ((scX + scY) * 0.5) * x5QzL2wT.pop,
+      );
+    }
     const a = x5QzL2wT.alpha;
     const pulse = 0.5 + 0.5 * Math.sin(nw * 0.006);
 
@@ -7202,7 +7907,7 @@ vec4 _mSoft(vec4 raw) {
       return;
     }
     if (c === m9TvL2sP.keyRevLock) {
-      if (f5TxL9wK || f8WnK3xL.locked) q2WnS7xM(true);
+      if (f5TxL9wK || f8WnK3xL.locked || v4WsLock) q2WnS7xM(true);
       g9PxL3vT();
       return;
     }
@@ -8534,6 +9239,17 @@ vec4 _mSoft(vec4 raw) {
         "macro-pill-trans",
         Boolean(m9TvL2sP.pillTransparent),
       );
+    const rmKey = m9TvL2sP.revMethod === "pixi" ? "pixi" : "ws";
+    const cRm = document.getElementById("macro-revmtd-cur");
+    const pRm = document.getElementById("macro-revmtd-pop");
+    const iRm = document.getElementById("macro-rev-info");
+    if (cRm) cRm.textContent = rmKey === "pixi" ? "Pixi" : "WebSocket";
+    if (pRm) {
+      pRm.querySelectorAll(".macro-pos-opt").forEach((o) => {
+        o.classList.toggle("active", o.getAttribute("data-revmtd") === rmKey);
+      });
+    }
+    if (iRm) iRm.style.display = rmKey === "pixi" ? "inline-flex" : "none";
     const tRn = document.getElementById("macro-toggle-revnot");
     const cRn = document.getElementById("macro-revnot-cur");
     const pRn = document.getElementById("macro-revnot-pop");
@@ -8997,7 +9713,7 @@ vec4 _mSoft(vec4 raw) {
       .macro-info-tooltip{position:absolute;bottom:calc(100% + 0.65em);right:0;width:21em;max-width:calc(100vw - 24px);background:rgba(14,14,14,0.98);border:1px solid #484848;border-radius:0.5em;padding:0.75em 0.9em;color:#e0e0e0;font-size:0.88em;line-height:1.4;text-transform:none;letter-spacing:0;font-weight:500;pointer-events:none;opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity 0.18s ease,transform 0.18s ease,visibility 0s linear 0.18s;box-shadow:0 8px 24px rgba(0,0,0,0.85);z-index:100000}
       .macro-info-wrap:hover .macro-info-tooltip{opacity:1;visibility:visible;transform:translateY(0);transition:opacity 0.18s ease,transform 0.18s ease,visibility 0s linear 0s}
       .macro-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.7em;font-size:1em;gap:0.8em;transition:color 0.28s ease}
-      .macro-row-disabled{opacity:0.42;filter:grayscale(0.85);transition:opacity 0.2s,filter 0.2s}
+
       .macro-controls-group{display:flex;align-items:center;gap:0.6em}
       .macro-slider-track{width:7.5em;height:0.85em;background:var(--macro-btn-bg-sub,#141414);border:1px solid var(--macro-btn-border,#2d2d2d);border-radius:0.45em;position:relative;cursor:pointer;overflow:hidden}
       .macro-icon-btn{background:var(--macro-btn-bg,#242424);border:1px solid var(--macro-btn-border,#383838);color:var(--macro-btn-text,#eee);border-radius:0.35em;padding:0.35em 0.5em;font-size:1em;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:0;transition:background 0.12s,border-color 0.12s,color 0.28s ease}
@@ -9106,6 +9822,12 @@ vec4 _mSoft(vec4 raw) {
       .macro-win-body.macro-pal-dim .macro-row,.macro-win-body.macro-pal-dim .macro-section-header,.macro-win-body.macro-pal-dim .macro-sep,.macro-win-body.macro-pal-dim .macro-textarea,.macro-win-body.macro-pal-dim .macro-menu-bind-wrap,.macro-win-body.macro-pal-dim .macro-reset-all-btn,.macro-win-body.macro-pal-dim .macro-tutorial-btn,.macro-win-body.macro-pal-dim .macro-upd-banner{opacity:0.24;pointer-events:none}
       .macro-win-body.macro-pal-dim .macro-row.macro-pal-active{opacity:1;pointer-events:auto;position:relative;z-index:49}
       .macro-win-body.macro-pal-dim .macro-row.macro-pal-active>span{color:var(--macro-title-color,#fff);text-shadow:var(--macro-pal-glow,0 0 8px rgba(255,255,255,0.28))}
+      .macro-rev-hdr-r{display:inline-flex;align-items:center;gap:0.45em}
+      .macro-rev-mtd-lbl{font-size:1em;font-weight:500;color:var(--macro-muted-text,#9aa0a6);text-transform:none;letter-spacing:0;white-space:nowrap;transition:color 0.28s ease}
+      .macro-section-header .macro-pos-btn{width:auto;min-width:0;font-size:0.95em;padding:0.26em 0.52em;text-transform:none;letter-spacing:0;white-space:nowrap}
+      #macro-revmtd-pop{width:max-content;min-width:7.2em;max-width:12em}
+            .macro-win-body.macro-pal-dim .macro-section-header.macro-pal-active{opacity:1;pointer-events:auto;position:relative;z-index:49}
+            .macro-win-body.macro-pal-dim .macro-section-header.macro-pal-active>span{color:var(--macro-title-color,#fff);text-shadow:var(--macro-pal-glow,0 0 8px rgba(255,255,255,0.28))}
       .macro-pos-btn{display:inline-flex;align-items:center;justify-content:space-between;gap:0.35em;width:6.2em;box-sizing:border-box;background:var(--macro-btn-bg,#242424);border:1px solid var(--macro-btn-border,#383838);color:var(--macro-btn-text,#eee);border-radius:0.35em;padding:0.36em 0.55em;font-family:inherit;font-size:0.9em;font-weight:600;cursor:pointer;transition:border-color 0.16s,filter 0.14s,color 0.28s ease}
       .macro-pos-btn:hover{filter:brightness(1.14)}
       .macro-pos-btn.open{border-color:var(--macro-accent-muted,rgba(255,255,255,0.48))}
@@ -9243,9 +9965,16 @@ vec4 _mSoft(vec4 raw) {
         <div id="macro-ff-binds"></div>
         ${mkR(y4WpS9vT)}
         <div class="macro-sep"></div>
-        <div class="macro-section-header">
-          <span data-i18n="secRev">${k3Tr("secRev")}</span>
-          <div class="macro-info-wrap"><span class="macro-info-icon"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.6a1 1 0 0 1 1 1v5.1a1 1 0 1 1-2 0V3.6a1 1 0 0 1 1-1Zm0 8.55a1.15 1.15 0 1 1 0 2.3 1.15 1.15 0 0 1 0-2.3Z"/></svg></span><div class="macro-info-tooltip" data-i18n="tipRev">${k3Tr("tipRev")}</div></div>
+        <div class="macro-section-header" id="macro-hdr-rev">
+                  <span data-i18n="secRev">${k3Tr("secRev")}</span>
+                  <div class="macro-rev-hdr-r">
+                    <span class="macro-rev-mtd-lbl" data-i18n="revMtd">${k3Tr("revMtd")}</span>
+                    <button type="button" class="macro-pos-btn" id="macro-revmtd-btn">
+              <span class="macro-lang-cur" id="macro-revmtd-cur">${m9TvL2sP.revMethod === "pixi" ? "Pixi" : "WebSocket"}</span>
+              <svg class="macro-lang-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="macro-info-wrap" id="macro-rev-info" style="display:${m9TvL2sP.revMethod === "pixi" ? "inline-flex" : "none"}"><span class="macro-info-icon"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.6a1 1 0 0 1 1 1v5.1a1 1 0 1 1-2 0V3.6a1 1 0 0 1 1-1Zm0 8.55a1.15 1.15 0 1 1 0 2.3 1.15 1.15 0 0 1 0-2.3Z"/></svg></span><div class="macro-info-tooltip" data-i18n="tipRev">${k3Tr("tipRev")}</div></div>
+          </div>
         </div>
         ${mkR(w9QnL2xM)}
         <div class="macro-row" id="macro-row-revnot">
@@ -9442,6 +10171,12 @@ vec4 _mSoft(vec4 raw) {
                     <button type="button" class="macro-pos-opt${m9TvL2sP.mapGridMode === "over" ? " active" : ""}" data-grid="over"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="gridOver">${k3Tr("gridOver")}</span></button>
                   </div>
                 </div>
+        <div class="macro-pos-pop" id="macro-revmtd-pop">
+          <div class="macro-lang-list">
+            <button type="button" class="macro-pos-opt${m9TvL2sP.revMethod !== "pixi" ? " active" : ""}" data-revmtd="ws"><span class="macro-lang-bar"></span><span class="macro-lang-name">WebSocket</span></button>
+            <button type="button" class="macro-pos-opt${m9TvL2sP.revMethod === "pixi" ? " active" : ""}" data-revmtd="pixi"><span class="macro-lang-bar"></span><span class="macro-lang-name">Pixi</span></button>
+          </div>
+        </div>
           </div>
         </div>
         <div class="macro-pane-settings">
@@ -9736,179 +10471,104 @@ vec4 _mSoft(vec4 raw) {
       "fixed",
     );
 
-    const b7NmQ2xL = win.querySelector(".macro-win-body");
-    const t9VpL4wK = document.createElement("div");
-    t9VpL4wK.className = "macro-custom-scroll-track";
-    const d3XnK8vP = document.createElement("div");
-    d3XnK8vP.className = "macro-custom-scroll-thumb";
-    t9VpL4wK.appendChild(d3XnK8vP);
-    win.querySelector(".macro-pane-main").appendChild(t9VpL4wK);
+    function k7MkScroll(pn, bd, tw) {
+      if (!pn || !bd) return () => {};
+      const trk = document.createElement("div");
+      trk.className = "macro-custom-scroll-track";
+      if (tw) trk.style.width = tw;
+      const thm = document.createElement("div");
+      thm.className = "macro-custom-scroll-thumb";
+      trk.appendChild(thm);
+      pn.appendChild(trk);
 
-    function u4PwM8xQ() {
-      const cH = b7NmQ2xL.clientHeight,
-        sH = b7NmQ2xL.scrollHeight;
-      if (sH - cH <= 4) {
-        t9VpL4wK.style.display = "none";
-        b7NmQ2xL.scrollTop = 0;
-        return;
-      }
-      t9VpL4wK.style.display = "block";
-      const tH = t9VpL4wK.offsetHeight;
-      const thH = Math.max(22, Math.round((cH / sH) * tH));
-      const mSt = sH - cH,
-        mTp = tH - thH;
-      if (mTp <= 0 || mSt <= 0) {
-        t9VpL4wK.style.display = "none";
-        return;
-      }
-      d3XnK8vP.style.height = thH + "px";
-      d3XnK8vP.style.top = Math.round((b7NmQ2xL.scrollTop / mSt) * mTp) + "px";
-    }
-
-    b7NmQ2xL.addEventListener("scroll", u4PwM8xQ, { passive: true });
-    if (window.ResizeObserver) new ResizeObserver(u4PwM8xQ).observe(b7NmQ2xL);
-
-    let g8WpT3xN = false,
-      k1LvQ5xM = 0,
-      z6NtP9wR = 0;
-    function startScrollDrag(e) {
-      g8WpT3xN = true;
-      k1LvQ5xM = e.clientY;
-      z6NtP9wR = b7NmQ2xL.scrollTop;
-      d3XnK8vP.classList.add("dragging");
-      try {
-        t9VpL4wK.setPointerCapture(e.pointerId);
-      } catch (_) {}
-    }
-
-    t9VpL4wK.addEventListener("pointerdown", (e) => {
-      if (e.button !== 0) return;
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.target !== d3XnK8vP) {
-        const r = t9VpL4wK.getBoundingClientRect(),
-          tH = t9VpL4wK.offsetHeight,
-          thH = d3XnK8vP.offsetHeight;
-        const mTp = tH - thH,
-          mSt = b7NmQ2xL.scrollHeight - b7NmQ2xL.clientHeight;
-        if (mTp > 0)
-          b7NmQ2xL.scrollTop = ((e.clientY - r.top - thH * 0.5) / mTp) * mSt;
-      }
-      startScrollDrag(e);
-    });
-
-    t9VpL4wK.addEventListener("pointermove", (e) => {
-      if (!g8WpT3xN) return;
-      e.preventDefault();
-      e.stopPropagation();
-      const tH = t9VpL4wK.offsetHeight,
-        thH = d3XnK8vP.offsetHeight;
-      const mTp = tH - thH,
-        mSt = b7NmQ2xL.scrollHeight - b7NmQ2xL.clientHeight;
-      if (mTp <= 0) return;
-      b7NmQ2xL.scrollTop = z6NtP9wR + ((e.clientY - k1LvQ5xM) / mTp) * mSt;
-    });
-
-    const s4KzM7vW = (e) => {
-      if (g8WpT3xN) {
-        g8WpT3xN = false;
-        d3XnK8vP.classList.remove("dragging");
-        if (e && e.pointerId !== undefined) {
-          try {
-            t9VpL4wK.releasePointerCapture(e.pointerId);
-          } catch (_) {}
+      function upd() {
+        const cH = bd.clientHeight,
+          sH = bd.scrollHeight;
+        if (sH - cH <= 4) {
+          trk.style.display = "none";
+          bd.scrollTop = 0;
+          return;
         }
+        trk.style.display = "block";
+        const tH = trk.offsetHeight,
+          thH = Math.max(22, Math.round((cH / sH) * tH));
+        const mSt = sH - cH,
+          mTp = tH - thH;
+        if (mTp <= 0 || mSt <= 0) {
+          trk.style.display = "none";
+          return;
+        }
+        thm.style.height = thH + "px";
+        thm.style.top = Math.round((bd.scrollTop / mSt) * mTp) + "px";
       }
-    };
-    t9VpL4wK.addEventListener("pointerup", s4KzM7vW);
-    t9VpL4wK.addEventListener("pointercancel", s4KzM7vW);
-    window.addEventListener("blur", s4KzM7vW);
 
-    const s7BodyQ = win.querySelector(".macro-settings-body");
-    const s7PaneQ = win.querySelector(".macro-pane-settings");
-    const s7Trk = document.createElement("div");
-    s7Trk.className = "macro-custom-scroll-track";
-    s7Trk.style.width = "1.15em";
-    const s7Thm = document.createElement("div");
-    s7Thm.className = "macro-custom-scroll-thumb";
-    s7Trk.appendChild(s7Thm);
-    if (s7PaneQ) s7PaneQ.appendChild(s7Trk);
+      bd.addEventListener("scroll", upd, { passive: true });
+      if (window.ResizeObserver) new ResizeObserver(upd).observe(bd);
 
-    function u4PwS8mQ() {
-      if (!s7BodyQ) return;
-      const cH = s7BodyQ.clientHeight,
-        sH = s7BodyQ.scrollHeight;
-      if (sH - cH <= 4) {
-        s7Trk.style.display = "none";
-        s7BodyQ.scrollTop = 0;
-        return;
-      }
-      s7Trk.style.display = "block";
-      const tH = s7Trk.offsetHeight;
-      const thH = Math.max(22, Math.round((cH / sH) * tH));
-      const mSt = sH - cH,
-        mTp = tH - thH;
-      if (mTp <= 0 || mSt <= 0) {
-        s7Trk.style.display = "none";
-        return;
-      }
-      s7Thm.style.height = thH + "px";
-      s7Thm.style.top = Math.round((s7BodyQ.scrollTop / mSt) * mTp) + "px";
-    }
-
-    if (s7BodyQ) {
-      s7BodyQ.addEventListener("scroll", u4PwS8mQ, { passive: true });
-      if (window.ResizeObserver) new ResizeObserver(u4PwS8mQ).observe(s7BodyQ);
-      let s7Drg = false,
-        s7SY = 0,
-        s7ST = 0;
-      s7Trk.addEventListener("pointerdown", (e) => {
+      let drg = false,
+        sY = 0,
+        sT = 0;
+      trk.addEventListener("pointerdown", (e) => {
         if (e.button !== 0) return;
         e.preventDefault();
         e.stopPropagation();
-        if (e.target !== s7Thm) {
-          const r = s7Trk.getBoundingClientRect(),
-            tH = s7Trk.offsetHeight,
-            thH = s7Thm.offsetHeight;
+        if (e.target !== thm) {
+          const r = trk.getBoundingClientRect(),
+            tH = trk.offsetHeight,
+            thH = thm.offsetHeight;
           const mTp = tH - thH,
-            mSt = s7BodyQ.scrollHeight - s7BodyQ.clientHeight;
+            mSt = bd.scrollHeight - bd.clientHeight;
           if (mTp > 0)
-            s7BodyQ.scrollTop = ((e.clientY - r.top - thH * 0.5) / mTp) * mSt;
+            bd.scrollTop = ((e.clientY - r.top - thH * 0.5) / mTp) * mSt;
         }
-        s7Drg = true;
-        s7SY = e.clientY;
-        s7ST = s7BodyQ.scrollTop;
-        s7Thm.classList.add("dragging");
+        drg = true;
+        sY = e.clientY;
+        sT = bd.scrollTop;
+        thm.classList.add("dragging");
         try {
-          s7Trk.setPointerCapture(e.pointerId);
+          trk.setPointerCapture(e.pointerId);
         } catch (_) {}
       });
-      s7Trk.addEventListener("pointermove", (e) => {
-        if (!s7Drg) return;
+      trk.addEventListener("pointermove", (e) => {
+        if (!drg) return;
         e.preventDefault();
         e.stopPropagation();
-        const tH = s7Trk.offsetHeight,
-          thH = s7Thm.offsetHeight;
+        const tH = trk.offsetHeight,
+          thH = thm.offsetHeight;
         const mTp = tH - thH,
-          mSt = s7BodyQ.scrollHeight - s7BodyQ.clientHeight;
+          mSt = bd.scrollHeight - bd.clientHeight;
         if (mTp <= 0) return;
-        s7BodyQ.scrollTop = s7ST + ((e.clientY - s7SY) / mTp) * mSt;
+        bd.scrollTop = sT + ((e.clientY - sY) / mTp) * mSt;
       });
-      const s7End = (e) => {
-        if (s7Drg) {
-          s7Drg = false;
-          s7Thm.classList.remove("dragging");
+      const end = (e) => {
+        if (drg) {
+          drg = false;
+          thm.classList.remove("dragging");
           if (e && e.pointerId !== undefined) {
             try {
-              s7Trk.releasePointerCapture(e.pointerId);
+              trk.releasePointerCapture(e.pointerId);
             } catch (_) {}
           }
         }
       };
-      s7Trk.addEventListener("pointerup", s7End);
-      s7Trk.addEventListener("pointercancel", s7End);
-      window.addEventListener("blur", s7End);
+      trk.addEventListener("pointerup", end);
+      trk.addEventListener("pointercancel", end);
+      window.addEventListener("blur", end);
+      return upd;
     }
+
+    const b7NmQ2xL = win.querySelector(".macro-win-body");
+    const u4PwM8xQ = k7MkScroll(
+      win.querySelector(".macro-pane-main"),
+      b7NmQ2xL,
+      "",
+    );
+    const s7BodyQ = win.querySelector(".macro-settings-body");
+    const u4PwS8mQ = k7MkScroll(
+      win.querySelector(".macro-pane-settings"),
+      s7BodyQ,
+      "1.15em",
+    );
 
     win.addEventListener(
       "wheel",
@@ -10156,20 +10816,22 @@ vec4 _mSoft(vec4 raw) {
     window.addEventListener("mouseup", endResize);
     window.addEventListener("blur", endResize);
 
-    function rL3vT8mK(tk, inp, key) {
+    function k4BindRange(tk, inp, bDec, bInc, sFn, mn, mx, stp, fb, onChg) {
+      if (!tk || !inp) return;
       const fl = tk.querySelector(".macro-slider-fill");
+      const sp = mx - mn;
       function app(v, cmt) {
-        v = Math.max(50, Math.min(3000, v));
-        m9TvL2sP[key] = v;
-        fl.style.width = ((v - 50) / 2950) * 100 + "%";
+        v = Math.max(mn, Math.min(mx, Math.round(v)));
+        sFn(v);
+        if (fl) fl.style.width = ((v - mn) / sp) * 100 + "%";
         q2SetVal(inp, v, Boolean(cmt));
         x3QnK8wR();
+        if (onChg) onChg(v);
       }
-      let sld = false;
       function hM(e) {
         const r = tk.getBoundingClientRect();
-        let p = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-        app(Math.round((50 + p * 2950 - 50) / 10) * 10 + 50, false);
+        const p = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+        app(mn + Math.round((p * sp) / stp) * stp, false);
       }
       tk.addEventListener("mousedown", (e) => {
         if (e.button !== 0) return;
@@ -10177,15 +10839,11 @@ vec4 _mSoft(vec4 raw) {
           document.activeElement.blur();
         e.preventDefault();
         e.stopPropagation();
-        sld = true;
-        fl.classList.add("active");
         hM(e);
         function onMv(ev) {
-          if (sld) hM(ev);
+          hM(ev);
         }
         function onUp() {
-          sld = false;
-          fl.classList.remove("active");
           window.removeEventListener("mousemove", onMv);
           window.removeEventListener("mouseup", onUp);
           window.removeEventListener("blur", onUp);
@@ -10196,42 +10854,29 @@ vec4 _mSoft(vec4 raw) {
         window.addEventListener("blur", onUp);
       });
       inp.addEventListener("input", () => {
-        let v = parseInt(inp.value, 10);
+        const v = parseInt(inp.value, 10);
         if (!isNaN(v)) {
-          m9TvL2sP[key] = Math.max(50, Math.min(3000, v));
-          fl.style.width = ((m9TvL2sP[key] - 50) / 2950) * 100 + "%";
+          const nv = Math.max(mn, Math.min(mx, v));
+          sFn(nv);
+          if (fl) fl.style.width = ((nv - mn) / sp) * 100 + "%";
           x3QnK8wR();
+          if (onChg) onChg(nv);
         }
       });
       inp.addEventListener("blur", () => {
-        let v = parseInt(inp.value, 10);
-        app(isNaN(v) ? 800 : v, true);
+        const v = parseInt(inp.value, 10);
+        app(isNaN(v) ? fb : v, true);
       });
-    }
-
-    function wP2kM7wV(
-      bDec,
-      bInc,
-      inp,
-      tk,
-      key,
-      min = 50,
-      max = 3000,
-      fallback = 800,
-      stp = 10,
-      onChg = null,
-    ) {
       function step(d) {
-        let v = parseInt(inp.value, 10);
-        v = Math.max(min, Math.min(max, (isNaN(v) ? fallback : v) + d));
-        m9TvL2sP[key] = v;
-        q2SetVal(inp, v, false);
-        const fl = tk.querySelector(".macro-slider-fill");
-        if (fl) fl.style.width = ((v - min) / (max - min)) * 100 + "%";
+        const v = parseInt(inp.value, 10);
+        const nv = Math.max(mn, Math.min(mx, (isNaN(v) ? fb : v) + d));
+        sFn(nv);
+        q2SetVal(inp, nv, false);
+        if (fl) fl.style.width = ((nv - mn) / sp) * 100 + "%";
         x3QnK8wR();
-        if (onChg) onChg(v);
+        if (onChg) onChg(nv);
       }
-      function bind(btn, delta) {
+      function bStp(btn, d) {
         let hT = null,
           rT = null,
           act = false;
@@ -10255,157 +10900,68 @@ vec4 _mSoft(vec4 raw) {
           act = true;
           window.addEventListener("mouseup", clr);
           window.addEventListener("blur", clr);
-          step(delta);
+          step(d);
           hT = setTimeout(() => {
-            rT = setInterval(() => step(delta), 40);
+            rT = setInterval(() => step(d), 40);
           }, 500);
         });
         ["mouseup", "mouseleave"].forEach((ev) =>
           btn.addEventListener(ev, clr),
         );
       }
-      if (bDec) bind(bDec, -stp);
-      if (bInc) bind(bInc, stp);
+      if (bDec) bStp(bDec, -stp);
+      if (bInc) bStp(bInc, stp);
     }
 
     ["solo", "auto"].forEach((k) => {
       const prop = k === "solo" ? "soloDelay" : "autoDelay";
-      const sNum = document.getElementById("macro-num-" + k),
-        sTrk = document.getElementById("macro-track-" + k);
-      rL3vT8mK(sTrk, sNum, prop);
-      wP2kM7wV(
+      k4BindRange(
+        document.getElementById("macro-track-" + k),
+        document.getElementById("macro-num-" + k),
         document.getElementById(`macro-dec-${k}`),
         document.getElementById(`macro-inc-${k}`),
-        sNum,
-        sTrk,
-        prop,
+        (v) => {
+          m9TvL2sP[prop] = v;
+        },
+        50,
+        3000,
+        10,
+        800,
+        null,
       );
     });
 
-    const sTrkM = document.getElementById("macro-track-margin"),
-      sNumM = document.getElementById("macro-num-margin");
-    if (sTrkM && sNumM) {
-      const flM = sTrkM.querySelector(".macro-slider-fill");
-      function appM(v, cmt) {
-        v = Math.max(30, Math.min(500, v));
+    k4BindRange(
+      document.getElementById("macro-track-margin"),
+      document.getElementById("macro-num-margin"),
+      document.getElementById("macro-dec-margin"),
+      document.getElementById("macro-inc-margin"),
+      (v) => {
         m9TvL2sP.cullMargin = v;
-        flM.style.width = ((v - 30) / 470) * 100 + "%";
-        q2SetVal(sNumM, v, Boolean(cmt));
-        x3QnK8wR();
-      }
-      sTrkM.addEventListener("mousedown", (e) => {
-        if (e.button !== 0) return;
-        e.preventDefault();
-        e.stopPropagation();
-        function hMM(ev) {
-          const r = sTrkM.getBoundingClientRect();
-          let p = Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width));
-          appM(Math.round((30 + p * 470 - 30) / 10) * 10 + 30, false);
-        }
-        hMM(e);
-        function onMvM(ev) {
-          hMM(ev);
-        }
-        function onUpM() {
-          window.removeEventListener("mousemove", onMvM);
-          window.removeEventListener("mouseup", onUpM);
-          window.removeEventListener("blur", onUpM);
-          q6CommitVal(sNumM);
-        }
-        window.addEventListener("mousemove", onMvM);
-        window.addEventListener("mouseup", onUpM);
-        window.addEventListener("blur", onUpM);
-      });
-      sNumM.addEventListener("input", () => {
-        let v = parseInt(sNumM.value, 10);
-        if (!isNaN(v)) {
-          m9TvL2sP.cullMargin = Math.max(30, Math.min(500, v));
-          flM.style.width = ((m9TvL2sP.cullMargin - 30) / 470) * 100 + "%";
-          x3QnK8wR();
-        }
-      });
-      sNumM.addEventListener("blur", () => {
-        let v = parseInt(sNumM.value, 10);
-        appM(isNaN(v) ? 120 : v, true);
-      });
-      wP2kM7wV(
-        document.getElementById("macro-dec-margin"),
-        document.getElementById("macro-inc-margin"),
-        sNumM,
-        sTrkM,
-        "cullMargin",
-        30,
-        500,
-        120,
-      );
-    }
+      },
+      30,
+      500,
+      10,
+      120,
+      null,
+    );
 
-    const sTrkR = document.getElementById("macro-track-rscale"),
-      sNumR = document.getElementById("macro-num-rscale");
-    if (sTrkR && sNumR) {
-      const flR = sTrkR.querySelector(".macro-slider-fill");
-      const u5Res = () => {
-        if (p9RndRef) p9ApplyRes(p9RndRef);
-      };
-      function appR(v, cmt) {
-        v = Math.max(25, Math.min(100, Math.round(v)));
+    k4BindRange(
+      document.getElementById("macro-track-rscale"),
+      document.getElementById("macro-num-rscale"),
+      document.getElementById("macro-dec-rscale"),
+      document.getElementById("macro-inc-rscale"),
+      (v) => {
         m9TvL2sP.renderScale = v;
-        flR.style.width = ((v - 25) / 75) * 100 + "%";
-        q2SetVal(sNumR, v, Boolean(cmt));
-        x3QnK8wR();
-        u5Res();
-      }
-      sTrkR.addEventListener("mousedown", (e) => {
-        if (e.button !== 0) return;
-        if (document.activeElement && document.activeElement.blur)
-          document.activeElement.blur();
-        e.preventDefault();
-        e.stopPropagation();
-        function hMR(ev) {
-          const r = sTrkR.getBoundingClientRect();
-          const p = Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width));
-          appR(Math.round((25 + p * 75 - 25) / 5) * 5 + 25, false);
-        }
-        hMR(e);
-        function onMvR(ev) {
-          hMR(ev);
-        }
-        function onUpR() {
-          window.removeEventListener("mousemove", onMvR);
-          window.removeEventListener("mouseup", onUpR);
-          window.removeEventListener("blur", onUpR);
-          q6CommitVal(sNumR);
-        }
-        window.addEventListener("mousemove", onMvR);
-        window.addEventListener("mouseup", onUpR);
-        window.addEventListener("blur", onUpR);
-      });
-      sNumR.addEventListener("input", () => {
-        const v = parseInt(sNumR.value, 10);
-        if (!isNaN(v)) {
-          m9TvL2sP.renderScale = Math.max(25, Math.min(100, v));
-          flR.style.width = ((m9TvL2sP.renderScale - 25) / 75) * 100 + "%";
-          x3QnK8wR();
-          u5Res();
-        }
-      });
-      sNumR.addEventListener("blur", () => {
-        const v = parseInt(sNumR.value, 10);
-        appR(isNaN(v) ? 100 : v, true);
-      });
-      wP2kM7wV(
-        document.getElementById("macro-dec-rscale"),
-        document.getElementById("macro-inc-rscale"),
-        sNumR,
-        sTrkR,
-        "renderScale",
-        25,
-        100,
-        100,
-        5,
-        u5Res,
-      );
-    }
+      },
+      25,
+      100,
+      5,
+      100,
+      () => {
+        if (p9RndRef) p9ApplyRes(p9RndRef);
+      },
+    );
     const tRs = document.getElementById("macro-toggle-rscale");
     if (tRs) {
       tRs.addEventListener("change", (e) => {
@@ -10586,93 +11142,6 @@ vec4 _mSoft(vec4 raw) {
     const d5VrP8nK = win.querySelector("#macro-ff-delays");
     const b8MtQ2wL = win.querySelector("#macro-ff-binds");
 
-    function b6VzM2xT(tr, inp, bDec, bInc, ff) {
-      const fl = tr.querySelector(".macro-slider-fill");
-      function app(v, cmt) {
-        v = Math.max(50, Math.min(3000, v));
-        ff.delay = v;
-        if (fl) fl.style.width = ((v - 50) / 2950) * 100 + "%";
-        q2SetVal(inp, v, Boolean(cmt));
-        x3QnK8wR();
-      }
-      function hM(e) {
-        const r = tr.getBoundingClientRect();
-        const p = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-        app(Math.round((50 + p * 2950 - 50) / 10) * 10 + 50, false);
-      }
-      tr.addEventListener("mousedown", (e) => {
-        if (e.button !== 0) return;
-        if (document.activeElement && document.activeElement.blur)
-          document.activeElement.blur();
-        e.preventDefault();
-        e.stopPropagation();
-        hM(e);
-        function onMv(ev) {
-          hM(ev);
-        }
-        function onUp() {
-          window.removeEventListener("mousemove", onMv);
-          window.removeEventListener("mouseup", onUp);
-          window.removeEventListener("blur", onUp);
-          q6CommitVal(inp);
-        }
-        window.addEventListener("mousemove", onMv);
-        window.addEventListener("mouseup", onUp);
-        window.addEventListener("blur", onUp);
-      });
-      inp.addEventListener("input", () => {
-        const v = parseInt(inp.value, 10);
-        if (!isNaN(v)) {
-          ff.delay = Math.max(50, Math.min(3000, v));
-          if (fl) fl.style.width = ((ff.delay - 50) / 2950) * 100 + "%";
-          x3QnK8wR();
-        }
-      });
-      inp.addEventListener("blur", () => {
-        const v = parseInt(inp.value, 10);
-        app(isNaN(v) ? 800 : v, true);
-      });
-      function step(d) {
-        const v = parseInt(inp.value, 10);
-        app((isNaN(v) ? 800 : v) + d, false);
-      }
-      function bindStep(btn, delta) {
-        let hT = null,
-          rT = null,
-          act = false;
-        function clr() {
-          if (hT) clearTimeout(hT);
-          if (rT) clearInterval(rT);
-          hT = null;
-          rT = null;
-          if (act) {
-            act = false;
-            window.removeEventListener("mouseup", clr);
-            window.removeEventListener("blur", clr);
-            q6CommitVal(inp, "step");
-          }
-        }
-        btn.addEventListener("mousedown", (e) => {
-          if (e.button !== 0) return;
-          e.preventDefault();
-          e.stopPropagation();
-          clr();
-          act = true;
-          window.addEventListener("mouseup", clr);
-          window.addEventListener("blur", clr);
-          step(delta);
-          hT = setTimeout(() => {
-            rT = setInterval(() => step(delta), 40);
-          }, 500);
-        });
-        ["mouseup", "mouseleave"].forEach((ev) =>
-          btn.addEventListener(ev, clr),
-        );
-      }
-      if (bDec) bindStep(bDec, -10);
-      if (bInc) bindStep(bInc, 10);
-    }
-
     function v4NpQ8mL(ff, idx, animate) {
       if (!d5VrP8nK || !b8MtQ2wL) return;
       const num = idx + 2;
@@ -10700,7 +11169,20 @@ vec4 _mSoft(vec4 raw) {
       const bInc = dWrap.querySelector("#macro-inc-extraFF_" + idx);
       b2WzL7vP(tr, ff.delay);
       b3EdBind(inp);
-      b6VzM2xT(tr, inp, bDec, bInc, ff);
+      k4BindRange(
+        tr,
+        inp,
+        bDec,
+        bInc,
+        (v) => {
+          ff.delay = v;
+        },
+        50,
+        3000,
+        10,
+        800,
+        null,
+      );
 
       const bWrap = document.createElement("div");
       bWrap.className = "macro-ff-anim" + (animate ? " macro-ff-entering" : "");
@@ -11287,7 +11769,6 @@ vec4 _mSoft(vec4 raw) {
         .forEach((rw) => rw.classList.remove("macro-pal-active"));
       win.querySelectorAll(".macro-mini-pal").forEach((b) => {
         const on = b.getAttribute("data-target") === tgt;
-        b.classList.toggle("active", on);
         const rw = b.closest(".macro-row");
         if (rw) rw.classList.toggle("macro-pal-active", on);
       });
@@ -11310,7 +11791,6 @@ vec4 _mSoft(vec4 raw) {
       if (pSet && !(lPop && lPop.classList.contains("open")))
         pSet.classList.remove("macro-pal-dim");
       win.querySelectorAll(".macro-mini-pal").forEach((b) => {
-        b.classList.remove("active");
         const rw = b.closest(".macro-row");
         if (rw) rw.classList.remove("macro-pal-active");
       });
@@ -11583,6 +12063,14 @@ vec4 _mSoft(vec4 raw) {
         t: 0,
         fixW: false,
       },
+      {
+        id: "revmtd",
+        row: document.getElementById("macro-hdr-rev"),
+        btn: document.getElementById("macro-revmtd-btn"),
+        pop: document.getElementById("macro-revmtd-pop"),
+        t: 0,
+        fixW: false,
+      },
     ];
 
     function j4PosMainPop(it) {
@@ -11759,6 +12247,15 @@ vec4 _mSoft(vec4 raw) {
       f4RefocusGame();
     });
 
+    b4BindMainPop("revmtd", (opt) => {
+      const nxt = opt.getAttribute("data-revmtd") === "pixi" ? "pixi" : "ws";
+      if (m9TvL2sP.revMethod !== nxt) q2WnS7xM(false);
+      m9TvL2sP.revMethod = nxt;
+      x3QnK8wR();
+      r8QnM4tL();
+      f4RefocusGame();
+    });
+
     if (window.ResizeObserver && b7NmQ2xL) {
       new ResizeObserver(() => {
         m4MainPops.forEach((it) => {
@@ -11784,7 +12281,7 @@ vec4 _mSoft(vec4 raw) {
           t &&
           t.closest &&
           t.closest(
-            "#macro-revnot-pop, #macro-revnot-btn, #macro-xhair-pop, #macro-xhair-btn, #macro-grid-pop, #macro-grid-btn, .macro-custom-scroll-track, #macro-toggle-pill",
+            "#macro-revnot-pop, #macro-revnot-btn, #macro-xhair-pop, #macro-xhair-btn, #macro-grid-pop, #macro-grid-btn, #macro-revmtd-pop, #macro-revmtd-btn, .macro-custom-scroll-track, #macro-toggle-pill",
           )
         )
           return;
@@ -12110,6 +12607,7 @@ vec4 _mSoft(vec4 raw) {
       cfg.mapGridMode = cfg.mapGridMode === "over" ? "over" : "bg";
       cfg.crosshairStyle = cfg.crosshairStyle === "cross" ? "cross" : "plus";
       cfg.revNotifyPos = cfg.revNotifyPos === "bottom" ? "bottom" : "top";
+      cfg.revMethod = cfg.revMethod === "pixi" ? "pixi" : "ws";
       ["menuColor", "buttonsColor", "plexusColor"].forEach((k) => {
         cfg[k] =
           typeof cfg[k] === "string" && /^#[0-9a-f]{6}$/i.test(cfg[k])
@@ -12178,6 +12676,7 @@ vec4 _mSoft(vec4 raw) {
           return;
         }
         hCl2xK9m();
+        q2WnS7xM(false);
         c6RmP3xW.clear();
         m9TvL2sP = n6NormCfg(parsed);
         cfgDirty = false;
@@ -12246,6 +12745,7 @@ vec4 _mSoft(vec4 raw) {
       .addEventListener("click", (e) => {
         e.stopPropagation();
         hCl2xK9m();
+        q2WnS7xM(false);
         window.setMapBackground(null);
         window.setFixedBackground(null);
         k2DbClr();
@@ -12444,7 +12944,7 @@ vec4 _mSoft(vec4 raw) {
 
     j5TwM9xK(win, c1XnL4vP);
     r4BindHooks();
-    q9EnvOk = d4VkL8wQ() ? 1 : 0;
+    q9EnvOk = 1;
   }
 
   function initGfx() {
