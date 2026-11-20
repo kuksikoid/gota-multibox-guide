@@ -1,45 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MULTIBOX For Gota.io By Kuksik & Judex Tutorial</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#0d0d0d;color:#d0d0d0;font-family:'Ubuntu',Arial,sans-serif;min-height:100vh;line-height:1.58;font-size:14px}
-header{position:sticky;top:0;z-index:50;background:#121212;border-bottom:1px solid #242424}
-.top-bar{max-width:1160px;margin:0 auto;padding:11px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
-.logo{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.logo-main{font-size:17px;font-weight:700;color:#efefef;letter-spacing:0.2px}
-.logo-main span{color:#3898ec}
-.logo-ver{font-size:12px;color:#777;font-weight:500}
-.lang-select{background:#191919;border:1px solid #303030;color:#e4e4e4;font-family:inherit;font-size:13px;font-weight:500;padding:6px 10px;border-radius:4px;outline:none;cursor:pointer;max-width:210px}
-.lang-select:hover,.lang-select:focus{border-color:#505050}
-.lang-select option{background:#161616;color:#e4e4e4}
-main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
-.notice{background:#181212;border:1px solid #2d1d1d;border-inline-start:3px solid #d13838;color:#c9b4b4;font-size:13.5px;padding:11px 15px;border-radius:4px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
-.notice b{color:#ff6b6b}
-.notice-text{flex:1 1 260px;min-width:0}
-.notice-link{display:inline-flex;align-items:center;gap:7px;background:#131c26;border:1px solid #233b54;color:#3898ec;font-size:13px;font-weight:700;line-height:1.25;padding:5px 11px;border-radius:4px;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:background 0.15s,border-color 0.15s,color 0.15s}
-.notice-link:hover,.notice-link:focus-visible{background:#192736;border-color:#3898ec;color:#62b2f5;outline:none}
-.notice-link svg{width:14px;height:14px;fill:currentColor;flex-shrink:0;display:block}
-.list{display:flex;flex-direction:column;gap:14px}
-.item{background:#141414;border:1px solid #242424;border-radius:5px;padding:18px 20px;display:grid;grid-template-columns:minmax(0,1fr) 450px;gap:22px;align-items:start}
-.item-head{font-size:16px;font-weight:700;color:#fff;padding-bottom:9px;margin-bottom:11px;border-bottom:1px solid #222}
-.item-body{font-size:13.5px;color:#c8c8c8;overflow-wrap:break-word}
-.item-body p{margin-bottom:10px}
-.item-body p:last-child{margin-bottom:0}
-.item-body strong{color:#fff}
-.media-wrap{width:100%;aspect-ratio:16/9;background:#070707;border:1px solid #262626;border-radius:4px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
-.media-wrap video{width:100%;height:100%;object-fit:contain;outline:none;display:block}
-.vid-empty{display:none;color:#666;font-size:12.5px;text-align:center;padding:14px;user-select:none}
-@media(max-width:940px){
-  .item{grid-template-columns:1fr;gap:16px;padding:16px}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MULTIBOX For Gota.io By Kuksik & Judex Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#0d0d0d;color:#d0d0d0;font-family:'Ubuntu',Arial,sans-serif;min-height:100vh;line-height:1.58;font-size:14px}
+    header{position:sticky;top:0;z-index:50;background:#121212;border-bottom:1px solid #242424}
+    .top-bar{max-width:1160px;margin:0 auto;padding:11px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+    .logo{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+    .logo-main{font-size:17px;font-weight:700;color:#efefef;letter-spacing:0.2px}
+    .logo-main span{color:#3898ec}
+    .logo-ver{font-size:12px;color:#777;font-weight:500}
+    .lang-select{background:#191919;border:1px solid #303030;color:#e4e4e4;font-family:inherit;font-size:13px;font-weight:500;padding:6px 10px;border-radius:4px;outline:none;cursor:pointer;max-width:210px}
+    .lang-select:hover,.lang-select:focus{border-color:#505050}
+    .lang-select option{background:#161616;color:#e4e4e4}
+    main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
+    .notice{background:#181212;border:1px solid #2d1d1d;border-inline-start:3px solid #d13838;color:#c9b4b4;font-size:13.5px;padding:11px 15px;border-radius:4px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+    .notice b{color:#ff6b6b}
+    .notice-text{flex:1 1 260px;min-width:0}
+    .notice-link{display:inline-flex;align-items:center;gap:7px;background:#131c26;border:1px solid #233b54;color:#3898ec;font-size:13px;font-weight:700;line-height:1.25;padding:5px 11px;border-radius:4px;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:background 0.15s,border-color 0.15s,color 0.15s}
+    .notice-link:hover,.notice-link:focus-visible{background:#192736;border-color:#3898ec;color:#62b2f5;outline:none}
+    .notice-link svg{width:14px;height:14px;fill:currentColor;flex-shrink:0;display:block}
+    .list{display:flex;flex-direction:column;gap:14px}
+    .item{background:#141414;border:1px solid #242424;border-radius:5px;padding:18px 20px;display:grid;grid-template-columns:minmax(0,1fr) 450px;gap:22px;align-items:start}
+    .item-head{font-size:16px;font-weight:700;color:#fff;padding-bottom:9px;margin-bottom:11px;border-bottom:1px solid #222}
+    .item-body{font-size:13.5px;color:#c8c8c8;overflow-wrap:break-word}
+    .item-body p{margin-bottom:10px}
+    .item-body ol{margin:6px 0 12px;padding-inline-start:18px}
+    .item-body li{margin-bottom:5px}
+    .item-body p:last-child,.item-body ol:last-child,.item-body li:last-child{margin-bottom:0}
+    .item-body strong{color:#fff}
+    .item-body .auto-rev-glow{color:#fff;text-shadow:0 0 5px rgba(255,255,255,.75),0 0 10px rgba(255,255,255,.35)}
+    .media-wrap{width:100%;aspect-ratio:16/9;background:#070707;border:1px solid #262626;border-radius:4px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
+    .media-wrap video{width:100%;height:100%;object-fit:contain;outline:none;display:block}
+    .vid-empty{display:none;color:#666;font-size:12.5px;text-align:center;padding:14px;user-select:none}
+    @media(max-width:940px){
+      .item{grid-template-columns:1fr;gap:16px;padding:16px}
+    }
+  </style>
 </head>
 <body>
 <header>
@@ -119,8 +122,8 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
 </main>
 
 <script>
-(function (k8LmQ) {
-  const d4PxN = {
+  (function (k8LmQ) {
+    const d4PxN = {
       en: {
         alert: "This script will not work in any Russian browser.",
         soloTitle: "Solo-Trick",
@@ -128,7 +131,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>Want to efficiently dump mass into another cell? Use Fast-Feed. Press Freeze Mouse in the needed direction and press the Fast-Feed bind. Only the window where the bind was pressed will split.</p><p>The script does 5 splits (32 pieces), waits for the set time, and does another 5 splits (32 pieces). P.S. At heavy mass (~800k), raise the delay slider to around 850ms so the split does not trigger too early.</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>Yes, Auto-Rev is not implemented in the best way, but we had no other choice because the game is too protected. For the feature to work consistently, you need consistently good FPS and ping, and also:</p><p>The target cell must be fully visible and not covered by other cells or screen edges. You <strong>MUST</strong> turn off mass display, skins, and enemy nicknames in the game settings, otherwise there will be false triggers. Your camera must stay still, do not zoom while locked.</p><p>Notes: There is a ~10ms delay, but thanks to the clever implementation of the Auto-Rev mechanic, it will not break in future game updates; it is not recommended to set more than two splits (4 pieces), because you simply will not make it to the target in time.</p>",
+        autoDesc: "<p>Previously, we thought the game was too heavily protected, so Auto-Rev only worked through screen image analysis. It turned out that is not the case, and now two methods are available in the menu: <strong>WebSocket</strong> and <strong>Pixi</strong>.</p><p><strong>WebSocket</strong> – works directly through server data:</p><ol><li><strong>Ignores you and your teammates:</strong> when locking a target, the script filters out your own cells and your party members. You will not lock onto yourself or a teammate, even if a teammate is overlapping the enemy under your cursor.</li><li><strong>No settings changes required:</strong> works seamlessly with skins, mass display, and enemy nicknames enabled. Overlapping cells, camera movement, and zooming do not interfere with it (as long as the target stays within the <strong>SERVER</strong>'s visibility range).</li><li><strong>Instant reaction with no false triggers:</strong> Auto-Rev triggers the moment the server packet confirms the locked player split. When you die, the target dies, or the match resets, the lock is automatically cleared. Good ping and FPS are still required for consistent performance.</li></ol><p><strong>Pixi (backup visual method)</strong> – the legacy method that reads the image from the screen. It is kept in case a game update temporarily breaks WebSocket reading. Its requirements are stricter – you need consistently good FPS and ping, and also:</p><ol><li>The target must be fully visible: not covered by other cells or screen edges.</li><li>You <strong>MUST</strong> turn off skins, mass display, and enemy nicknames in the game settings, otherwise false triggers will occur.</li><li>Your camera must stay still; do not zoom while locked.</li><li>This method has a ~10ms delay, but it does not depend on the game's internal code and will keep working after any updates.</li></ol><p><strong>Note:</strong> Setting more than two splits (4 pieces / 2x) is not recommended, as you simply will not reach the target in time due to the game's own physics.</p>",
         noVideo: "Video unavailable",
         codeLink: "Latest code"
       },
@@ -139,7 +142,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>Хотите эффективно влить массу в другой шар? Используйте Fast-Feed. Нажмите Freeze Mouse в нужном направлении и нажмите бинд Fast-Feed'а. Делится только то окно, с которого нажат бинд.</p><p>Скрипт делает 5 сплитов (32 части), ждет заданное время и делает еще 5 сплитов (32 части). P.S. При большой массе (~800k) увеличьте ползунок задержки примерно до 850ms, чтобы деление не сработало слишком рано.</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>Да, авто-рев реализован не самым лучшим образом, но другого выбора у нас не было, игра слишком защищена. Чтобы функция работала стабильно, нужно иметь стабильно хорошие FPS и пинг, а также:</p><p>Шар цели должен быть полностью виден, не закрыт другими шарами или краями экрана. Вы <strong>ОБЯЗАНЫ</strong> выключить показ массы, скины и ники врагов в настройках игры, иначе будут ложные срабатывания. Камера должна быть неподвижной, не зумите во время лока.</p><p>Примечания: Есть задержка в ~10ms, но благодаря интересной реализации механики авто-рева, он не сломается при будущих обновлениях игры; больше двух сплитов (4 части) ставить не рекомендовано, так как вы тупо не успеете долететь до цели.</p>",
+        autoDesc: "<p>Раньше мы думали, что игра слишком сильно защищена, поэтому авто-рев работал только через анализ картинки. Но оказалось, что это не так, и теперь в меню доступны два метода работы: <strong>WebSocket</strong> и <strong>Pixi</strong>.</p><p><strong>WebSocket</strong> – работает напрямую через данные сервера:</p><ol><li><strong>Не реагирует на вас и тиммейтов:</strong> при захвате цели скрипт отсеивает ваши шары и участников вашей пати. Вы не залочите себя или сокомандника, даже если тиммейт перекрывает врага под курсором.</li><li><strong>Не требует менять настройки:</strong> спокойно работает с включёнными скинами, показом массы и никами врагов. Ему не мешают перекрытия другими шарами, движение камеры и зум (главное, чтобы цель оставалась в зоне видимости <strong>СЕРВЕРА</strong>).</li><li><strong>Мгновенная реакция без ложных срабатываний:</strong> рев срабатывает сразу в момент получения пакета от сервера о том, что захваченный игрок разделился. При вашей смерти, смерти цели или сбросе матча захват снимается автоматически. Для стабильной работы всё так же нужны нормальные пинг и FPS.</li></ol><p><strong>Pixi (запасной визуальный способ)</strong> – старый способ, который считывает картинку с экрана. Нужен на случай, если какое-то обновление игры временно сломает чтение WebSocket. Здесь условия чуть построже – нужны стабильно хорошие FPS и пинг, а также:</p><ol><li>Цель должна быть полностью видна: не закрыта другими шарами или краями экрана.</li><li>Вы <strong class="auto-rev-glow">ОБЯЗАНЫ</strong> выключить скины, массу и ники врагов в настройках игры, иначе будут ложные срабатывания.</li><li>Камера должна быть неподвижной, не зумите во время лока.</li><li>У этого метода есть задержка ~10ms, но он не зависит от внутреннего кода игры и продолжит работать после любых обновлений.</li></ol><p><strong>Примечание:</strong> Больше двух сплитов (4 части / 2x) ставить не рекомендуется, так как вы просто не успеете долететь до цели по физике самой игры.</p>",
         noVideo: "Видео недоступно",
         codeLink: "Актуальный код"
       },
@@ -150,7 +153,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>Хочете ефективно влити масу в іншу кулю? Використовуйте Fast-Feed. Натисніть Freeze Mouse у потрібному напрямку та натисніть бінд Fast-Feed'а. Ділиться лише те вікно, з якого натиснуто бінд.</p><p>Скрипт робить 5 сплітів (32 частини), чекає заданий час і робить ще 5 сплітів (32 частини). P.S. При великій масі (~800k) збільште повзунок затримки приблизно до 850ms, щоб поділ не спрацював занадто рано.</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>Так, авто-рев реалізовано не найкращим чином, але іншого вибору в нас не було — гра занадто захищена. Щоб функція працювала стабільно, потрібно мати стабільно хороші FPS і пінг, а також:</p><p>Куля цілі має бути повністю видимою, не закритою іншими кулями чи краями екрана. Ви <strong>ЗОБОВ'ЯЗАНІ</strong> вимкнути показ маси, скіни та ніки ворогів у налаштуваннях гри, інакше будуть хибні спрацьовування. Камера повинна бути нерухомою, не зуміть під час локу.</p><p>Примітки: Є затримка ~10ms, але завдяки цікавій реалізації механіки авто-рева він не зламається під час майбутніх оновлень гри; більше двох сплітів (4 частини) ставити не рекомендовано, бо ви тупо не встигнете долетіти до цілі.</p>",
+        autoDesc: "<p>Раніше ми думали, що гра надто сильно захищена, тому авто-рев працював лише через аналіз картинки. Але виявилося, що це не так, і тепер у меню доступні два методи роботи: <strong>WebSocket</strong> та <strong>Pixi</strong>.</p><p><strong>WebSocket</strong> – працює напряму через дані сервера:</p><ol><li><strong>Не реагує на вас і тіммейтів:</strong> під час захоплення цілі скрипт відсіює ваші кулі та учасників вашої паті. Ви не залочите себе чи сокомандника, навіть якщо тіммейт перекриває ворога під курсором.</li><li><strong>Не потребує зміни налаштувань:</strong> спокійно працює з увімкненими скінами, показом маси та ніками ворогів. Йому не заважають перекриття іншими кулями, рух камери та зум (головне, щоб ціль залишалася в зоні видимості <strong>СЕРВЕРА</strong>).</li><li><strong>Миттєва реакція без хибних спрацьовувань:</strong> рев спрацьовує одразу в момент отримання пакета від сервера про те, що захоплений гравець розділився. Після вашої смерті, смерті цілі або скидання матчу захоплення знімається автоматично. Для стабільної роботи так само потрібні нормальні пінг і FPS.</li></ol><p><strong>Pixi (запасний візуальний спосіб)</strong> – старий спосіб, який зчитує картинку з екрана. Потрібен на випадок, якщо якесь оновлення гри тимчасово зламає читання WebSocket. Тут умови трохи суворіші – потрібні стабільно хороші FPS і пінг, а також:</p><ol><li>Ціль має бути повністю видимою: не закритою іншими кулями чи краями екрана.</li><li>Ви <strong>ЗОБОВ'ЯЗАНІ</strong> вимкнути скіни, масу та ніки ворогів у налаштуваннях гри, інакше будуть хибні спрацьовування.</li><li>Камера повинна бути нерухомою, не зуміть під час локу.</li><li>У цього методу є затримка ~10ms, але він не залежить від внутрішнього коду гри й продовжить працювати після будь-яких оновлень.</li></ol><p><strong>Примітка:</strong> Більше двох сплітів (4 частини / 2x) ставити не рекомендується, оскільки ви просто не встигнете долетіти до цілі за фізикою самої гри.</p>",
         noVideo: "Відео недоступне",
         codeLink: "Актуальний код"
       },
@@ -161,7 +164,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>¿Quieres pasar masa de forma eficiente a otra célula? Usa Fast-Feed. Pulsa Freeze Mouse en la dirección deseada y pulsa el bind de Fast-Feed. Solo se divide la ventana desde la que pulsaste el bind.</p><p>El script hace 5 splits (32 partes), espera el tiempo indicado y hace otros 5 splits (32 partes). P.D. Con masa alta (~800k), sube el deslizador de retraso a unos 850ms para que no se active demasiado pronto.</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>Sí, Auto-Rev no está hecho de la mejor manera, pero no teníamos otra opción porque el juego está muy protegido. Para que funcione de forma estable necesitas FPS estables y buen ping, y además:</p><p>La célula objetivo debe verse por completo y no quedar tapada por otras células o por los bordes de la pantalla. Estás <strong>OBLIGADO</strong> a desactivar la masa, skins y nombres enemigos en los ajustes del juego, o habrá falsos disparos. Mantén la cámara inmóvil y no hagas zoom durante el bloqueo.</p><p>Notas: Hay un retraso de ~10ms, pero gracias a cómo está hecha la mecánica de Auto-Rev no se romperá en futuras actualizaciones del juego; no se recomienda poner más de dos splits (4 partes), ya que simplemente no llegarás a tiempo al objetivo.</p>",
+        autoDesc: "<p>Antes pensábamos que el juego estaba demasiado protegido, por lo que Auto-Rev solo funcionaba analizando la imagen de la pantalla. Resultó que no es así, y ahora hay dos métodos disponibles en el menú: <strong>WebSocket</strong> y <strong>Pixi</strong>.</p><p><strong>WebSocket</strong> – funciona directamente con los datos del servidor:</p><ol><li><strong>No reacciona a ti ni a tus compañeros:</strong> al fijar un objetivo, el script descarta tus propias células y a los miembros de tu party. No fijarás ni a ti mismo ni a un compañero, incluso si este tapa al enemigo bajo el cursor.</li><li><strong>No requiere cambiar los ajustes:</strong> funciona sin problemas con las skins, la masa y los nombres enemigos activados. No le molestan otras células encima, el movimiento de cámara ni el zoom (siempre que el objetivo siga dentro del alcance de visión del <strong>SERVIDOR</strong>).</li><li><strong>Reacción instantánea sin falsos disparos:</strong> se activa en el mismo instante en que llega el paquete del servidor confirmando que el jugador fijado se ha dividido. Si tú o el objetivo morís, o si la partida se reinicia, el bloqueo se quita automáticamente. Para un rendimiento estable siguen haciendo falta un buen ping y buenos FPS.</li></ol><p><strong>Pixi (método visual de respaldo)</strong> – el método antiguo que lee la imagen de la pantalla. Sirve por si alguna actualización del juego rompe temporalmente la lectura por WebSocket. Aquí los requisitos son un poco más estrictos: necesitas FPS y ping estables, y además:</p><ol><li>El objetivo debe verse por completo: sin estar tapado por otras células ni por los bordes de la pantalla.</li><li>Estás <strong>OBLIGADO</strong> a desactivar las skins, la masa y los nombres de los enemigos en los ajustes del juego, o habrá falsos disparos.</li><li>La cámara debe permanecer quieta; no hagas zoom durante el bloqueo.</li><li>Este método tiene un retardo de ~10ms, pero no depende del código interno del juego y seguirá funcionando tras cualquier actualización.</li></ol><p><strong>Nota:</strong> No se recomienda configurar más de dos splits (4 partes / 2x), ya que simplemente no llegarás a tiempo al objetivo por la propia física del juego.</p>",
         noVideo: "Video no disponible",
         codeLink: "Código actual"
       },
@@ -172,7 +175,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>Quer passar massa de forma eficiente para outra célula? Use o Fast-Feed. Aperte Freeze Mouse na direção desejada e aperte o bind do Fast-Feed. Apenas a janela de onde o bind foi pressionado será dividida.</p><p>O script faz 5 splits (32 pedaços), aguarda o tempo definido e faz mais 5 splits (32 pedaços). P.S. Com massa alta (~800k), aumente o controle de atraso para cerca de 850ms para a divisão não disparar cedo demais.</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>Sim, o Auto-Rev não foi implementado da melhor forma, mas não tínhamos escolha porque o jogo é muito protegido. Para funcionar de forma estável, você precisa de FPS e ping consistentemente bons, e também:</p><p>A célula alvo deve estar totalmente visível, sem ser coberta por outras células ou pelas bordas da tela. Você é <strong>OBRIGADO</strong> a desativar exibição de massa, skins e nicks inimigos nas configurações do jogo, caso contrário haverá ativações falsas. Mantenha a câmera parada e não dê zoom durante o lock.</p><p>Notas: Há um atraso de ~10ms, mas graças à forma inteligente como a mecânica foi feita, ele não vai quebrar nas próximas atualizações do jogo; não é recomendado colocar mais de dois splits (4 pedaços), pois você simplesmente não chegará a tempo no alvo.</p>",
+        autoDesc: "<p>Antes achávamos que o jogo era protegido demais, então o Auto-Rev funcionava apenas analisando a imagem da tela. Mas descobrimos que não é bem assim, e agora há dois métodos disponíveis no menu: <strong>WebSocket</strong> e <strong>Pixi</strong>.</p><p><strong>WebSocket</strong> – funciona diretamente pelos dados do servidor:</p><ol><li><strong>Não reage a você nem aos aliados:</strong> ao travar o alvo, o script filtra suas próprias células e os membros da sua party. Você não vai travar em si mesmo nem em um aliado, mesmo que ele esteja por cima do inimigo sob o cursor.</li><li><strong>Não exige mudar configurações:</strong> funciona normalmente com skins, massa e nicks inimigos ativados. Sobreposição de outras células, movimento da câmera e zoom não atrapalham (desde que o alvo continue na área de visão do <strong>SERVIDOR</strong>).</li><li><strong>Reação instantânea sem falsos disparos:</strong> ativa no exato momento em que chega o pacote do servidor informando que o jogador travado se dividiu. Se você ou o alvo morrerem, ou se a partida reiniciar, a trava é removida automaticamente. Para funcionar bem, ainda são necessários bom ping e FPS estáveis.</li></ol><p><strong>Pixi (método visual reserva)</strong> – o método antigo que lê a imagem da tela. Serve caso alguma atualização do jogo quebre temporariamente a leitura via WebSocket. Aqui as condições são um pouco mais rígidas – você precisa de FPS e ping constantemente bons, além disso:</p><ol><li>O alvo deve estar totalmente visível: sem ficar coberto por outras células ou pelas bordas da tela.</li><li>Você é <strong>OBRIGADO</strong> a desativar skins, massa e nicks dos inimigos nas configurações do jogo, senão haverá falsos disparos.</li><li>A câmera deve ficar parada; não dê zoom durante o lock.</li><li>Esse método tem um atraso de ~10ms, mas não depende do código interno do jogo e continuará funcionando após qualquer atualização.</li></ol><p><strong>Observação:</strong> Não é recomendado usar mais de dois splits (4 pedaços / 2x), pois você simplesmente não chegará ao alvo a tempo pela própria física do jogo.</p>",
         noVideo: "Vídeo indisponível",
         codeLink: "Código atual"
       },
@@ -183,7 +186,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>Vous voulez envoyer efficacement de la masse dans une autre cellule ? Utilisez Fast-Feed. Appuyez sur Freeze Mouse dans la bonne direction puis appuyez sur le bind Fast-Feed. Seule la fenêtre depuis laquelle le bind est pressé se divisera.</p><p>Le script fait 5 splits (32 parts), attend le délai défini et refait 5 splits (32 parts). P.S. Avec une grosse masse (~800k), montez le curseur de délai vers 850ms pour éviter que la division ne parte trop tôt.</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>Oui, Auto-Rev n'est pas implémenté de la meilleure façon, mais nous n'avions pas le choix car le jeu est trop protégé. Pour qu'il fonctionne de façon stable, il faut un FPS et un ping constamment bons, ainsi que :</p><p>La cellule cible doit être entièrement visible, sans être cachée par d'autres cellules ou les bords de l'écran. Vous êtes <strong>OBLIGÉ</strong> de désactiver l'affichage de la masse, les skins et les pseudos ennemis dans les paramètres du jeu, sinon il y aura de faux déclenchements. Gardez la caméra immobile et ne zoomez pas pendant le verrouillage.</p><p>Notes : Il y a un délai d'environ 10ms, mais grâce à la conception astucieuse de la mécanique Auto-Rev, il ne cassera pas lors des futures mises à jour du jeu ; il est déconseillé de mettre plus de deux splits (4 parts), car vous n'aurez tout simplement pas le temps d'atteindre la cible.</p>",
+        autoDesc: "<p>Nous pensions auparavant que le jeu était trop protégé, donc Auto-Rev fonctionnait uniquement par analyse d'image. Il s'est avéré que ce n'est pas le cas, et deux méthodes sont désormais disponibles dans le menu : <strong>WebSocket</strong> et <strong>Pixi</strong>.</p><p><strong>WebSocket</strong> – fonctionne directement via les données du serveur :</p><ol><li><strong>Ne réagit ni à vous ni à vos coéquipiers :</strong> lors du verrouillage, le script exclut vos propres cellules et les membres de votre party. Vous ne verrouillerez ni vous-même ni un allié, même si un coéquipier recouvre l'ennemi sous le curseur.</li><li><strong>Aucun réglage à modifier :</strong> fonctionne sans souci avec les skins, l'affichage de la masse et les pseudos ennemis activés. Les cellules superposées, les mouvements de caméra et le zoom ne le gênent pas (tant que la cible reste dans la zone de visibilité du <strong>SERVEUR</strong>).</li><li><strong>Réaction instantanée sans faux déclenchements :</strong> se déclenche dès réception du paquet serveur indiquant que le joueur verrouillé s'est divisé. Si vous mourez, si la cible meurt ou si la partie est réinitialisée, le verrouillage se retire automatiquement. Un bon ping et de bons FPS restent nécessaires pour un fonctionnement stable.</li></ol><p><strong>Pixi (méthode visuelle de secours)</strong> – l'ancienne méthode qui lit l'image à l'écran. Utile si une mise à jour du jeu casse temporairement la lecture WebSocket. Ici, les conditions sont un peu plus strictes – il faut des FPS et un ping constamment bons, ainsi que :</p><ol><li>La cible doit être entièrement visible : ni masquée par d'autres cellules ni coupée par les bords de l'écran.</li><li>Vous êtes <strong>OBLIGÉ</strong> de désactiver les skins, la masse et les pseudos ennemis dans les paramètres du jeu, sinon il y aura de faux déclenchements.</li><li>La caméra doit rester immobile ; ne zoomez pas pendant le verrouillage.</li><li>Cette méthode a un délai d'environ 10ms, mais ne dépend pas du code interne du jeu et continuera de fonctionner après toute mise à jour.</li></ol><p><strong>Remarque :</strong> Il est déconseillé de mettre plus de deux splits (4 parts / 2x), car vous n'atteindrez tout simplement pas la cible à temps à cause de la physique même du jeu.</p>",
         noVideo: "Vidéo indisponible",
         codeLink: "Code actuel"
       },
@@ -194,7 +197,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>Willst du Masse effizient in eine andere Zelle pumpen? Nutze Fast-Feed. Drücke Freeze Mouse in die gewünschte Richtung und drücke den Fast-Feed-Bind. Nur das Fenster, in dem der Bind gedrückt wurde, teilt sich.</p><p>Das Script macht 5 Splits (32 Teile), wartet die eingestellte Zeit und macht weitere 5 Splits (32 Teile). P.S. Bei hoher Masse (~800k) stelle den Delay-Regler auf etwa 850ms, damit der Split nicht zu früh auslöst.</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>Ja, Auto-Rev ist nicht optimal umgesetzt, aber wir hatten keine andere Wahl, da das Spiel zu stark geschützt ist. Damit es stabil läuft, brauchst du konstant gute FPS und einen niedrigen Ping sowie Folgendes:</p><p>Die Zielzelle muss vollständig sichtbar sein und darf weder von anderen Zellen noch vom Bildschirmrand verdeckt sein. Du <strong>MUSST</strong> Massenanzeige, Skins und gegnerische Namen in den Spieleinstellungen deaktivieren, sonst kommt es zu Fehlauslösungen. Halte die Kamera still und zoome während des Locks nicht.</p><p>Hinweise: Es gibt eine Verzögerung von ~10ms, aber dank der interessanten Umsetzung der Auto-Rev-Mechanik wird es bei zukünftigen Spiel-Updates nicht kaputtgehen; mehr als zwei Splits (4 Teile) einzustellen wird nicht empfohlen, da du es schlicht nicht rechtzeitig zum Ziel schaffst.</p>",
+        autoDesc: "<p>Früher dachten wir, das Spiel sei zu stark geschützt, weshalb Auto-Rev nur über Bildanalyse funktionierte. Es stellte sich heraus, dass dem nicht so ist, und jetzt stehen im Menü zwei Methoden zur Verfügung: <strong>WebSocket</strong> und <strong>Pixi</strong>.</p><p><strong>WebSocket</strong> – arbeitet direkt mit den Serverdaten:</p><ol><li><strong>Reagiert nicht auf dich und Teammates:</strong> Beim Fixieren filtert das Script deine eigenen Zellen und deine Party-Mitglieder heraus. Du fixierst weder dich selbst noch einen Mitspieler, selbst wenn ein Teammate den Gegner unter dem Cursor verdeckt.</li><li><strong>Keine Einstellungsänderungen nötig:</strong> Funktioniert problemlos mit aktivierten Skins, Massenanzeige und gegnerischen Namen. Überlappende Zellen, Kamerabewegungen und Zoomen stören nicht (solange das Ziel im Sichtbereich des <strong>SERVERS</strong> bleibt).</li><li><strong>Sofortige Reaktion ohne Fehlauslösungen:</strong> Löst exakt in dem Moment aus, in dem das Serverpaket über die Teilung des fixierten Spielers eintrifft. Stirbst du, stirbt das Ziel oder wird das Match zurückgesetzt, wird der Lock automatisch aufgehoben. Für einen stabilen Betrieb sind weiterhin guter Ping und stabile FPS nötig.</li></ol><p><strong>Pixi (visuelle Backup-Methode)</strong> – die alte Methode, die das Bild vom Bildschirm ausliest. Nützlich, falls ein Spiel-Update das Auslesen per WebSocket vorübergehend unterbricht. Hier sind die Bedingungen etwas strenger – erforderlich sind konstant gute FPS und niedriger Ping sowie:</p><ol><li>Das Ziel muss vollständig sichtbar sein: weder von anderen Zellen noch vom Bildschirmrand verdeckt.</li><li>Du <strong>MUSST</strong> Skins, Masse und gegnerische Namen in den Spieleinstellungen deaktivieren, sonst kommt es zu Fehlauslösungen.</li><li>Die Kamera muss ruhig bleiben; zoome während des Locks nicht.</li><li>Diese Methode hat eine Verzögerung von ~10ms, hängt aber nicht vom internen Spielcode ab und funktioniert nach jedem Update weiter.</li></ol><p><strong>Hinweis:</strong> Mehr als zwei Splits (4 Teile / 2x) einzustellen wird nicht empfohlen, da du das Ziel aufgrund der Spielphysik schlicht nicht rechtzeitig erreichst.</p>",
         noVideo: "Video nicht verfügbar",
         codeLink: "Aktueller Code"
       },
@@ -205,7 +208,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>Vuoi passare massa in modo efficace in un'altra cellula? Usa Fast-Feed. Premi Freeze Mouse nella direzione voluta e premi il bind di Fast-Feed. Si divide solo la finestra da cui è stato premuto il bind.</p><p>Lo script fa 5 split (32 parti), aspetta il tempo impostato e fa altri 5 split (32 parti). P.S. Con massa elevata (~800k) aumenta lo slider del ritardo a circa 850ms per non far partire la divisione troppo presto.</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>Sì, Auto-Rev non è implementato nel modo migliore, ma non avevamo altra scelta perché il gioco è troppo protetto. Perché funzioni in modo stabile servono FPS e ping costantemente buoni, e inoltre:</p><p>La cellula bersaglio deve essere completamente visibile, non coperta da altre cellule o dai bordi dello schermo. Sei <strong>OBBLIGATO</strong> a disattivare massa, skin e nomi nemici nelle impostazioni di gioco, altrimenti ci saranno attivazioni false. Tieni la visuale ferma e non fare zoom durante il lock.</p><p>Note: C'è un ritardo di ~10ms, ma grazie all'interessante realizzazione della meccanica Auto-Rev non si romperà nei futuri aggiornamenti del gioco; impostare più di due split (4 parti) è sconsigliato, perché semplicemente non farai in tempo ad arrivare sul bersaglio.</p>",
+        autoDesc: "<p>Prima pensavamo che il gioco fosse troppo protetto, quindi Auto-Rev funzionava solo tramite l'analisi dell'immagine sullo schermo. Si è scoperto che non è così, e ora nel menu sono disponibili due metodi: <strong>WebSocket</strong> e <strong>Pixi</strong>.</p><p><strong>WebSocket</strong> – lavora direttamente attraverso i dati del server:</p><ol><li><strong>Non reagisce a te e ai compagni:</strong> durante il blocco del bersaglio, lo script esclude le tue cellule e i membri del tuo party. Non bloccherai mai te stesso o un compagno, nemmeno se quest'ultimo copre il nemico sotto il cursore.</li><li><strong>Non richiede di cambiare impostazioni:</strong> funziona tranquillamente con skin, massa e nomi nemici attivi. Sovrapposizioni con altre cellule, movimenti della visuale e zoom non lo disturbano (purché il bersaglio resti nella zona visibile del <strong>SERVER</strong>).</li><li><strong>Reazione istantanea senza falsi scatti:</strong> si attiva nel momento esatto in cui arriva il pacchetto dal server che conferma la divisione del giocatore bloccato. Se muori tu, muore il bersaglio o la partita si resetta, il blocco si toglie automaticamente. Per una resa stabile servono comunque un buon ping e FPS regolari.</li></ol><p><strong>Pixi (metodo visivo di riserva)</strong> – il vecchio metodo che legge l'immagine dallo schermo. Serve nel caso in cui un aggiornamento del gioco comprometta temporaneamente la lettura WebSocket. Qui le condizioni sono un po' più rigide – servono FPS e ping costantemente buoni, e inoltre:</p><ol><li>Il bersaglio deve essere visibile per intero: non coperto da altre cellule o dai bordi dello schermo.</li><li>Sei <strong>OBBLIGATO</strong> a disattivare skin, massa e nomi nemici nelle impostazioni di gioco, altrimenti ci saranno falsi scatti.</li><li>La visuale deve restare ferma; non fare zoom durante il lock.</li><li>Questo metodo ha un ritardo di ~10ms, ma non dipende dal codice interno del gioco e continuerà a funzionare dopo qualsiasi aggiornamento.</li></ol><p><strong>Nota:</strong> Non è consigliabile impostare più di due split (4 parti / 2x), perché per la fisica stessa del gioco non faresti semplicemente in tempo a raggiungere il bersaglio.</p>",
         noVideo: "Video non disponibile",
         codeLink: "Codice attuale"
       },
@@ -216,7 +219,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>Chcesz skutecznie wlać masę w inną kulkę? Użyj Fast-Feed. Naciśnij Freeze Mouse w odpowiednim kierunku i wciśnij bind Fast-Feeda. Dzieli się tylko to okno, z którego wciśnięto bind.</p><p>Skrypt robi 5 splitów (32 części), czeka ustawiony czas i robi kolejne 5 splitów (32 części). P.S. Przy dużej masie (~800k) zwiększ suwak opóźnienia do około 850ms, aby podział nie zadziałał za wcześnie.</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>Tak, auto-rev nie jest zrobiony w najlepszy możliwy sposób, ale nie mieliśmy innego wyboru, bo gra jest zbyt mocno chroniona. Aby funkcja działała stabilnie, trzeba mieć stabilnie dobre FPS i ping, a także:</p><p>Kulka celu musi być w pełni widoczna, nie zasłonięta innymi kulkami ani krawędziami ekranu. Jesteś <strong>ZOBOWIĄZANY</strong> wyłączyć pokazywanie masy, skiny oraz nicki wrogów w ustawieniach gry, inaczej będą fałszywe reakcje. Kamera musi być nieruchoma, nie przybliżaj ani nie oddalaj podczas locka.</p><p>Uwagi: Jest opóźnienie ~10ms, ale dzięki sprytnej realizacji mechaniki auto-reva nie zepsuje się on przy przyszłych aktualizacjach gry; ustawianie więcej niż dwóch splitów (4 części) nie jest zalecane, bo po prostu nie zdążysz dolecieć do celu.</p>",
+        autoDesc: "<p>Wcześniej sądziliśmy, że gra jest zbyt mocno zabezpieczona, dlatego auto-rev działał wyłącznie przez analizę obrazu. Okazało się jednak, że tak nie jest, i teraz w menu są dostępne dwie metody działania: <strong>WebSocket</strong> oraz <strong>Pixi</strong>.</p><p><strong>WebSocket</strong> – działa bezpośrednio na danych z serwera:</p><ol><li><strong>Nie reaguje na ciebie i sojuszników:</strong> przy namierzaniu celu skrypt odfiltrowuje twoje kulki oraz członków twojego party. Nie zablokujesz siebie ani sojusznika, nawet jeśli kolega z drużyny zasłania wroga pod kursorem.</li><li><strong>Nie wymaga zmian w ustawieniach:</strong> bez problemu działa z włączonymi skinami, pokazywaniem masy i nickami wrogów. Nie przeszkadzają mu nachodzące na siebie kulki, ruch kamery ani zoom (ważne tylko, aby cel pozostawał w zasięgu widoczności <strong>SERWERA</strong>).</li><li><strong>Natychmiastowa reakcja bez fałszywych zadziałań:</strong> rev odpala się w chwili otrzymania pakietu z serwera o podziale namierzonego gracza. Gdy zginiesz ty, zginie cel lub mecz zostanie zresetowany, blokada zdejmuje się automatycznie. Do stabilnego działania nadal potrzebny jest dobry ping i FPS.</li></ol><p><strong>Pixi (zapasowy tryb wizualny)</strong> – starsza metoda sczytująca obraz z ekranu. Przydaje się na wypadek, gdyby aktualizacja gry tymczasowo popsuła odczyt WebSocket. Tutaj warunki są nieco ostrzejsze – potrzebne są stabilnie wysokie FPS i niski ping, a ponadto:</p><ol><li>Cel musi być w pełni widoczny: niezasłonięty przez inne kulki ani krawędzie ekranu.</li><li>Jesteś <strong>ZOBOWIĄZANY</strong> wyłączyć skiny, masę i nicki wrogów w ustawieniach gry, w przeciwnym razie wystąpią fałszywe reakcje.</li><li>Kamera musi być nieruchoma, nie przybliżaj ani nie oddalaj podczas locka.</li><li>Ta metoda ma opóźnienie ~10ms, ale nie zależy od wewnętrznego kodu gry i będzie działać po kolejnych aktualizacjach.</li></ol><p><strong>Uwaga:</strong> Nie zaleca się ustawiania więcej niż dwóch splitów (4 części / 2x), ponieważ przez samą fizykę gry po prostu nie zdążysz dolecieć do celu.</p>",
         noVideo: "Wideo niedostępne",
         codeLink: "Aktualny kod"
       },
@@ -227,7 +230,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>Wil je efficiënt massa in een andere cel pompen? Gebruik Fast-Feed. Druk op Freeze Mouse in de gewenste richting en druk op de Fast-Feed-bind. Alleen het venster waarin de bind is ingedrukt splitst.</p><p>Het script doet 5 splits (32 delen), wacht de ingestelde tijd en doet nog eens 5 splits (32 delen). P.S. Zet bij grote massa (~800k) de vertragingsschuif op ongeveer 850ms zodat de splitsing niet te vroeg afgaat.</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>Ja, Auto-Rev is niet op de allerbeste manier gebouwd, maar we hadden geen andere keus omdat de game te zwaar beveiligd is. Voor stabiele werking heb je constant goede FPS en ping nodig, en ook:</p><p>De doelcel moet volledig zichtbaar zijn en mag niet worden bedekt door andere cellen of schermranden. Je bent <strong>VERPLICHT</strong> om massaweergave, skins en vijandelijke namen uit te zetten in de spelinstellingen, anders krijg je valse triggers. Houd je camera stil en zoom niet tijdens de lock.</p><p>Opmerkingen: Er zit ~10ms vertraging op, maar dankzij de slimme opzet van de Auto-Rev-mechaniek gaat het niet stuk bij toekomstige updates; meer dan twee splits (4 delen) instellen wordt afgeraden, omdat je simpelweg niet op tijd bij het doel aankomt.</p>",
+        autoDesc: "<p>Eerder dachten we dat de game te streng beveiligd was, waardoor Auto-Rev alleen via beeldanalyse werkte. Dat bleek mee te vallen, en nu zijn er twee methodes beschikbaar in het menu: <strong>WebSocket</strong> en <strong>Pixi</strong>.</p><p><strong>WebSocket</strong> – werkt rechtstreeks via servergegevens:</p><ol><li><strong>Reageert niet op jou of teamgenoten:</strong> bij het locken filtert het script je eigen cellen en je party-leden eruit. Je lockt nooit op jezelf of een teamgenoot, zelfs niet als een teamgenoot de vijand onder je cursor overlapt.</li><li><strong>Geen instellingen aanpassen nodig:</strong> werkt probleemloos met skins, massaweergave en vijandelijke namen ingeschakeld. Overlappende cellen, camerabewegingen en zoomen hinderen hem niet (zolang het doel binnen het zichtbereik van de <strong>SERVER</strong> blijft).</li><li><strong>Directe reactie zonder valse triggers:</strong> gaat direct af op het moment dat het serverpakket binnenkomt dat de gelockte speler is gesplitst. Als jij sterft, het doel sterft of de match reset, vervalt de lock automatisch. Voor stabiele werking blijven goede ping en FPS nodig.</li></ol><p><strong>Pixi (visuele back-upmethode)</strong> – de oude methode die het beeld van het scherm uitleest. Handig voor het geval een game-update het uitlezen via WebSocket tijdelijk breekt. Hier zijn de eisen iets strenger – je hebt constant goede FPS en ping nodig, en ook:</p><ol><li>Het doel moet volledig zichtbaar zijn: niet bedekt door andere cellen of schermranden.</li><li>Je bent <strong>VERPLICHT</strong> om skins, massa en vijandelijke namen uit te zetten in de spelinstellingen, anders krijg je valse triggers.</li><li>De camera moet stil blijven staan; zoom niet tijdens een lock.</li><li>Deze methode heeft ~10ms vertraging, maar hangt niet af van de interne gamecode en blijft na updates gewoon werken.</li></ol><p><strong>Opmerking:</strong> Meer dan twee splits (4 delen / 2x) instellen wordt afgeraden, omdat je het doel door de fysica van de game simpelweg niet op tijd bereikt.</p>",
         noVideo: "Video niet beschikbaar",
         codeLink: "Actuele code"
       },
@@ -238,7 +241,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>Vrei să torni masă eficient într-o altă celulă? Folosește Fast-Feed. Apasă Freeze Mouse în direcția dorită și apasă bind-ul de Fast-Feed. Se împarte doar fereastra din care a fost apăsat bind-ul.</p><p>Scriptul face 5 split-uri (32 bucăți), așteaptă timpul setat și face încă 5 split-uri (32 bucăți). P.S. La masă mare (~800k), mărește slider-ul de întârziere pe la 850ms ca împărțirea să nu pornească prea devreme.</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>Da, auto-rev nu este implementat în cel mai bun mod, dar nu am avut altă opțiune, jocul este prea protejat. Ca funcția să meargă stabil, ai nevoie de FPS și ping constant bune, și de asemenea:</p><p>Celula țintă trebuie să fie complet vizibilă, neacoperită de alte celule sau de marginile ecranului. Ești <strong>OBLIGAT</strong> să dezactivezi afișarea masei, skin-urile și numele inamicilor din setările jocului, altfel vor apărea declanșări false. Camera trebuie să fie nemișcată, nu da zoom în timpul lock-ului.</p><p>Note: Există o întârziere de ~10ms, dar datorită modului interesant în care este făcută mecanica auto-rev, nu se va strica la viitoarele actualizări ale jocului; nu este recomandat să pui mai mult de două split-uri (4 bucăți), deoarece pur și simplu nu vei ajunge la timp până la țintă.</p>",
+        autoDesc: "<p>Înainte credeam că jocul este prea protejat, așa că auto-rev funcționa doar prin analiza imaginii de pe ecran. S-a dovedit că nu este așa, iar acum în meniu sunt disponibile două metode: <strong>WebSocket</strong> și <strong>Pixi</strong>.</p><p><strong>WebSocket</strong> – funcționează direct prin datele serverului:</p><ol><li><strong>Nu reacționează la tine și la coechipieri:</strong> la blocarea țintei, scriptul filtrează celulele tale și membrii din party. Nu te vei bloca pe tine sau pe un coechipier, chiar dacă acesta acoperă inamicul de sub cursor.</li><li><strong>Nu necesită modificarea setărilor:</strong> merge fără probleme cu skin-urile, afișarea masei și numele inamicilor activate. Suprapunerile cu alte celule, mișcarea camerei și zoom-ul nu îl încurcă (important este ca ținta să rămână în raza de vizibilitate a <strong>SERVERULUI</strong>).</li><li><strong>Reacție instantanee fără declanșări false:</strong> se activează exact în momentul primirii pachetului de la server că jucătorul blocat s-a împărțit. Când mori tu, moare ținta sau meciul se resetează, blocarea se scoate automat. Pentru funcționare stabilă sunt în continuare necesare ping bun și FPS constante.</li></ol><p><strong>Pixi (metodă vizuală de rezervă)</strong> – metoda veche care citește imaginea de pe ecran. Este utilă în cazul în care un update al jocului strică temporar citirea prin WebSocket. Aici condițiile sunt puțin mai stricte – ai nevoie de FPS și ping constant bune, precum și:</p><ol><li>Ținta trebuie să fie complet vizibilă: neacoperită de alte celule sau de marginile ecranului.</li><li>Ești <strong>OBLIGAT</strong> să dezactivezi skin-urile, masa și numele inamicilor din setările jocului, altfel vor apărea declanșări false.</li><li>Camera trebuie să fie nemișcată, nu da zoom în timpul lock-ului.</li><li>Această metodă are o întârziere de ~10ms, dar nu depinde de codul intern al jocului și va continua să funcționeze după orice actualizare.</li></ol><p><strong>Notă:</strong> Nu este recomandat să pui mai mult de două split-uri (4 bucăți / 2x), deoarece pur și simplu nu vei ajunge la timp la țintă din cauza fizicii jocului.</p>",
         noVideo: "Video indisponibil",
         codeLink: "Cod actual"
       },
@@ -249,7 +252,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>Başka bir hücreye verimli şekilde kütle aktarmak mı istiyorsunuz? Fast-Feed kullanın. İstediğiniz yönde Freeze Mouse'a basın ve Fast-Feed tuşuna basın. Yalnızca tuşa basılan pencere bölünür.</p><p>Script 5 split (32 parça) yapar, ayarlanan süreyi bekler ve 5 split (32 parça) daha yapar. Not: Yüksek kütlede (~800k) bölünmenin çok erken tetiklenmemesi için gecikme kaydırıcısını yaklaşık 850ms'ye çıkarın.</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>Evet, auto-rev en iyi şekilde yapılmış değil ama başka seçeneğimiz yoktu, oyun çok fazla korunuyor. Özelliğin stabil çalışması için sürekli iyi FPS ve ping değerine sahip olmanız, ayrıca şunlara uymanız gerekir:</p><p>Hedef hücre tamamen görünür olmalı, başka hücreler veya ekran kenarları tarafından kapatılmamalıdır. Oyun ayarlarından kütle gösterimini, skinleri ve rakip isimlerini kapatmak <strong>ZORUNDASINIZ</strong>, aksi halde yanlış tetiklemeler olur. Kamera sabit kalmalı, kilitliyken zoom yapmamalısınız.</p><p>Notlar: ~10ms gecikme vardır ancak auto-rev mekaniğinin ilginç yapısı sayesinde gelecek oyun güncellemelerinde bozulmaz; ikiden fazla split (4 parça) koymanız önerilmez çünkü hedefe yetişemezsiniz.</p>",
+        autoDesc: "<p>Eskiden oyunun çok sıkı korunduğunu sanıyorduk, bu yüzden auto-rev yalnızca ekran görüntüsü analiziyle çalışıyordu. Durumun öyle olmadığı ortaya çıktı ve artık menüde iki yöntem mevcut: <strong>WebSocket</strong> ve <strong>Pixi</strong>.</p><p><strong>WebSocket</strong> – doğrudan sunucu verileri üzerinden çalışır:</p><ol><li><strong>Size ve takım arkadaşlarınıza tepki vermez:</strong> hedef kilitlerken script kendi hücrelerinizi ve party üyelerinizi eler. Bir takım arkadaşınız imlecin altındaki rakibi kapatsa bile kendinize veya arkadaşınıza kilitlenmezsiniz.</li><li><strong>Ayarları değiştirmenizi gerektirmez:</strong> skinler, kütle gösterimi ve rakip isimleri açıkken sorunsuz çalışır. Başka hücrelerin üstünü örtmesi, kamera hareketi veya yakınlaştırma onu etkilemez (hedefin <strong>SUNUCU</strong> görüş alanında kalması yeterlidir).</li><li><strong>Yanlış tetikleme olmadan anında tepki:</strong> kilitlenen oyuncunun bölündüğünü bildiren sunucu paketi geldiği anda çalışır. Siz öldüğünüzde, hedef öldüğünde veya maç sıfırlandığında kilit otomatik olarak kalkar. Stabil çalışması için yine iyi bir ping ve FPS gerekir.</li></ol><p><strong>Pixi (yedek görsel yöntem)</strong> – görüntüyü ekrandan okuyan eski yöntemdir. Bir oyun güncellemesinin WebSocket okumasını geçici olarak bozması ihtimaline karşı eklenmiştir. Burada şartlar biraz daha sıkıdır – sürekli iyi FPS ve ping gerekir, ayrıca:</p><ol><li>Hedef tamamen görünür olmalıdır: başka hücreler veya ekran kenarları tarafından kapatılmamalıdır.</li><li>Oyun ayarlarından skinleri, kütleyi ve rakip isimlerini kapatmak <strong>ZORUNDASINIZ</strong>, aksi halde yanlış tetiklemeler olur.</li><li>Kamera sabit kalmalı, kilitliyken zoom yapmamalısınız.</li><li>Bu yöntemde ~10ms gecikme vardır ancak oyunun iç koduna bağlı değildir ve tüm güncellemelerden sonra çalışmaya devam eder.</li></ol><p><strong>Not:</strong> İkiden fazla split (4 parça / 2x) ayarlamanız önerilmez; oyunun kendi fiziği gereği hedefe zamanında yetişemezsiniz.</p>",
         noVideo: "Video kullanılamıyor",
         codeLink: "Güncel kod"
       },
@@ -260,7 +263,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>هل تريد ضخ الكتلة بفعالية إلى كرة أخرى؟ استخدم Fast-Feed. اضغط Freeze Mouse في الاتجاه المطلوب ثم اضغط زر Fast-Feed. ستنقسم النافذة التي ضغطت منها فقط.</p><p>يقوم السكربت بـ 5 انقسامات (32 جزءاً)، ينتظر الوقت المحدد ثم يقوم بـ 5 انقسامات أخرى (32 جزءاً). ملاحظة: عند الكتلة الكبيرة (~800k) ارفع شريط التأخير إلى حوالي 850ms حتى لا يبدأ الانقسام مبكراً جداً.</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>نعم، لم يُبنَ Auto-Rev بأفضل طريقة ممكنة، لكن لم يكن لدينا خيار آخر لأن اللعبة محمية جداً. لكي تعمل الميزة بثبات يجب أن يكون لديك FPS وبينغ جيدان باستمرار، وأيضاً:</p><p>يجب أن تكون الكرة الهدف ظاهرة بالكامل وغير مغطاة بكرات أخرى أو بحواف الشاشة. أنت <strong>مُلزم</strong> بإيقاف عرض الكتلة والسكينات وأسماء الخصوم في إعدادات اللعبة، وإلا ستحدث استجابات خاطئة. يجب أن تبقى الكاميرا ثابتة، ولا تقم بالتكبير أو التصغير أثناء القفل.</p><p>ملاحظات: يوجد تأخير ~10ms، ولكن بفضل طريقة تنفيذ آلية Auto-Rev الذكية لن يتعطل مع تحديثات اللعبة المستقبلية؛ ولا يُنصح بوضع أكثر من انقسامين (4 أجزاء) لأنك ببساطة لن تلحق بالوصول إلى الهدف.</p>",
+        autoDesc: "<p>في السابق كنا نظن أن اللعبة محمية بشكل مبالغ فيه، لذلك كان Auto-Rev يعمل فقط عبر تحليل صورة الشاشة. لكن اتضح أن الأمر ليس كذلك، والآن يتوفر في القائمة أسلوبان للعمل: <strong>WebSocket</strong> و<strong>Pixi</strong>.</p><p><strong>WebSocket</strong> – يعمل مباشرة عبر بيانات السيرفر:</p><ol><li><strong>لا يتفاعل معك أو مع زملائك في الفريق:</strong> عند تثبيت الهدف يستبعد السكربت كراتك وأعضاء مجموعتك (البارتي). لن تثبّت على نفسك أو على زميلك حتى لو كان يغطي الخصم تحت المؤشر.</li><li><strong>لا يتطلب تغيير الإعدادات:</strong> يعمل بسلاسة مع تفعيل السكينات وإظهار الكتلة وأسماء الخصوم. لا يؤثر عليه تداخل الكرات الأخرى أو حركة الكاميرا أو التكبير والتصغير (الأهم أن يبقى الهدف ضمن نطاق رؤية <strong>السيرفر</strong>).</li><li><strong>استجابة فورية بدون تفعيلات خاطئة:</strong> ينطلق في لحظة وصول حزمة السيرفر التي تفيد بانقسام اللاعب المثبّت. عند موتك أو موت الهدف أو إعادة ضبط المباراة يُزال التثبيت تلقائياً. ولأداء مستقر لا يزال يلزم بينغ جيد وFPS ثابت.</li></ol><p><strong>Pixi (طريقة بصرية احتياطية)</strong> – الطريقة القديمة التي تقرأ الصورة من الشاشة. توجد في حال تسبب تحديث للعبة بتعطيل قراءة WebSocket مؤقتاً. هنا الشروط أكثر صرامة قليلاً – تحتاج إلى FPS وبينغ جيدين باستمرار، وأيضاً:</p><ol><li>يجب أن يكون الهدف مرئياً بالكامل: غير مغطى بكرات أخرى أو بحواف الشاشة.</li><li>أنت <strong>مُلزم</strong> بإيقاف السكينات والكتلة وأسماء الخصوم في إعدادات اللعبة، وإلا فستحدث استجابات خاطئة.</li><li>يجب أن تبقى الكاميرا ثابتة، ولا تقم بالتكبير أو التصغير أثناء القفل.</li><li>يوجد في هذه الطريقة تأخير ~10ms، لكنها لا تعتمد على الكود الداخلي للعبة وستواصل العمل بعد أي تحديثات.</li></ol><p><strong>ملاحظة:</strong> لا يُنصح بوضع أكثر من انقسامين (4 أجزاء / 2x)، لأنك ببساطة لن تلحق بالوصول إلى الهدف بسبب فيزياء اللعبة نفسها.</p>",
         noVideo: "الفيديو غير متاح",
         codeLink: "الكود الأحدث"
       },
@@ -271,7 +274,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>किसी दूसरी सेल में तेज़ी और असरदार तरीके से मास डालना चाहते हैं? Fast-Feed का उपयोग करें। सही दिशा में Freeze Mouse दबाएँ और Fast-Feed बाइंड दबाएँ। केवल वही विंडो स्प्लिट होगी जहाँ से बाइंड दबाया गया है।</p><p>स्क्रिप्ट 5 स्प्लिट (32 हिस्से) करती है, तय समय तक रुकती है और फिर 5 स्प्लिट (32 हिस्से) करती है। नोट: बड़ी मास (~800k) पर डिले स्लाइडर को लगभग 850ms तक बढ़ा दें ताकि स्प्लिट बहुत जल्दी न हो जाए।</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>हाँ, Auto-Rev सबसे बेहतरीन तरीके से लागू नहीं किया गया है, लेकिन हमारे पास कोई दूसरा विकल्प नहीं था क्योंकि गेम बहुत ज़्यादा सुरक्षित है। इस फीचर के स्थिर चलने के लिए लगातार अच्छे FPS और पिंग होना ज़रूरी है, और साथ ही:</p><p>टारगेट सेल पूरी तरह दिखनी चाहिए, अन्य सेल्स या स्क्रीन के किनारों से ढकी नहीं होनी चाहिए। आपको गेम सेटिंग्स में मास डिस्प्ले, स्किन और दुश्मनों के नाम बंद करना <strong>अनिवार्य</strong> है, वरना गलत ट्रिगर होंगे। कैमरा स्थिर रहना चाहिए, लॉक के दौरान ज़ूम न करें।</p><p>नोट: इसमें ~10ms की देरी है, लेकिन Auto-Rev मैकेनिक की दिलचस्प बनावट की वजह से यह आने वाले गेम अपडेट्स में टूटेगा नहीं; दो स्प्लिट (4 हिस्से) से ज़्यादा रखने की सलाह नहीं दी जाती, क्योंकि आप बस समय पर टारगेट तक पहुँच ही नहीं पाएँगे।</p>",
+        autoDesc: "<p>पहले हमें लगता था कि गेम बहुत ज़्यादा सुरक्षित है, इसलिए Auto-Rev सिर्फ़ स्क्रीन की इमेज के विश्लेषण से काम करता था। लेकिन ऐसा नहीं निकला, और अब मेनू में काम करने के दो तरीके उपलब्ध हैं: <strong>WebSocket</strong> और <strong>Pixi</strong>।</p><p><strong>WebSocket</strong> – सीधे सर्वर डेटा के ज़रिए काम करता है:</p><ol><li><strong>आप और टीममेट्स पर रिएक्ट नहीं करता:</strong> टारगेट लॉक करते समय स्क्रिप्ट आपकी अपनी सेल्स और आपकी पार्टी के सदस्यों को अलग कर देती है। आप खुद को या टीममेट को लॉक नहीं करेंगे, भले ही टीममेट कर्सर के नीचे दुश्मन को ढक रहा हो।</li><li><strong>सेटिंग्स बदलने की ज़रूरत नहीं:</strong> स्किन, मास डिस्प्ले और दुश्मनों के नाम चालू होने पर भी आराम से काम करता है। दूसरी सेल्स के ऊपर आने, कैमरा हिलने और ज़ूम करने से इस पर फ़र्क नहीं पड़ता (बस टारगेट <strong>सर्वर</strong> की विज़िबिलिटी रेंज में रहना चाहिए)।</li><li><strong>बिना गलत ट्रिगर के तुरंत रिएक्शन:</strong> जैसे ही सर्वर से पैकेट आता है कि लॉक किया गया खिलाड़ी स्प्लिट हुआ है, उसी पल यह ट्रिगर हो जाता है। आपके मरने, टारगेट के मरने या मैच रीसेट होने पर लॉक अपने आप हट जाता है। स्थिर काम के लिए अच्छा पिंग और FPS अब भी ज़रूरी हैं।</li></ol><p><strong>Pixi (बैकअप विज़ुअल तरीका)</strong> – पुराना तरीका, जो स्क्रीन से तस्वीर पढ़ता है। यह इस स्थिति के लिए है अगर गेम का कोई अपडेट अस्थायी रूप से WebSocket रीडिंग को तोड़ दे। यहाँ शर्तें थोड़ी ज़्यादा सख़्त हैं – लगातार अच्छे FPS और पिंग चाहिए, और साथ ही:</p><ol><li>टारगेट पूरी तरह दिखना चाहिए: दूसरी सेल्स या स्क्रीन के किनारों से ढका नहीं होना चाहिए।</li><li>आपको गेम सेटिंग्स में स्किन, मास और दुश्मनों के नाम बंद करना <strong>अनिवार्य</strong> है, वरना गलत ट्रिगर होंगे।</li><li>कैमरा स्थिर रहना चाहिए, लॉक के दौरान ज़ूम न करें।</li><li>इस तरीके में ~10ms की देरी है, लेकिन यह गेम के अंदरूनी कोड पर निर्भर नहीं है और किसी भी अपडेट के बाद चलता रहेगा।</li></ol><p><strong>नोट:</strong> दो स्प्लिट (4 हिस्से / 2x) से ज़्यादा रखने की सलाह नहीं दी जाती, क्योंकि गेम की अपनी फ़िज़िक्स की वजह से आप बस समय पर टारगेट तक पहुँच ही नहीं पाएँगे।</p>",
         noVideo: "वीडियो उपलब्ध नहीं है",
         codeLink: "नवीनतम कोड"
       },
@@ -282,7 +285,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>想把质量高效地灌入另一个球？请使用 Fast-Feed。向目标方向按下 Freeze Mouse，然后按下 Fast-Feed 快捷键。只有按下快捷键的当前窗口会分裂。</p><p>脚本会分裂 5 次（32 份），等待设定时间后再分裂 5 次（32 份）。提示：质量很大（~800k）时，请把延迟滑块调高到约 850ms，以免过早触发。</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>是的，Auto-Rev 的实现方式并不算完美，但因为游戏保护太强我们没有别的选择。要让该功能稳定生效，需要持续保持良好的 FPS 和延迟，同时注意：</p><p>目标球必须完全可见，不能被其他球或屏幕边缘遮挡。您<strong>必须</strong>在游戏设置中关闭质量显示、皮肤和敌方昵称，否则会出现误触发。锁定期间视角必须保持静止，不要缩放画面。</p><p>说明：存在约 ~10ms 的延迟，但得益于 Auto-Rev 机制的巧妙实现，未来游戏更新也不会轻易失效；不建议设置超过两次分裂（4 份），因为您根本来不及飞到目标位置。</p>",
+        autoDesc: "<p>以前我们以为游戏保护得太严，所以 Auto-Rev 只能通过画面图像分析来工作。但事实并非如此，现在菜单中提供了两种工作方式：<strong>WebSocket</strong> 和 <strong>Pixi</strong>。</p><p><strong>WebSocket</strong> – 直接通过服务器数据工作：</p><ol><li><strong>不会误锁自己和队友：</strong>锁定目标时，脚本会过滤掉你自己的球以及你的组队成员。即使队友刚好挡在光标下的敌人上面，你也不会锁到自己或队友。</li><li><strong>无需修改游戏设置：</strong>开启皮肤、质量显示和敌方昵称时也能正常使用。其他球遮挡、镜头移动和缩放都不会影响它（只要目标仍在<strong>服务器</strong>可见范围内即可）。</li><li><strong>瞬时响应且无误触发：</strong>一旦收到目标玩家分裂的服务器数据包就会立刻触发。当你死亡、目标死亡或对局重置时，锁定会自动解除。为了稳定运行，仍需要良好的延迟和 FPS。</li></ol><p><strong>Pixi（备用视觉方式）</strong> – 从屏幕读取画面的旧方式。用于在游戏更新暂时破坏 WebSocket 读取时作为备选。这里的条件更严格一些 – 需要持续稳定的高 FPS 和低延迟，同时：</p><ol><li>目标必须完全可见：不能被其他球或屏幕边缘遮挡。</li><li>您<strong>必须</strong>在游戏设置中关闭皮肤、质量和敌方昵称，否则会出现误触发。</li><li>视角必须保持静止，锁定期间不要缩放。</li><li>该方式约有 ~10ms 延迟，但它不依赖游戏内部代码，后续任何更新都能继续使用。</li></ol><p><strong>注意：</strong>不建议设置超过两次分裂（4 份 / 2x），因为按照游戏本身的物理机制，你根本来不及飞到目标位置。</p>",
         noVideo: "暂无视频",
         codeLink: "最新代码"
       },
@@ -293,7 +296,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>別の玉へ効率よく質量を流し込みたい時は Fast-Feed を使ってください。目的の方向で Freeze Mouse を押し、Fast-Feed のバインドを押します。バインドを押したウィンドウだけが分裂します。</p><p>5回分裂（32分割）し、設定時間待ってからさらに5回分裂（32分割）します。補足: 大質量（~800k）の時は早すぎる発動を防ぐため遅延スライダーを約 850ms まで上げてください。</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>確かに Auto-Rev の実装はベストとは言えませんが、ゲームの保護が強すぎるため他に選択肢がありませんでした。安定して動作させるには、常に良好な FPS と低 Ping、そして以下が必要です:</p><p>ターゲットの玉が他の玉や画面端に隠れず完全に見えている必要があります。ゲーム設定で質量表示・スキン・敵の名前をオフにするのが<strong>必須</strong>です。そうしないと誤作動します。ロック中はカメラを動かさずズームもしないでください。</p><p>備考: ~10ms の遅延がありますが、Auto-Rev メカニズムのユニークな実装により今後のゲームアップデートでも壊れません。また、ターゲットまで到底間に合わなくなるため、2回分裂（4分割）より多く設定するのは非推奨です。</p>",
+        autoDesc: "<p>以前はゲームの保護が強すぎると思っていたため、Auto-Rev は画面画像の解析だけで動いていました。しかし実際はそうではなく、現在はメニューで <strong>WebSocket</strong> と <strong>Pixi</strong> の 2 つの方式を選べます。</p><p><strong>WebSocket</strong> – サーバーデータを直接利用して動作します：</p><ol><li><strong>自分や味方に反応しない：</strong>ターゲット固定時、自分の玉やパーティーメンバーを除外します。味方がカーソル下の敵に重なっていても、自分や味方を誤ってロックしません。</li><li><strong>設定変更が不要：</strong>スキン、質量表示、敵の名前がオンのままでも問題なく動きます。他の玉の重なりやカメラ移動、ズームの影響も受けません（ターゲットが<strong>サーバー</strong>の視界範囲内に留まっていることが条件です）。</li><li><strong>誤作動なしの即時反応：</strong>ロック中のプレイヤーが分裂したというサーバーパケットを受信した瞬間に反応します。自分やターゲットの死亡、試合のリセット時にはロックが自動解除されます。安定動作にはやはり良好な Ping と FPS が必要です。</li></ol><p><strong>Pixi（予備の視覚方式）</strong> – 画面上の映像を読み取る従来の方式です。ゲームのアップデートで一時的に WebSocket の読み取りが使えなくなった場合のための予備です。こちらは条件が少し厳しく、安定した高い FPS と低 Ping に加えて以下が必要です：</p><ol><li>ターゲットが他の玉や画面端に隠れず、完全に表示されていること。</li><li>誤作動を防ぐため、ゲーム設定でスキン・質量・敵の名前をオフにするのが<strong>必須</strong>です。</li><li>ロック中はカメラを動かさず、ズームもしないでください。</li><li>~10ms の遅延がありますが、ゲームの内部コードに依存しないため今後のアップデート後も動き続けます。</li></ol><p><strong>注意：</strong>ゲーム自体の物理挙動上、ターゲットまで時間内に届かないため、2回分裂（4分割 / 2x）より多く設定するのは非推奨です。</p>",
         noVideo: "動画が利用できません",
         codeLink: "最新コード"
       },
@@ -304,7 +307,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>다른 셀에 효율적으로 매스를 몰아주고 싶다면 Fast-Feed를 사용하세요. 원하는 방향에서 Freeze Mouse를 누른 뒤 Fast-Feed 바인드를 누르면 됩니다. 바인드를 누른 창만 분열합니다.</p><p>스크립트가 5번(32조각) 분열하고 설정된 시간만큼 기다린 뒤 다시 5번(32조각) 분열합니다. 참고: 매스가 클 때(~800k)는 분열이 너무 빨리 터지지 않도록 딜레이 슬라이더를 약 850ms로 높여 주세요.</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>네, Auto-Rev가 최선의 방식으로 구현된 것은 아니지만 게임 보안이 너무 강해서 다른 선택지가 없었습니다. 안정적으로 작동하려면 꾸준히 좋은 FPS와 낮은 핑이 필요하며, 다음 조건도 필수입니다:</p><p>대상 셀이 다른 셀이나 화면 가장자리에 가려지지 않고 온전히 보여야 합니다. 게임 설정에서 매스 표시, 스킨, 적 닉네임을 <strong>반드시</strong> 꺼야 오작동을 막을 수 있습니다. 락 중에는 카메라를 고정하고 줌을 하지 마세요.</p><p>참고: ~10ms의 지연이 있지만 Auto-Rev 메커니즘의 독특한 구현 덕분에 향후 게임 업데이트에서도 망가지지 않습니다. 또한 어차피 시간 안에 목표까지 닿지 못하므로 2회 분열(4조각)을 초과해 설정하는 것은 권장하지 않습니다.</p>",
+        autoDesc: "<p>예전에는 게임 보안이 너무 강하다고 생각해 Auto-Rev가 화면 이미지 분석 방식으로만 작동했습니다. 하지만 그렇지 않다는 것이 밝혀졌고, 이제 메뉴에서 <strong>WebSocket</strong>과 <strong>Pixi</strong> 두 가지 방식을 사용할 수 있습니다.</p><p><strong>WebSocket</strong> – 서버 데이터를 통해 직접 작동합니다:</p><ol><li><strong>본인과 팀원에게는 반응하지 않음:</strong> 대상을 고정할 때 내 셀과 파티원을 걸러냅니다. 팀원이 커서 아래의 적을 가리고 있더라도 본인이나 팀원이 락 걸리지 않습니다.</li><li><strong>설정 변경 불필요:</strong> 스킨, 매스 표시, 적 닉네임이 켜져 있어도 무리 없이 작동합니다. 다른 셀의 겹침, 카메라 이동, 줌도 방해되지 않습니다(대상이 <strong>서버</strong> 시야 범위 안에 남아 있기만 하면 됩니다).</li><li><strong>오작동 없는 즉각 반응:</strong> 고정된 플레이어가 분열했다는 서버 패킷을 받는 즉시 반응합니다. 본인이 죽거나, 대상이 죽거나, 매치가 초기화되면 락이 자동으로 풀립니다. 안정적인 작동을 위해 좋은 핑과 FPS는 여전히 필요합니다.</li></ol><p><strong>Pixi (예비 시각 방식)</strong> – 화면의 이미지를 읽어들이는 기존 방식입니다. 게임 업데이트로 WebSocket 읽기가 일시적으로 막혔을 때를 대비해 유지됩니다. 조건이 조금 더 까다로우며, 꾸준히 좋은 FPS와 핑 외에도 다음이 필요합니다:</p><ol><li>대상이 다른 셀이나 화면 가장자리에 가리지 않고 완전히 보여야 합니다.</li><li>오작동을 막으려면 게임 설정에서 스킨, 매스, 적 닉네임을 <strong>반드시</strong> 꺼야 합니다.</li><li>락 중에는 카메라를 고정하고 줌을 하지 마세요.</li><li>약 ~10ms의 지연이 있지만 게임 내부 코드에 의존하지 않아 어떤 업데이트 이후에도 계속 작동합니다.</li></ol><p><strong>참고:</strong> 게임 자체 물리상 시간 안에 목표까지 닿지 못하므로 2회 분열(4조각 / 2x)을 초과해 설정하는 것은 권장하지 않습니다.</p>",
         noVideo: "동영상을 사용할 수 없습니다",
         codeLink: "최신 코드"
       },
@@ -315,7 +318,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>Ingin menyalurkan massa secara efektif ke sel lain? Gunakan Fast-Feed. Tekan Freeze Mouse ke arah yang diinginkan lalu tekan bind Fast-Feed. Hanya jendela tempat bind ditekan yang akan membelah.</p><p>Script membelah 5 kali (32 bagian), menunggu waktu yang diatur, lalu membelah 5 kali lagi (32 bagian). P.S. Saat massa besar (~800k), naikkan slider delay ke sekitar 850ms agar pembelahan tidak terpicu terlalu cepat.</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>Ya, Auto-Rev memang tidak dibuat dengan cara paling ideal, tapi kami tidak punya pilihan lain karena gamenya terlalu terlindungi. Agar fitur ini berjalan stabil, Anda harus punya FPS dan ping yang stabil bagus, serta:</p><p>Sel target harus terlihat penuh, tidak tertutup sel lain atau tepi layar. Anda <strong>WAJIB</strong> mematikan tampilan massa, skin, dan nama musuh di pengaturan game, jika tidak akan muncul pemicu palsu. Kamera harus diam, jangan zoom saat sedang lock.</p><p>Catatan: Ada delay ~10ms, tapi berkat implementasi mekanik Auto-Rev yang unik, fitur ini tidak akan rusak pada update game mendatang; tidak disarankan memasang lebih dari dua split (4 bagian), karena Anda memang tidak akan sempat sampai ke target.</p>",
+        autoDesc: "<p>Sebelumnya kami mengira game ini terlalu terlindungi, jadi Auto-Rev hanya bekerja lewat analisis gambar layar. Ternyata tidak demikian, dan sekarang tersedia dua metode di menu: <strong>WebSocket</strong> dan <strong>Pixi</strong>.</p><p><strong>WebSocket</strong> – bekerja langsung melalui data server:</p><ol><li><strong>Tidak bereaksi pada Anda maupun rekan setim:</strong> saat mengunci target, script menyaring sel Anda sendiri dan anggota party Anda. Anda tidak akan mengunci diri sendiri atau teman setim, meskipun teman setim menutupi musuh di bawah kursor.</li><li><strong>Tidak perlu ubah pengaturan:</strong> berjalan lancar meski skin, tampilan massa, dan nama musuh aktif. Tertutup sel lain, pergerakan kamera, dan zoom tidak mengganggunya (yang penting target tetap berada dalam jangkauan pandang <strong>SERVER</strong>).</li><li><strong>Reaksi instan tanpa pemicu palsu:</strong> langsung aktif tepat saat paket dari server masuk bahwa pemain yang dikunci membelah diri. Jika Anda mati, target mati, atau match di-reset, kunci otomatis dilepas. Untuk performa stabil, ping dan FPS yang baik tetap diperlukan.</li></ol><p><strong>Pixi (metode visual cadangan)</strong> – cara lama yang membaca gambar dari layar. Berguna jika suatu saat update game merusak pembacaan WebSocket untuk sementara. Di sini syaratnya sedikit lebih ketat – butuh FPS dan ping yang stabil bagus, serta:</p><ol><li>Target harus terlihat penuh: tidak tertutup sel lain atau tepi layar.</li><li>Anda <strong>WAJIB</strong> mematikan skin, massa, dan nama musuh di pengaturan game, jika tidak akan terjadi pemicu palsu.</li><li>Kamera harus diam, jangan zoom saat sedang lock.</li><li>Metode ini memiliki jeda ~10ms, tetapi tidak bergantung pada kode internal game dan akan tetap bekerja setelah update apa pun.</li></ol><p><strong>Catatan:</strong> Tidak disarankan memasang lebih dari dua split (4 bagian / 2x), karena berdasarkan fisika gamenya sendiri Anda memang tidak akan sempat sampai ke target.</p>",
         noVideo: "Video tidak tersedia",
         codeLink: "Kode terbaru"
       },
@@ -326,7 +329,7 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>Muốn dồn khối lượng hiệu quả sang một bóng khác? Hãy dùng Fast-Feed. Nhấn Freeze Mouse theo hướng mong muốn rồi bấm bind Fast-Feed. Chỉ cửa sổ nơi bạn bấm bind mới thực hiện tách.</p><p>Script tách 5 lần (32 mảnh), chờ theo thời gian đã đặt rồi tách tiếp 5 lần (32 mảnh). P.S. Khi khối lượng lớn (~800k), hãy tăng thanh độ trễ lên khoảng 850ms để bóng không tách quá sớm.</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>Đúng là Auto-Rev chưa được làm theo cách tối ưu nhất, nhưng chúng tôi không có lựa chọn khác vì game được bảo vệ quá kỹ. Để tính năng chạy ổn định, bạn cần có FPS và ping tốt ổn định, đồng thời:</p><p>Bóng mục tiêu phải hiện rõ hoàn toàn, không bị che bởi bóng khác hay mép màn hình. Bạn <strong>BẮT BUỘC</strong> phải tắt hiển thị khối lượng, skin và tên đối thủ trong cài đặt game, nếu không sẽ bị kích hoạt nhầm. Camera phải đứng yên, không zoom khi đang khóa.</p><p>Lưu ý: Có độ trễ ~10ms, nhưng nhờ cách xử lý thú vị của cơ chế Auto-Rev, nó sẽ không bị hỏng trong các bản cập nhật game tương lai; không khuyến nghị đặt quá hai lần tách (4 mảnh), vì đơn giản là bạn sẽ không kịp bay tới mục tiêu.</p>",
+        autoDesc: "<p>Trước đây chúng tôi nghĩ game được bảo vệ quá chặt nên Auto-Rev chỉ hoạt động qua việc phân tích hình ảnh màn hình. Nhưng hóa ra không phải vậy, và hiện trong menu có hai phương thức hoạt động: <strong>WebSocket</strong> và <strong>Pixi</strong>.</p><p><strong>WebSocket</strong> – hoạt động trực tiếp qua dữ liệu máy chủ:</p><ol><li><strong>Không phản ứng với bạn và đồng đội:</strong> khi khóa mục tiêu, script sẽ lọc bỏ các bóng của bạn và thành viên trong party. Bạn sẽ không khóa nhầm bản thân hay đồng đội, ngay cả khi đồng đội đang đè lên kẻ địch dưới con trỏ.</li><li><strong>Không cần đổi cài đặt:</strong> chạy mượt ngay cả khi bật skin, hiển thị khối lượng và tên địch. Bị bóng khác che, di chuyển camera hay zoom đều không làm ảnh hưởng (miễn là mục tiêu vẫn nằm trong tầm nhìn của <strong>MÁY CHỦ</strong>).</li><li><strong>Phản ứng tức thì, không kích hoạt nhầm:</strong> kích hoạt ngay khoảnh khắc nhận gói tin từ máy chủ báo người chơi bị khóa vừa tách. Khi bạn chết, mục tiêu chết hoặc trận đấu đặt lại, khóa sẽ tự động hủy. Để chạy ổn định vẫn cần ping và FPS tốt.</li></ol><p><strong>Pixi (cách trực quan dự phòng)</strong> – cách cũ đọc hình ảnh từ màn hình. Dùng trong trường hợp bản cập nhật game nào đó tạm thời làm hỏng việc đọc WebSocket. Ở đây điều kiện chặt hơn một chút – cần FPS và ping ổn định, đồng thời:</p><ol><li>Mục tiêu phải hiển thị đầy đủ: không bị bóng khác hay mép màn hình che khuất.</li><li>Bạn <strong>BẮT BUỘC</strong> phải tắt skin, khối lượng và tên địch trong cài đặt game, nếu không sẽ bị kích hoạt nhầm.</li><li>Camera phải đứng yên, không zoom khi đang khóa.</li><li>Phương thức này có độ trễ ~10ms nhưng không phụ thuộc vào mã nội bộ của game nên sẽ tiếp tục hoạt động sau mọi bản cập nhật.</li></ol><p><strong>Lưu ý:</strong> Không khuyến nghị đặt quá hai lần tách (4 mảnh / 2x), vì theo vật lý của chính game thì bạn đơn giản là không kịp bay tới mục tiêu.</p>",
         noVideo: "Video không khả dụng",
         codeLink: "Mã mới nhất"
       },
@@ -337,66 +340,66 @@ main{max-width:1160px;margin:0 auto;padding:20px 20px 56px}
         fastTitle: "Fast-Feed",
         fastDesc: "<p>อยากส่งมวลเข้าอีกลูกอย่างมีประสิทธิภาพใช่ไหม? ใช้ Fast-Feed เลย กด Freeze Mouse ไปทิศทางที่ต้องการแล้วกดปุ่ม Fast-Feed เฉพาะหน้าต่างที่กดปุ่มเท่านั้นที่จะแตกตัว</p><p>สคริปต์จะแตกตัว 5 ครั้ง (32 ชิ้น) รอตามเวลาที่ตั้งไว้ แล้วแตกตัวอีก 5 ครั้ง (32 ชิ้น) หมายเหตุ: เมื่อมวลเยอะ (~800k) ให้เพิ่มตัวเลื่อนดีเลย์ไปประมาณ 850ms เพื่อไม่ให้การแตกตัวทำงานเร็วเกินไป</p>",
         autoTitle: "Auto-Rev",
-        autoDesc: "<p>ใช่ Auto-Rev ยังไม่ได้ถูกทำด้วยวิธีที่ดีที่สุด แต่เราไม่มีทางเลือกอื่นเพราะเกมป้องกันแน่นหนาเกินไป เพื่อให้ฟีเจอร์นี้ทำงานเสถียร คุณต้องมี FPS และ Ping ที่ดีอย่างสม่ำเสมอ รวมถึง:</p><p>ลูกเป้าหมายต้องมองเห็นได้เต็มวง ไม่ถูกบังด้วยลูกอื่นหรือขอบจอ คุณ<strong>ต้อง</strong>ปิดการแสดงมวล สกิน และชื่อศัตรูในการตั้งค่าเกม มิฉะนั้นจะเกิดการทำงานผิดพลาด กล้องต้องนิ่ง ห้ามซูมระหว่างล็อกเป้า</p><p>หมายเหตุ: มีดีเลย์ราว ~10ms แต่ด้วยรูปแบบการทำงานที่น่าสนใจของกลไก Auto-Rev มันจะไม่พังเมื่อเกมอัปเดตในอนาคต ไม่แนะนำให้ตั้งเกิน 2 สปลิต (4 ชิ้น) เพราะคุณจะพุ่งไปถึงเป้าหมายไม่ทัน</p>",
+        autoDesc: "<p>ก่อนหน้านี้เราคิดว่าเกมป้องกันแน่นหนาเกินไป Auto-Rev เลยทำงานผ่านการวิเคราะห์ภาพหน้าจอเท่านั้น แต่ปรากฏว่าไม่ใช่แบบนั้น และตอนนี้ในเมนูมีให้เลือก 2 วิธีคือ <strong>WebSocket</strong> และ <strong>Pixi</strong></p><p><strong>WebSocket</strong> – ทำงานผ่านข้อมูลเซิร์ฟเวอร์โดยตรง:</p><ol><li><strong>ไม่ตอบสนองต่อคุณและเพื่อนร่วมทีม:</strong> ตอนล็อกเป้าหมาย สคริปต์จะคัดลูกของคุณและคนในปาร์ตี้ออก คุณจะไม่ล็อกตัวเองหรือเพื่อนร่วมทีม แม้เพื่อนจะบังศัตรูอยู่ใต้เคอร์เซอร์ก็ตาม</li><li><strong>ไม่ต้องเปลี่ยนการตั้งค่า:</strong> ใช้งานได้ปกติแม้จะเปิดสกิน แสดงมวล และชื่อศัตรูไว้ ลูกอื่นบัง การขยับกล้อง หรือการซูมก็ไม่รบกวน (ขอแค่เป้าหมายยังอยู่ในระยะการมองเห็นของ <strong>เซิร์ฟเวอร์</strong>)</li><li><strong>ตอบสนองทันทีโดยไม่ลั่นมั่ว:</strong> ทำงานทันทีในจังหวะที่ได้รับแพ็กเก็ตจากเซิร์ฟเวอร์ว่าผู้เล่นที่ล็อกไว้แตกตัวแล้ว เมื่อคุณตาย เป้าหมายตาย หรือรีเซ็ตแมตช์ ระบบจะปลดล็อกให้อัตโนมัติ ทั้งนี้ยังต้องอาศัย Ping และ FPS ที่ดีเพื่อความเสถียร</li></ol><p><strong>Pixi (วิธีสำรองแบบอ่านภาพ)</strong> – วิธีแบบเดิมที่อ่านภาพจากหน้าจอ มีไว้เผื่อกรณีที่อัปเดตเกมทำให้การอ่าน WebSocket เสียชั่วคราว เงื่อนไขจะเข้มงวดกว่านิดหน่อย ต้องมี FPS และ Ping ที่ดีสม่ำเสมอ รวมถึง:</p><ol><li>เป้าหมายต้องมองเห็นได้เต็มวง ไม่ถูกลูกอื่นหรือขอบจอบัง</li><li>คุณ<strong>ต้อง</strong>ปิดสกิน มวล และชื่อศัตรูในการตั้งค่าเกม มิฉะนั้นจะเกิดการทำงานผิดพลาด</li><li>กล้องต้องนิ่ง ห้ามซูมระหว่างล็อกเป้า</li><li>วิธีนี้มีดีเลย์ ~10ms แต่ไม่อิงกับโค้ดภายในของเกม จึงทำงานต่อได้หลังอัปเดตทุกครั้ง</li></ol><p><strong>หมายเหตุ:</strong> ไม่แนะนำให้ตั้งเกิน 2 สปลิต (4 ชิ้น / 2x) เพราะตามฟิสิกส์ของตัวเกมเอง คุณจะพุ่งไปถึงเป้าหมายไม่ทัน</p>",
         noVideo: "ไม่มีวิดีโอ",
         codeLink: "โค้ดล่าสุด"
       }
-  };
+    };
 
-  const s2VnK = k8LmQ.getElementById("lang-select");
-  const a7RmT = k8LmQ.getElementById("alert-box");
-  const q1WxP = k8LmQ.getElementById("t-solo-title");
-  const w3ZnL = k8LmQ.getElementById("t-solo-desc");
-  const e5KpM = k8LmQ.getElementById("t-fast-title");
-  const r9TvB = k8LmQ.getElementById("t-fast-desc");
-  const t2YxC = k8LmQ.getElementById("t-auto-title");
-  const y4HuN = k8LmQ.getElementById("t-auto-desc");
-  const m6QcL = k8LmQ.getElementById("t-code-link");
-  const v8JsM = Object.keys(d4PxN);
+    const s2VnK = k8LmQ.getElementById("lang-select");
+    const a7RmT = k8LmQ.getElementById("alert-box");
+    const q1WxP = k8LmQ.getElementById("t-solo-title");
+    const w3ZnL = k8LmQ.getElementById("t-solo-desc");
+    const e5KpM = k8LmQ.getElementById("t-fast-title");
+    const r9TvB = k8LmQ.getElementById("t-fast-desc");
+    const t2YxC = k8LmQ.getElementById("t-auto-title");
+    const y4HuN = k8LmQ.getElementById("t-auto-desc");
+    const m6QcL = k8LmQ.getElementById("t-code-link");
+    const v8JsM = Object.keys(d4PxN);
 
-  function c6FgW(lang) {
-    const code = v8JsM.indexOf(lang) !== -1 ? lang : "en";
-    const d = d4PxN[code];
-    k8LmQ.documentElement.lang = code;
-    k8LmQ.documentElement.dir = code === "ar" ? "rtl" : "ltr";
-    a7RmT.innerHTML = d.alert;
-    q1WxP.textContent = d.soloTitle;
-    w3ZnL.innerHTML = d.soloDesc;
-    e5KpM.textContent = d.fastTitle;
-    r9TvB.innerHTML = d.fastDesc;
-    t2YxC.textContent = d.autoTitle;
-    y4HuN.innerHTML = d.autoDesc;
-    if (m6QcL) m6QcL.textContent = d.codeLink;
-    s2VnK.value = code;
-    k8LmQ.querySelectorAll(".vid-empty").forEach(el => {
-      el.textContent = d.noVideo + " (" + el.getAttribute("data-file") + ")";
+    function c6FgW(lang) {
+      const code = v8JsM.indexOf(lang) !== -1 ? lang : "en";
+      const d = d4PxN[code];
+      k8LmQ.documentElement.lang = code;
+      k8LmQ.documentElement.dir = code === "ar" ? "rtl" : "ltr";
+      a7RmT.innerHTML = d.alert;
+      q1WxP.textContent = d.soloTitle;
+      w3ZnL.innerHTML = d.soloDesc;
+      e5KpM.textContent = d.fastTitle;
+      r9TvB.innerHTML = d.fastDesc;
+      t2YxC.textContent = d.autoTitle;
+      y4HuN.innerHTML = d.autoDesc;
+      if (m6QcL) m6QcL.textContent = d.codeLink;
+      s2VnK.value = code;
+      k8LmQ.querySelectorAll(".vid-empty").forEach(el => {
+        el.textContent = d.noVideo + " (" + el.getAttribute("data-file") + ")";
+      });
+    }
+
+    const n3LpQ = ((navigator.languages && navigator.languages[0]) || navigator.language || "en").toLowerCase().slice(0, 2);
+    let p7XrZ = null;
+    try { p7XrZ = localStorage.getItem("mbx_user_lang"); } catch (_) {}
+    if (!p7XrZ || v8JsM.indexOf(p7XrZ) === -1) {
+      p7XrZ = v8JsM.indexOf(n3LpQ) !== -1 ? n3LpQ : "en";
+    }
+    c6FgW(p7XrZ);
+
+    s2VnK.addEventListener("change", function () {
+      const v = this.value;
+      try { localStorage.setItem("mbx_user_lang", v); } catch (_) {}
+      c6FgW(v);
     });
-  }
 
-  const n3LpQ = ((navigator.languages && navigator.languages[0]) || navigator.language || "en").toLowerCase().slice(0, 2);
-  let p7XrZ = null;
-  try { p7XrZ = localStorage.getItem("mbx_user_lang"); } catch (_) {}
-  if (!p7XrZ || v8JsM.indexOf(p7XrZ) === -1) {
-    p7XrZ = v8JsM.indexOf(n3LpQ) !== -1 ? n3LpQ : "en";
-  }
-  c6FgW(p7XrZ);
-
-  s2VnK.addEventListener("change", function () {
-    const v = this.value;
-    try { localStorage.setItem("mbx_user_lang", v); } catch (_) {}
-    c6FgW(v);
-  });
-
-  ["solo-video", "fast-feed-video", "auto-rev-video"].forEach(id => {
-    const v = k8LmQ.getElementById(id);
-    if (!v) return;
-    v.addEventListener("error", () => {
-      v.style.display = "none";
-      const ph = v.parentElement && v.parentElement.querySelector(".vid-empty");
-      if (ph) ph.style.display = "block";
+    ["solo-video", "fast-feed-video", "auto-rev-video"].forEach(id => {
+      const v = k8LmQ.getElementById(id);
+      if (!v) return;
+      v.addEventListener("error", () => {
+        v.style.display = "none";
+        const ph = v.parentElement && v.parentElement.querySelector(".vid-empty");
+        if (ph) ph.style.display = "block";
+      });
     });
-  });
-})(document);
+  })(document);
 </script>
 </body>
 </html>
