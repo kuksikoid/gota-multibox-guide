@@ -559,6 +559,7 @@
     keyRevSplit7: null,
     keyRevSplit8: null,
     keyHoldSpam: null,
+    holdSpamMode: "hold",
     revSplits: 4,
     revMethod: "ws",
     pillX: null,
@@ -595,6 +596,16 @@
     revNotify: false,
     revNotifyPos: "top",
     selectableText: false,
+    bypassEnabled: false,
+    bypassMethod: "smart",
+    bypassTtl: 8500,
+    bypassPhantoms: false,
+    bypassRadar: false,
+    bypassRadarMode: "real",
+    bypassRadarLock: false,
+    bypassMapX: null,
+    bypassMapY: null,
+    bypassMapSize: 220,
     menuColor: null,
     buttonsColor: null,
     plexusColor: null,
@@ -716,6 +727,8 @@
   m9TvL2sP.pillTransparent = Boolean(m9TvL2sP.pillTransparent);
   m9TvL2sP.revNotify = Boolean(m9TvL2sP.revNotify);
   m9TvL2sP.revNotifyPos = m9TvL2sP.revNotifyPos === "bottom" ? "bottom" : "top";
+  m9TvL2sP.holdSpamMode =
+    m9TvL2sP.holdSpamMode === "release" ? "release" : "hold";
   m9TvL2sP.revMethod = m9TvL2sP.revMethod === "pixi" ? "pixi" : "ws";
   m9TvL2sP.ffMethod = m9TvL2sP.ffMethod === "auto" ? "auto" : "manual";
   m9TvL2sP.mapGridEnabled = Boolean(m9TvL2sP.mapGridEnabled);
@@ -748,28 +761,43 @@
     /^#[0-9a-f]{6}$/i.test(m9TvL2sP.plexusColor)
       ? m9TvL2sP.plexusColor
       : null;
+  m9TvL2sP.bypassEnabled = Boolean(m9TvL2sP.bypassEnabled);
+  m9TvL2sP.bypassMethod = [
+    "smart",
+    "nearme",
+    "cursor",
+    "biggest",
+    "lb",
+  ].includes(m9TvL2sP.bypassMethod)
+    ? m9TvL2sP.bypassMethod
+    : "smart";
+  const bpTtlVal = Number(m9TvL2sP.bypassTtl);
+  m9TvL2sP.bypassTtl = Number.isFinite(bpTtlVal)
+    ? Math.max(1500, Math.min(25000, Math.round(bpTtlVal)))
+    : 8500;
+  m9TvL2sP.bypassPhantoms = Boolean(m9TvL2sP.bypassPhantoms);
+  m9TvL2sP.bypassRadar = Boolean(m9TvL2sP.bypassRadar);
+  m9TvL2sP.bypassRadarMode =
+    m9TvL2sP.bypassRadarMode === "fixed" ? "fixed" : "real";
+  m9TvL2sP.bypassRadarLock = Boolean(m9TvL2sP.bypassRadarLock);
+  m9TvL2sP.bypassMapX =
+    typeof m9TvL2sP.bypassMapX === "number" &&
+    Number.isFinite(m9TvL2sP.bypassMapX)
+      ? m9TvL2sP.bypassMapX
+      : null;
+  m9TvL2sP.bypassMapY =
+    typeof m9TvL2sP.bypassMapY === "number" &&
+    Number.isFinite(m9TvL2sP.bypassMapY)
+      ? m9TvL2sP.bypassMapY
+      : null;
+  const bpMapSzVal = Number(m9TvL2sP.bypassMapSize);
+  m9TvL2sP.bypassMapSize = Number.isFinite(bpMapSzVal)
+    ? Math.max(140, Math.min(440, Math.round(bpMapSzVal)))
+    : 220;
 
   const t3LangList = [
     { code: "en", name: "English" },
     { code: "ru", name: "Русский" },
-    { code: "uk", name: "Українська" },
-    { code: "es", name: "Español" },
-    { code: "pt", name: "Português" },
-    { code: "fr", name: "Français" },
-    { code: "de", name: "Deutsch" },
-    { code: "it", name: "Italiano" },
-    { code: "pl", name: "Polski" },
-    { code: "nl", name: "Nederlands" },
-    { code: "ro", name: "Română" },
-    { code: "tr", name: "Türkçe" },
-    { code: "ar", name: "العربية" },
-    { code: "hi", name: "हिन्दी" },
-    { code: "zh", name: "中文" },
-    { code: "ja", name: "日本語" },
-    { code: "ko", name: "한국어" },
-    { code: "id", name: "Indonesia" },
-    { code: "vi", name: "Tiếng Việt" },
-    { code: "th", name: "ไทย" },
   ];
 
   const t3LangDict = {
@@ -842,6 +870,28 @@
       gridOver: "Over Canvas",
       gridBg: "Background",
       updRec: "Update available: v{n} (recommended)",
+      softCol: "Soft Colors",
+      revMtd: "Method",
+      secFf: "FAST-FEED",
+      secSolo: "SOLO-TRICK",
+      ffLock: "Lock / Unlock",
+      ffAct: "Activate",
+      ffMan: "Manual",
+      ffAuto: "Auto",
+      secBypass: "BYPASS VIEW DISTANCE",
+      tipBypass:
+        'First enable "Radar Map", adjust its position and size as you like, and then turn on "Lock Radar" so it does not get in the way during gameplay. If you are used to playing with two windows, you will need to switch to the built-in multibox because the second window is used to scout the map. Enabling "Enable" automatically opens an extra window, unless another Gota tab is already open. Once enabled, everything is already active, so in the second window you just join the same server and enter spectate manually, and the script handles the rest on its own.',
+      bpEnable: "Enable",
+      bpMethod: "Method",
+      bpTtl: "Phantom Lifetime",
+      bpPhantoms: "Phantoms",
+      bpRadar: "Radar Map",
+      bpRadReal: "Real",
+      bpRadFixed: "Fixed",
+      bpLockRadar: "Lock Radar",
+      splitsLbl: "Splits",
+      hmHold: "Hold Alt-Tab",
+      hmDrop: "Stop Alt-Tab",
     },
     ru: {
       cfg: "Настройки",
@@ -912,1486 +962,30 @@
       gridOver: "Поверх канваса",
       gridBg: "Задний фон",
       updRec: "Доступно обновление: v{n} (рекомендуется)",
-    },
-    uk: {
-      cfg: "Налаштування",
-      soloDel: "Затримка Соло-Тріку",
-      ffDel: "Затримка Fast-Feed",
-      ffDelN: "Затримка Fast-Feed {n}",
-      ff: "Fast-Feed",
-      ffAdd: "Додати Fast-Feed",
-      ffRem: "Видалити",
-      trick: "Трюк",
-      secRev: "АВТО-РЕВ",
-      tipRev:
-        "Куля цілі має бути повністю видимою та не перекритою іншими кулями чи краями екрана. Ви ЗОБОВ’ЯЗАНІ вимкнути показ маси, скіни та ніки ворогів у налаштуваннях гри, інакше будуть хибні спрацьовування. Тримайте камеру нерухомо та не змінюйте зум під час локу. Примітка: є затримка ~10ms, але авто-рев стабільно працюватиме в усіх майбутніх оновленнях гри; більше 4 частин ставити не рекомендовано.",
-      lock: "Захопити ціль",
-      unlock: "Зняти захоплення",
-      revSp: "Спліти реву",
-      revNot: "Сповіщення реву",
-      posTop: "Верх",
-      posBot: "Низ",
-      selRev: "Вибір реву",
-      secOpt: "ОПТИМІЗАЦІЯ",
-      tipOpt:
-        '"Відсікання за екраном" - головний перемикач, що вимикає рендер об’єктів поза екраном для підняття FPS. "Запас відсікання" задає буферну зону, щоб кулі з’являлися плавно. Якщо "Відсікання за екраном" вимкнено, запас не діє.',
-      cull: "Відсікання за екраном",
-      filt: "Прибрати важкі фільтри",
-      marg: "Запас відсікання",
-      rScale: "Масштаб рендеру (%)",
-      secBg: "МАПА ТА ФОН",
-
-      mapBg: "Фон мапи",
-      fixBg: "Фіксований фон",
-      fFile: "Файл",
-      fUrl: "URL",
-      promptUrl: "Введіть посилання на зображення, відео або колір:",
-      secMisc: "ІНШЕ",
-      fixFeed: "Фікс кнопки фіду",
-      selTxt: "Виділення тексту",
-      secName: "ЗМІНА НІКУ",
-      skinSt: "Стілер скіна",
-      nameSt: "Стілер ніку / скіна",
-      custSw: "Свої ніки / скіни",
-      menuBind: "Бінд меню",
-      rst: "Скинути",
-      none: "Немає",
-      rstAll: "Скинути все",
-      tut: "Гайд та навчання",
-      secIf: "ІНТЕРФЕЙС",
-      geo: "Геометричний ефект",
-      syncSz: "Масштаб під розмір меню",
-      pillTr: "Прозора кнопка MULTIBOX",
-      secCol: "КОЛЬОРИ",
-      mCol: "Колір меню",
-      bCol: "Кнопки та скролбар",
-      secLang: "МОВА",
-      lang: "Мова",
-      secCfg: "КОНФІГ",
-      cfgPh: "Вставте JSON конфігу сюди...",
-      cfgCopy: "Копіювати",
-      cfgApply: "Застосувати",
-      cfgCopied: "Скопійовано!",
-      cfgApplied: "Застосовано!",
-      cfgInvalid: "Помилковий JSON",
-      xhair: "Курсор-приціл",
-      xhPlus: "Плюсик (+)",
-      xhCross: "Хрестик (×)",
-      curArr: "Стрілка до курсора",
-      mapGrid: "Сітка секторів",
-      gridOver: "Поверх канвасу",
-      gridBg: "Задній фон",
-      updRec: "Доступне оновлення: v{n} (рекомендовано)",
-    },
-    es: {
-      cfg: "Ajustes",
-      soloDel: "Retardo Solo-Trick",
-      ffDel: "Retardo Fast-Feed",
-      ffDelN: "Retardo Fast-Feed {n}",
-      ff: "Fast-Feed",
-      ffAdd: "Añadir Fast-Feed",
-      ffRem: "Eliminar",
-      trick: "Truco",
-      secRev: "AUTO-REV",
-      tipRev:
-        "La célula objetivo debe estar totalmente visible y sin ser tapada por otras células o bordes. Debes desactivar masa, skins y nombres enemigos o fallará. Mantén la cámara quieta y sin hacer zoom. Tiene ~10ms de retardo de proceso con mínimo margen de error, estable en futuras actualizaciones.",
-      lock: "Fijar objetivo",
-      unlock: "Soltar objetivo",
-      revSp: "Divisiones Rev",
-      revNot: "Aviso de Rev",
-      posTop: "Arriba",
-      posBot: "Abajo",
-      selRev: "Elegir Rev",
-      secOpt: "OPTIMIZACIÓN",
-      tipOpt:
-        '"Recorte fuera de pantalla" oculta entidades fuera de vista para mejorar los FPS. "Margen de recorte" añade una zona extra para que las células aparezcan suavemente. Si "Recorte fuera de pantalla" está apagado, el margen no tiene efecto.',
-      cull: "Recorte fuera de pantalla",
-      filt: "Quitar filtros pesados",
-      marg: "Margen de recorte",
-      rScale: "Escala de render (%)",
-      secBg: "MAPA Y FONDO",
-
-      mapBg: "Fondo del mapa",
-      fixBg: "Fondo fijo",
-      fFile: "Archivo",
-      fUrl: "URL",
-      promptUrl: "Introduce imagen, vídeo o color:",
-      secMisc: "VARIOS",
-      fixFeed: "Fix botón de feed",
-      selTxt: "Texto seleccionable",
-      secName: "CAMBIO DE NOMBRE",
-      skinSt: "Robar skin",
-      nameSt: "Robar nombre / skin",
-      custSw: "Nombres / skins propios",
-      menuBind: "Tecla menú",
-      rst: "Reset",
-      none: "Ninguno",
-      rstAll: "Restablecer todo",
-      tut: "Tutorial y guía",
-      secIf: "INTERFAZ",
-      geo: "Efecto geométrico",
-      syncSz: "Escalar contenido al menú",
-      pillTr: "Botón MULTIBOX transparente",
-      secCol: "COLORES",
-      mCol: "Color del menú",
-      bCol: "Botones y barra",
-      secLang: "IDIOMA",
-      lang: "Idioma",
-      secCfg: "CONFIG",
-      cfgPh: "Pega el JSON de configuración aquí...",
-      cfgCopy: "Copiar Config",
-      cfgApply: "Aplicar Config",
-      cfgCopied: "¡Copiado!",
-      cfgApplied: "¡Aplicado!",
-      cfgInvalid: "JSON inválido",
-      xhair: "Cursor de mira",
-      xhPlus: "Cruz (+)",
-      xhCross: "Aspa (×)",
-      curArr: "Flecha al cursor",
-      mapGrid: "Cuadrícula del mapa",
-      gridOver: "Sobre lienzo",
-      gridBg: "Fondo",
-      updRec: "Actualización disponible: v{n} (recomendada)",
-    },
-    pt: {
-      cfg: "Configurações",
-      soloDel: "Atraso Solo-Trick",
-      ffDel: "Atraso Fast-Feed",
-      ffDelN: "Atraso Fast-Feed {n}",
-      ff: "Fast-Feed",
-      ffAdd: "Adicionar Fast-Feed",
-      ffRem: "Remover",
-      trick: "Truque",
-      secRev: "AUTO-REV",
-      tipRev:
-        "A célula alvo deve estar totalmente visível e sem obstruções ou bordas da tela. Desative massa, skins e nomes inimigos ou causará falsos disparos. Mantenha a câmera parada e não dê zoom. Há ~10ms de atraso de processamento, funcionando de forma estável em futuras atualizações.",
-      lock: "Travar alvo",
-      unlock: "Cancelar trava",
-      revSp: "Divisões Rev",
-      revNot: "Aviso de Rev",
-      posTop: "Topo",
-      posBot: "Fundo",
-      selRev: "Selecionar Rev",
-      secOpt: "OTIMIZAÇÃO",
-      tipOpt:
-        '"Recorte fora da tela" deixa de renderizar entidades fora da tela para aumentar o FPS. "Margem de recorte" define uma zona extra de pré-carregamento. Se "Recorte fora da tela" estiver desligado, a margem não tem efeito.',
-      cull: "Recorte fora da tela",
-      filt: "Remover filtros pesados",
-      marg: "Margem de recorte",
-      rScale: "Escala de render (%)",
-      secBg: "MAPA E FUNDO",
-
-      mapBg: "Fundo do mapa",
-      fixBg: "Fundo fixo",
-      fFile: "Arquivo",
-      fUrl: "URL",
-      promptUrl: "Insira imagem, vídeo ou cor:",
-      secMisc: "OUTROS",
-      fixFeed: "Corrigir botão feed",
-      selTxt: "Texto selecionável",
-      secName: "TROCA DE NOME",
-      skinSt: "Roubar skin",
-      nameSt: "Roubar nome / skin",
-      custSw: "Nomes / skins próprios",
-      menuBind: "Tecla do menu",
-      rst: "Reset",
-      none: "Nenhum",
-      rstAll: "Restaurar padrão",
-      tut: "Tutorial e guia",
-      secIf: "INTERFACE",
-      geo: "Efeito geométrico",
-      syncSz: "Ajustar conteúdo ao menu",
-      pillTr: "Botão MULTIBOX transparente",
-      secCol: "CORES",
-      mCol: "Cor do menu",
-      bCol: "Botões e barra",
-      secLang: "IDIOMA",
-      lang: "Idioma",
-      secCfg: "CONFIG",
-      cfgPh: "Cole o JSON da configuração aqui...",
-      cfgCopy: "Copiar Config",
-      cfgApply: "Aplicar Config",
-      cfgCopied: "Copiado!",
-      cfgApplied: "Aplicado!",
-      cfgInvalid: "JSON inválido",
-      xhair: "Cursor de mira",
-      xhPlus: "Mais (+)",
-      xhCross: "Cruz (×)",
-      curArr: "Seta para cursor",
-      mapGrid: "Grade de setores",
-      gridOver: "Sobre a tela",
-      gridBg: "Fundo",
-      updRec: "Atualização disponível: v{n} (recomendada)",
-    },
-    fr: {
-      cfg: "Paramètres",
-      soloDel: "Délai Solo-Trick",
-      ffDel: "Délai Fast-Feed",
-      ffDelN: "Délai Fast-Feed {n}",
-      ff: "Fast-Feed",
-      ffAdd: "Ajouter Fast-Feed",
-      ffRem: "Supprimer",
-      trick: "Trick",
-      secRev: "AUTO-REV",
-      tipRev:
-        "La cellule cible doit être entièrement visible et non cachée par d'autres cellules ou les bords. Désactivez la masse, les skins et les pseudos ennemis sous peine de faux déclenchements. Gardez la caméra fixe sans zoomer. Délai de traitement ~10ms avec faible marge d'erreur.",
-      lock: "Verrouiller cible",
-      unlock: "Annuler verrou",
-      revSp: "Divisions Rev",
-      revNot: "Notif Rev",
-      posTop: "Haut",
-      posBot: "Bas",
-      selRev: "Choisir Rev",
-      secOpt: "OPTIMISATION",
-      tipOpt:
-        '"Masquage hors écran" arrête le rendu hors écran pour gagner des FPS. "Marge de rendu" crée une zone tampon pour un affichage fluide. Si "Masquage hors écran" est désactivé, la marge est sans effet.',
-      cull: "Masquage hors écran",
-      filt: "Retirer filtres lourds",
-      marg: "Marge de rendu",
-      rScale: "Échelle de rendu (%)",
-      secBg: "CARTE & FOND",
-
-      mapBg: "Fond de carte",
-      fixBg: "Fond fixe",
-      fFile: "Fichier",
-      fUrl: "URL",
-      promptUrl: "Entrez une image, vidéo ou couleur :",
-      secMisc: "DIVERS",
-      fixFeed: "Fix bouton feed",
-      selTxt: "Texte sélectionnable",
-      secName: "CHANGEUR DE PSEUDO",
-      skinSt: "Voleur de skin",
-      nameSt: "Voleur pseudo / skin",
-      custSw: "Pseudos / skins perso",
-      menuBind: "Touche menu",
-      rst: "Reset",
-      none: "Aucun",
-      rstAll: "Réinitialiser",
-      tut: "Tutoriel & guide",
-      secIf: "INTERFACE",
-      geo: "Effet géométrique",
-      syncSz: "Adapter contenu au menu",
-      pillTr: "Bouton MULTIBOX transparent",
-      secCol: "COULEURS",
-      mCol: "Couleur du menu",
-      bCol: "Boutons & barre",
-      secLang: "LANGUE",
-      lang: "Langue",
-      secCfg: "CONFIG",
-      cfgPh: "Collez le JSON de configuration ici...",
-      cfgCopy: "Copier Config",
-      cfgApply: "Appliquer Config",
-      cfgCopied: "Copié !",
-      cfgApplied: "Appliqué !",
-      cfgInvalid: "JSON invalide",
-      xhair: "Curseur viseur",
-      xhPlus: "Plus (+)",
-      xhCross: "Croix (×)",
-      curArr: "Flèche curseur",
-      mapGrid: "Grille de secteurs",
-      gridOver: "Sur le canevas",
-      gridBg: "Arrière-plan",
-      updRec: "Mise à jour disponible : v{n} (recommandée)",
-    },
-    de: {
-      cfg: "Einstellungen",
-      soloDel: "Solo-Trick Delay",
-      ffDel: "Fast-Feed Delay",
-      ffDelN: "Fast-Feed {n} Delay",
-      ff: "Fast-Feed",
-      ffAdd: "Fast-Feed hinzufügen",
-      ffRem: "Entfernen",
-      trick: "Trick",
-      secRev: "AUTO-REV",
-      tipRev:
-        "Die Zielzelle muss vollständig sichtbar sein und darf nicht verdeckt werden. Masseanzeige, Skins und gegnerische Namen MÜSSEN deaktiviert sein, sonst kommt es zu Fehlauslösungen. Kamera ruhig halten und nicht zoomen. ~10ms Verarbeitungsverzögerung, funktioniert zuverlässig in zukünftigen Updates.",
-      lock: "Ziel fixieren",
-      unlock: "Fixierung lösen",
-      revSp: "Rev Splits",
-      revNot: "Rev-Hinweis",
-      posTop: "Oben",
-      posBot: "Unten",
-      selRev: "Rev wählen",
-      secOpt: "OPTIMIERUNG",
-      tipOpt:
-        '"Ausblendung außerhalb" deaktiviert das Rendering außerhalb des Bildschirms für mehr FPS. "Sicht-Puffer" erstellt eine Pufferzone für flüssiges Erscheinen. Wenn "Ausblendung außerhalb" aus ist, hat der Sicht-Puffer keine Wirkung.',
-      cull: "Ausblendung außerhalb",
-      filt: "Schwere Filter entfernen",
-      marg: "Sicht-Puffer",
-      rScale: "Render-Skala (%)",
-      secBg: "KARTE & HINTERGRUND",
-
-      mapBg: "Kartenhintergrund",
-      fixBg: "Fester Hintergrund",
-      fFile: "Datei",
-      fUrl: "URL",
-      promptUrl: "Bild, Video oder Farbe eingeben:",
-      secMisc: "SONSTIGES",
-      fixFeed: "Feed-Taste fixen",
-      selTxt: "Wählbarer Text",
-      secName: "NAMENSWECHSLER",
-      skinSt: "Skin-Stealer",
-      nameSt: "Name / Skin Stealer",
-      custSw: "Eigene Namen / Skins",
-      menuBind: "Menü-Taste",
-      rst: "Reset",
-      none: "Keine",
-      rstAll: "Zurücksetzen",
-      tut: "Anleitung & Guide",
-      secIf: "OBERFLÄCHE",
-      geo: "Geometrie-Effekt",
-      syncSz: "Inhalt an Menügröße",
-      pillTr: "Transparenter MULTIBOX-Button",
-      secCol: "FARBEN",
-      mCol: "Menüfarbe",
-      bCol: "Tasten & Scrollbar",
-      secLang: "SPRACHE",
-      lang: "Sprache",
-      secCfg: "KONFIG",
-      cfgPh: "Konfig-JSON hier einfügen...",
-      cfgCopy: "Config kopieren",
-      cfgApply: "Config anwenden",
-      cfgCopied: "Kopiert!",
-      cfgApplied: "Angewendet!",
-      cfgInvalid: "Ungültiges JSON",
-      xhair: "Fadenkreuz-Cursor",
-      xhPlus: "Plus (+)",
-      xhCross: "Kreuz (×)",
-      curArr: "Cursor-Pfeil",
-      mapGrid: "Sektorgitter",
-      gridOver: "Über Canvas",
-      gridBg: "Hintergrund",
-      updRec: "Update verfügbar: v{n} (empfohlen)",
-    },
-    it: {
-      cfg: "Impostazioni",
-      soloDel: "Ritardo Solo-Trick",
-      ffDel: "Ritardo Fast-Feed",
-      ffDelN: "Ritardo Fast-Feed {n}",
-      ff: "Fast-Feed",
-      ffAdd: "Aggiungi Fast-Feed",
-      ffRem: "Rimuovi",
-      trick: "Trick",
-      secRev: "AUTO-REV",
-      tipRev:
-        "La cella bersaglio deve essere visibile per intero e non coperta da altre celle o dai bordi. Disattiva massa, skin e nomi nemici o si attiverà per errore. Tieni la visuale ferma senza zoomare. Ritardo di ~10ms con minimo margine di errore, compatibile con futuri aggiornamenti.",
-      lock: "Blocca bersaglio",
-      unlock: "Annulla blocco",
-      revSp: "Split Rev",
-      revNot: "Avviso Rev",
-      posTop: "Alto",
-      posBot: "Basso",
-      selRev: "Seleziona Rev",
-      secOpt: "OTTIMIZZAZIONE",
-      tipOpt:
-        '"Taglio fuori schermo" interrompe il rendering fuori schermo per aumentare gli FPS. "Margine di taglio" imposta una zona cuscinetto per far apparire le celle senza scatti. Se "Taglio fuori schermo" è spento, il margine non ha effetto.',
-      cull: "Taglio fuori schermo",
-      filt: "Rimuovi filtri pesanti",
-      marg: "Margine di taglio",
-      rScale: "Scala rendering (%)",
-      secBg: "MAPPA E SFONDO",
-
-      mapBg: "Sfondo mappa",
-      fixBg: "Sfondo fisso",
-      fFile: "File",
-      fUrl: "URL",
-      promptUrl: "Inserisci immagine, video o colore:",
-      secMisc: "VARIE",
-      fixFeed: "Fix tasto feed",
-      selTxt: "Testo selezionabile",
-      secName: "CAMBIO NOME",
-      skinSt: "Ruba skin",
-      nameSt: "Ruba nome / skin",
-      custSw: "Nomi / skin personalizzati",
-      menuBind: "Tasto menu",
-      rst: "Reset",
-      none: "Nessuno",
-      rstAll: "Ripristina tutto",
-      tut: "Tutorial e guida",
-      secIf: "INTERFACCIA",
-      geo: "Effetto geometrico",
-      syncSz: "Scala contenuto col menu",
-      pillTr: "Tasto MULTIBOX trasparente",
-      secCol: "COLORI",
-      mCol: "Colore menu",
-      bCol: "Tasti e scrollbar",
-      secLang: "LINGUA",
-      lang: "Lingua",
-      secCfg: "CONFIG",
-      cfgPh: "Incolla qui il JSON di configurazione...",
-      cfgCopy: "Copia Config",
-      cfgApply: "Applica Config",
-      cfgCopied: "Copiato!",
-      cfgApplied: "Applicato!",
-      cfgInvalid: "JSON non valido",
-      xhair: "Cursore mirino",
-      xhPlus: "Più (+)",
-      xhCross: "Croce (×)",
-      curArr: "Freccia cursore",
-      mapGrid: "Griglia settori",
-      gridOver: "Sopra canvas",
-      gridBg: "Sfondo",
-      updRec: "Aggiornamento disponibile: v{n} (consigliato)",
-    },
-    pl: {
-      cfg: "Ustawienia",
-      soloDel: "Opóźnienie Solo-Trick",
-      ffDel: "Opóźnienie Fast-Feed",
-      ffDelN: "Opóźnienie Fast-Feed {n}",
-      ff: "Fast-Feed",
-      ffAdd: "Dodaj Fast-Feed",
-      ffRem: "Usuń",
-      trick: "Trick",
-      secRev: "AUTO-REV",
-      tipRev:
-        "Komórka docelowa musi być w pełni widoczna i niezasłonięta przez inne komórki ani krawędzie ekranu. WYŁĄCZ masę, skiny i nicki wrogów, inaczej skrypt będzie działać błędnie. Nie ruszaj kamerą ani zoomem podczas użycia. Opóźnienie ~10ms z małym marginesem błędu.",
-      lock: "Zablokuj cel",
-      unlock: "Anuluj cel",
-      revSp: "Podziały Rev",
-      revNot: "Powiad. Rev",
-      posTop: "Góra",
-      posBot: "Dół",
-      selRev: "Wybierz Rev",
-      secOpt: "OPTYMALIZACJA",
-      tipOpt:
-        '"Odcinanie poza ekranem" wyłącza renderowanie obiektów poza widokiem dla większego FPS. "Margines odcinania" tworzy bufor dla płynnego pojawiania się komórek. Gdy "Odcinanie poza ekranem" jest wyłączone, margines nie działa.',
-      cull: "Odcinanie poza ekranem",
-      filt: "Usuń ciężkie filtry",
-      marg: "Margines odcinania",
-      rScale: "Skala renderowania (%)",
-      secBg: "MAPA I TŁO",
-
-      mapBg: "Tło mapy",
-      fixBg: "Stałe tło",
-      fFile: "Plik",
-      fUrl: "URL",
-      promptUrl: "Podaj link do obrazu, wideo lub kolor:",
-      secMisc: "RÓŻNE",
-      fixFeed: "Fix przycisku feed",
-      selTxt: "Zaznaczanie tekstu",
-      secName: "ZMIANA NICKU",
-      skinSt: "Kradzież skina",
-      nameSt: "Kradzież nicku / skina",
-      custSw: "Własne nicki / skiny",
-      menuBind: "Klawisz menu",
-      rst: "Reset",
-      none: "Brak",
-      rstAll: "Przywróć domyślne",
-      tut: "Poradnik i instrukcja",
-      secIf: "INTERFEJS",
-      geo: "Efekt geometryczny",
-      syncSz: "Skaluj treść do menu",
-      pillTr: "Przezroczysty przycisk MULTIBOX",
-      secCol: "KOLORY",
-      mCol: "Kolor menu",
-      bCol: "Przyciski i pasek",
-      secLang: "JĘZYK",
-      lang: "Język",
-      secCfg: "KONFIG",
-      cfgPh: "Wklej tutaj JSON konfiguracji...",
-      cfgCopy: "Kopiuj Config",
-      cfgApply: "Zastosuj Config",
-      cfgCopied: "Skopiowano!",
-      cfgApplied: "Zastosowano!",
-      cfgInvalid: "Błędny JSON",
-      xhair: "Kursor celownika",
-      xhPlus: "Plus (+)",
-      xhCross: "Krzyżyk (×)",
-      curArr: "Strzałka kursora",
-      mapGrid: "Siatka sektorów",
-      gridOver: "Nad płótnem",
-      gridBg: "Tło",
-      updRec: "Dostępna aktualizacja: v{n} (zalecana)",
-    },
-    nl: {
-      cfg: "Instellingen",
-      soloDel: "Solo-Trick Vertraging",
-      ffDel: "Fast-Feed Vertraging",
-      ffDelN: "Fast-Feed {n} Vertraging",
-      ff: "Fast-Feed",
-      ffAdd: "Fast-Feed toevoegen",
-      ffRem: "Verwijderen",
-      trick: "Trick",
-      secRev: "AUTO-REV",
-      tipRev:
-        "De doelcel moet volledig zichtbaar zijn zonder bedekking door andere cellen of schermranden. Schakel massaweergave, skins en vijandelijke namen UIT, anders faalt het script direct. Houd de camera stil en zoom niet. ~10ms vertraging met stabiele werking.",
-      lock: "Doel vergrendelen",
-      unlock: "Vergrendeling opheffen",
-      revSp: "Rev Splits",
-      revNot: "Rev Melding",
-      posTop: "Boven",
-      posBot: "Onder",
-      selRev: "Kies Rev",
-      secOpt: "OPTIMALISATIE",
-      tipOpt:
-        '"Buiten scherm verbergen" stopt het renderen buiten het scherm voor hogere FPS. "Verberg-marge" voegt een bufferzone toe zodat cellen soepel verschijnen. Als "Buiten scherm verbergen" UIT staat, heeft de marge geen effect.',
-      cull: "Buiten scherm verbergen",
-      filt: "Zware filters strippen",
-      marg: "Verberg-marge",
-      rScale: "Renderschaal (%)",
-      secBg: "KAART & ACHTERGROND",
-
-      mapBg: "Kaartachtergrond",
-      fixBg: "Vaste achtergrond",
-      fFile: "Bestand",
-      fUrl: "URL",
-      promptUrl: "Voer afbeelding, video of kleur in:",
-      secMisc: "OVERIG",
-      fixFeed: "Fix feed-knop",
-      selTxt: "Selecteerbare tekst",
-      secName: "NAAMWISSELAAR",
-      skinSt: "Skin steler",
-      nameSt: "Naam / Skin steler",
-      custSw: "Eigen namen / skins",
-      menuBind: "Menu toets",
-      rst: "Reset",
-      none: "Geen",
-      rstAll: "Standaard herstellen",
-      tut: "Handleiding & gids",
-      secIf: "INTERFACE",
-      geo: "Geometrisch effect",
-      syncSz: "Inhoud meeschalen",
-      pillTr: "Transparante MULTIBOX-knop",
-      secCol: "KLEUREN",
-      mCol: "Menukleur",
-      bCol: "Knoppen & schuifbalk",
-      secLang: "TAAL",
-      lang: "Taal",
-      secCfg: "CONFIG",
-      cfgPh: "Plak config-JSON hier...",
-      cfgCopy: "Kopieer Config",
-      cfgApply: "Config toepassen",
-      cfgCopied: "Gekopieerd!",
-      cfgApplied: "Toegepast!",
-      cfgInvalid: "Ongeldige JSON",
-      xhair: "Vizier-cursor",
-      xhPlus: "Plus (+)",
-      xhCross: "Kruis (×)",
-      curArr: "Cursorpijl",
-      mapGrid: "Sectorraster",
-      gridOver: "Over canvas",
-      gridBg: "Achtergrond",
-      updRec: "Update beschikbaar: v{n} (aanbevolen)",
-    },
-    ro: {
-      cfg: "Setări",
-      soloDel: "Întârziere Solo-Trick",
-      ffDel: "Întârziere Fast-Feed",
-      ffDelN: "Întârziere Fast-Feed {n}",
-      ff: "Fast-Feed",
-      ffAdd: "Adaugă Fast-Feed",
-      ffRem: "Elimină",
-      trick: "Trick",
-      secRev: "AUTO-REV",
-      tipRev:
-        "Celula țintă trebuie să fie complet vizibilă și neacoperită de alte celule sau de marginile ecranului. Dezactivează masa, skin-urile și numele inamicilor pentru a evita declanșările false. Ține camera nemișcată fără zoom. Întârziere ~10ms cu funcționare stabilă.",
-      lock: "Blochează ținta",
-      unlock: "Anulează blocarea",
-      revSp: "Splitări Rev",
-      revNot: "Notif. Rev",
-      posTop: "Sus",
-      posBot: "Jos",
-      selRev: "Alege Rev",
-      secOpt: "OPTIMIZARE",
-      tipOpt:
-        '"Ascundere în afara ecranului" oprește randarea entităților din afara ecranului pentru FPS mai mare. "Marjă randare" adaugă o zonă tampon pentru apariție lină. Dacă "Ascundere în afara ecranului" este oprită, marja nu are efect.',
-      cull: "Ascundere în afara ecranului",
-      filt: "Elimină filtrele grele",
-      marg: "Marjă randare",
-      rScale: "Scară randare (%)",
-      secBg: "HARTĂ ȘI FUNDAL",
-
-      mapBg: "Fundal hartă",
-      fixBg: "Fundal fix",
-      fFile: "Fișier",
-      fUrl: "URL",
-      promptUrl: "Introdu imagine, video sau culoare:",
-      secMisc: "DIVERSE",
-      fixFeed: "Fix buton feed",
-      selTxt: "Text selectabil",
-      secName: "SCHIMBARE NUME",
-      skinSt: "Furt skin",
-      nameSt: "Furt nume / skin",
-      custSw: "Nume / skin-uri proprii",
-      menuBind: "Tastă meniu",
-      rst: "Reset",
-      none: "Nimic",
-      rstAll: "Resetează tot",
-      tut: "Tutorial și ghid",
-      secIf: "INTERFAȚĂ",
-      geo: "Efect geometric",
-      syncSz: "Scalare cu meniul",
-      pillTr: "Buton MULTIBOX transparent",
-      secCol: "CULORI",
-      mCol: "Culoare meniu",
-      bCol: "Butoane și bară",
-      secLang: "LIMBĂ",
-      lang: "Limbă",
-      secCfg: "CONFIG",
-      cfgPh: "Lipește JSON-ul de configurare aici...",
-      cfgCopy: "Copiază Config",
-      cfgApply: "Aplică Config",
-      cfgCopied: "Copiat!",
-      cfgApplied: "Aplicat!",
-      cfgInvalid: "JSON invalid",
-      xhair: "Cursor țintă",
-      xhPlus: "Plus (+)",
-      xhCross: "Cruce (×)",
-      curArr: "Săgeată cursor",
-      mapGrid: "Grilă sectoare",
-      gridOver: "Peste canvas",
-      gridBg: "Fundal",
-      updRec: "Actualizare disponibilă: v{n} (recomandată)",
-    },
-    tr: {
-      cfg: "Ayarlar",
-      soloDel: "Solo-Trick Gecikmesi",
-      ffDel: "Fast-Feed Gecikmesi",
-      ffDelN: "Fast-Feed {n} Gecikmesi",
-      ff: "Fast-Feed",
-      ffAdd: "Fast-Feed Ekle",
-      ffRem: "Kaldır",
-      trick: "Trick",
-      secRev: "AUTO-REV",
-      tipRev:
-        "Hedef hücre tamamen görünür olmalı ve diğer hücreler veya ekran kenarları tarafından gizlenmemelidir. Kütle gösterimini, skinleri ve rakip isimlerini KAPATMALISINIZ, aksi halde hatalı tetiklenir. Kamerayı sabit tutun ve yakınlaştırmayın. ~10ms işlem gecikmesi vardır.",
-      lock: "Hedefi Kilitle",
-      unlock: "Kilidi İptal Et",
-      revSp: "Rev Bölme",
-      revNot: "Rev Bildirimi",
-      posTop: "Üst",
-      posBot: "Alt",
-      selRev: "Rev Seç",
-      secOpt: "OPTİMİZASYON",
-      tipOpt:
-        '"Ekran Dışı Gizleme", FPS artırmak için ekran dışındaki nesneleri çizmeyi durdurur. "Görüş Payı" hücrelerin akıcı görünmesi için ön yükleme alanı ekler. "Ekran Dışı Gizleme" kapalıysa payın etkisi olmaz.',
-      cull: "Ekran Dışı Gizleme",
-      filt: "Ağır Filtreleri Kaldır",
-      marg: "Görüş Payı",
-      rScale: "Render Ölçeği (%)",
-      secBg: "HARİTA VE ARKA PLAN",
-
-      mapBg: "Harita Arka Planı",
-      fixBg: "Sabit Arka Plan",
-      fFile: "Dosya",
-      fUrl: "URL",
-      promptUrl: "Resim, video veya renk girin:",
-      secMisc: "DİĞER",
-      fixFeed: "Feed Tuşu Düzeltme",
-      selTxt: "Seçilebilir Metin",
-      secName: "İSİM DEĞİŞTİRİCİ",
-      skinSt: "Skin Çalıcı",
-      nameSt: "İsim / Skin Çalıcı",
-      custSw: "Özel İsim / Skin",
-      menuBind: "Menü Tuşu",
-      rst: "Sıfırla",
-      none: "Yok",
-      rstAll: "Varsayılana Sıfırla",
-      tut: "Rehber ve Öğretici",
-      secIf: "ARAYÜZ",
-      geo: "Geometrik Efekt",
-      syncSz: "İçeriği Menüye Ölçekle",
-      pillTr: "Şeffaf MULTIBOX Düğmesi",
-      secCol: "RENKLER",
-      mCol: "Menü Rengi",
-      bCol: "Butonlar ve Kaydırma",
-      secLang: "DİL",
-      lang: "Dil",
-      secCfg: "YAPILANDIRMA",
-      cfgPh: "Yapılandırma JSON verisini buraya yapıştırın...",
-      cfgCopy: "Config Kopyala",
-      cfgApply: "Config Uygula",
-      cfgCopied: "Kopyalandı!",
-      cfgApplied: "Uygulandı!",
-      cfgInvalid: "Geçersiz JSON",
-      xhair: "Nişangah İmleci",
-      xhPlus: "Artı (+)",
-      xhCross: "Çarpı (×)",
-      curArr: "İmleç Oku",
-      mapGrid: "Harita Sektör Izgarası",
-      gridOver: "Tuval Üstü",
-      gridBg: "Arka Plan",
-      updRec: "Güncelleme mevcut: v{n} (önerilen)",
-    },
-    ar: {
-      cfg: "الإعدادات",
-      soloDel: "تأخير Solo-Trick",
-      ffDel: "تأخير Fast-Feed",
-      ffDelN: "تأخير Fast-Feed {n}",
-      ff: "Fast-Feed",
-      ffAdd: "إضافة Fast-Feed",
-      ffRem: "إزالة",
-      trick: "تريك",
-      secRev: "AUTO-REV",
-      tipRev:
-        "يجب أن تكون الخلية المستهدفة مرئية بالكامل وغير مغطاة بخلايا أخرى أو حواف الشاشة. يجب تعطيل عرض الكتلة والسكينات وأسماء الخصوم وإلا سيفشل السكربت. ثبت الكاميرا ولا تقم بالتكبير أثناء الاستخدام. يوجد تأخير معالجة ~10ms ويعمل بثبات في التحديثات القادمة.",
-      lock: "تثبيت الهدف",
-      unlock: "إلغاء التثبيت",
-      revSp: "تقسيمات Rev",
-      revNot: "إشعار Rev",
-      posTop: "أعلى",
-      posBot: "أسفل",
-      selRev: "اختيار Rev",
-      secOpt: "التحسين",
-      tipOpt:
-        '"إخفاء خارج الشاشة" يوقف رسم الكائنات خارج الشاشة لرفع FPS. "هامش الإخفاء" يضيف منطقة إضافية لظهور الخلايا بسلاسة. إذا كان "إخفاء خارج الشاشة" مغلقًا فلن يؤثر الهامش.',
-      cull: "إخفاء خارج الشاشة",
-      filt: "إزالة الفلاتر الثقيلة",
-      marg: "هامش الإخفاء",
-      rScale: "دقة العرض (%)",
-      secBg: "الخريطة والخلفية",
-
-      mapBg: "خلفية الخريطة",
-      fixBg: "خلفية ثابتة",
-      fFile: "ملف",
-      fUrl: "رابط",
-      promptUrl: "أدخل رابط صورة أو فيديو أو لون:",
-      secMisc: "متنوع",
-      fixFeed: "إصلاح زر الإطعام",
-      selTxt: "تحديد النص",
-      secName: "تغيير الاسم",
-      skinSt: "سارق السكن",
-      nameSt: "سارق الاسم / السكن",
-      custSw: "تبديل أسماء / سكينات",
-      menuBind: "زر القائمة",
-      rst: "إعادة",
-      none: "لا شيء",
-      rstAll: "استعادة الافتراضي",
-      tut: "الشرح والدليل",
-      secIf: "الواجهة",
-      geo: "تأثير هندسي",
-      syncSz: "مزامنة الحجم مع القائمة",
-      pillTr: "زر MULTIBOX شفاف",
-      secCol: "الألوان",
-      mCol: "لون القائمة",
-      bCol: "الأزرار وشريط التمرير",
-      secLang: "اللغة",
-      lang: "اللغة",
-      secCfg: "الإعدادات الجاهزة",
-      cfgPh: "ألصق نص JSON للإعدادات هنا...",
-      cfgCopy: "نسخ الإعدادات",
-      cfgApply: "تطبيق الإعدادات",
-      cfgCopied: "تم النسخ!",
-      cfgApplied: "تم التطبيق!",
-      cfgInvalid: "JSON غير صالح",
-      xhair: "مؤشر التصويب",
-      xhPlus: "زائد (+)",
-      xhCross: "تقاطع (×)",
-      curArr: "سهم المؤشر",
-      mapGrid: "شبكة الخريطة",
-      gridOver: "فوق اللوحة",
-      gridBg: "الخلفية",
-      updRec: "يتوفر تحديث: v{n} (موصى به)",
-    },
-    hi: {
-      cfg: "सेटिंग्स",
-      soloDel: "Solo-Trick देरी",
-      ffDel: "Fast-Feed देरी",
-      ffDelN: "Fast-Feed {n} देरी",
-      ff: "Fast-Feed",
-      ffAdd: "Fast-Feed जोड़ें",
-      ffRem: "हटाएँ",
-      trick: "ट्रिक",
-      secRev: "AUTO-REV",
-      tipRev:
-        "लक्ष्य सेल पूरी तरह दिखनी चाहिए और दूसरी सेल या स्क्रीन के किनारों से ढकी नहीं होनी चाहिए। मास डिस्प्ले, स्किन और दुश्मन के नाम बंद करना ज़रूरी है, वरना गलत ट्रिगर होगा। कैमरा स्थिर रखें और ज़ूम न करें। ~10ms प्रोसेसिंग देरी के साथ सभी अपडेट में स्थिर काम करता है।",
-      lock: "लक्ष्य लॉक करें",
-      unlock: "लॉक रद्द करें",
-      revSp: "Rev स्प्लिट्स",
-      revNot: "Rev सूचना",
-      posTop: "ऊपर",
-      posBot: "नीचे",
-      selRev: "Rev चुनें",
-      secOpt: "ऑप्टिमाइज़ेशन",
-      tipOpt:
-        '"स्क्रीन के बाहर छिपाएँ" FPS बढ़ाने के लिए स्क्रीन के बाहर के ऑब्जेक्ट रेंडर करना रोकता है। "छिपाने की सीमा" सेल को स्मूथ दिखाने के लिए अतिरिक्त बफ़र देती है। अगर "स्क्रीन के बाहर छिपाएँ" बंद है तो सीमा काम नहीं करेगी।',
-      cull: "स्क्रीन के बाहर छिपाएँ",
-      filt: "भारी फ़िल्टर हटाएँ",
-      marg: "छिपाने की सीमा",
-      rScale: "रेंडर स्केल (%)",
-      secBg: "मैप और बैकग्राउंड",
-
-      mapBg: "मैप बैकग्राउंड",
-      fixBg: "फिक्स्ड बैकग्राउंड",
-      fFile: "फ़ाइल",
-      fUrl: "URL",
-      promptUrl: "इमेज, वीडियो या रंग दर्ज करें:",
-      secMisc: "अन्य",
-      fixFeed: "फ़ीड बटन फ़िक्स",
-      selTxt: "चयन योग्य टेक्स्ट",
-      secName: "नेम चेंजर",
-      skinSt: "स्किन स्टीलर",
-      nameSt: "नेम / स्किन स्टीलर",
-      custSw: "कस्टम नाम / स्किन स्विचर",
-      menuBind: "मेनू कुंजी",
-      rst: "रीसेट",
-      none: "कोई नहीं",
-      rstAll: "डिफ़ॉल्ट पर रीसेट",
-      tut: "ट्यूटोरियल और गाइड",
-      secIf: "इंटरफ़ेस",
-      geo: "जियोमेट्रिक इफ़ेक्ट",
-      syncSz: "मेनू आकार से स्केल करें",
-      pillTr: "पारदर्शी MULTIBOX बटन",
-      secCol: "रंग",
-      mCol: "मेनू रंग",
-      bCol: "बटन और स्क्रॉलबार",
-      secLang: "भाषा",
-      lang: "भाषा",
-      secCfg: "कॉन्फ़िग",
-      cfgPh: "यहाँ कॉन्फ़िग JSON पेस्ट करें...",
-      cfgCopy: "कॉन्फ़िग कॉपी करें",
-      cfgApply: "कॉन्फ़िग लागू करें",
-      cfgCopied: "कॉपी हो गया!",
-      cfgApplied: "लागू हो गया!",
-      cfgInvalid: "अमान्य JSON",
-      xhair: "क्रॉसहेयर कर्सर",
-      xhPlus: "प्लस (+)",
-      xhCross: "क्रॉस (×)",
-      curArr: "कर्सर तीर",
-      mapGrid: "मैप सेक्टर ग्रिड",
-      gridOver: "कैनवास के ऊपर",
-      gridBg: "बैकग्राउंड",
-      updRec: "अपडेट उपलब्ध: v{n} (अनुशंसित)",
-    },
-    zh: {
-      cfg: "设置",
-      soloDel: "单人 Trick 延迟",
-      ffDel: "Fast-Feed 延迟",
-      ffDelN: "Fast-Feed {n} 延迟",
-      ff: "Fast-Feed",
-      ffAdd: "添加 Fast-Feed",
-      ffRem: "移除",
-      trick: "Trick",
-      secRev: "AUTO-REV",
-      tipRev:
-        "目标细胞必须完全可见，不能被其他细胞或屏幕边缘遮挡。必须关闭质量显示、皮肤和敌方昵称，否则脚本会立刻误判触发。保持镜头静止且不要缩放。约有 ~10ms 处理延迟及轻微误差，但在后续更新中保持稳定。",
-      lock: "锁定目标",
-      unlock: "取消锁定",
-      revSp: "Rev 分身数",
-      revNot: "Rev 提示",
-      posTop: "顶部",
-      posBot: "底部",
-      selRev: "选择 Rev",
-      secOpt: "性能优化",
-      tipOpt:
-        '"视锥剔除"会停止渲染屏幕外的实体以提升 FPS。"剔除边距"用于设置预加载缓冲区，使细胞平滑出现。关闭"视锥剔除"后，"剔除边距"不会生效。',
-      cull: "视锥剔除",
-      filt: "移除高耗滤镜",
-      marg: "剔除边距",
-      rScale: "渲染分辨率 (%)",
-      secBg: "地图与背景",
-
-      mapBg: "地图背景",
-      fixBg: "固定背景",
-      fFile: "文件",
-      fUrl: "URL",
-      promptUrl: "输入图片、视频或颜色：",
-      secMisc: "杂项",
-      fixFeed: "修复喂球按键",
-      selTxt: "可选中文本",
-      secName: "改名器",
-      skinSt: "皮肤窃取",
-      nameSt: "昵称 / 皮肤窃取",
-      custSw: "自定义昵称 / 皮肤轮换",
-      menuBind: "菜单热键",
-      rst: "重置",
-      none: "无",
-      rstAll: "恢复默认",
-      tut: "教程与指南",
-      secIf: "界面",
-      geo: "几何粒子效果",
-      syncSz: "内容随菜单缩放",
-      pillTr: "半透明 MULTIBOX 按钮",
-      secCol: "颜色",
-      mCol: "菜单颜色",
-      bCol: "按钮与滚动条",
-      secLang: "语言",
-      lang: "语言",
-      secCfg: "配置",
-      cfgPh: "在此粘贴配置 JSON...",
-      cfgCopy: "复制配置",
-      cfgApply: "应用配置",
-      cfgCopied: "已复制！",
-      cfgApplied: "已应用！",
-      cfgInvalid: "无效 JSON",
-      xhair: "准星光标",
-      xhPlus: "十字 (+)",
-      xhCross: "叉号 (×)",
-      curArr: "光标连线",
-      mapGrid: "地图分区网格",
-      gridOver: "画布上方",
-      gridBg: "背景层",
-      updRec: "发现新版本：v{n}（建议更新）",
-    },
-    ja: {
-      cfg: "設定",
-      soloDel: "Solo-Trick 遅延",
-      ffDel: "Fast-Feed 遅延",
-      ffDelN: "Fast-Feed {n} 遅延",
-      ff: "Fast-Feed",
-      ffAdd: "Fast-Feed 追加",
-      ffRem: "削除",
-      trick: "Trick",
-      secRev: "AUTO-REV",
-      tipRev:
-        "対象セルは画面端や他のセルに隠れず全体が見える必要があります。質量表示・スキン・敵ニックネームを必ず無効にしてください。カメラを静止させズームも控えてください。約10msの処理遅延はありますが今後のアップデートでも安定動作します。",
-      lock: "ターゲット固定",
-      unlock: "固定解除",
-      revSp: "Rev 分裂数",
-      revNot: "Rev 通知",
-      posTop: "上",
-      posBot: "下",
-      selRev: "Rev 選択",
-      secOpt: "最適化",
-      tipOpt:
-        '"画面外カリング"は画面外の描画を止めてFPSを向上させます。"カリング余白"はセルが滑らかに表示される予備領域です。"画面外カリング"がOFFの場合、余白は無効になります。',
-      cull: "画面外カリング",
-      filt: "重いフィルター削除",
-      marg: "カリング余白",
-      rScale: "描画スケール (%)",
-      secBg: "マップ＆背景",
-
-      mapBg: "マップ背景",
-      fixBg: "固定背景",
-      fFile: "ファイル",
-      fUrl: "URL",
-      promptUrl: "画像、動画、または色を入力：",
-      secMisc: "その他",
-      fixFeed: "フィードキー修正",
-      selTxt: "テキスト選択",
-      secName: "名前変更",
-      skinSt: "スキンスティーラー",
-      nameSt: "名前 / スキン盗用",
-      custSw: "カスタム名 / スキン切替",
-      menuBind: "メニューキー",
-      rst: "リセット",
-      none: "なし",
-      rstAll: "初期設定に戻す",
-      tut: "チュートリアル",
-      secIf: "インターフェース",
-      geo: "幾何学エフェクト",
-      syncSz: "メニューサイズに連動",
-      pillTr: "半透明 MULTIBOX ボタン",
-      secCol: "カラー",
-      mCol: "メニュー色",
-      bCol: "ボタン＆スクロールバー",
-      secLang: "言語",
-      lang: "言語",
-      secCfg: "コンフィグ",
-      cfgPh: "設定のJSONをここに貼り付け...",
-      cfgCopy: "設定をコピー",
-      cfgApply: "設定を適用",
-      cfgCopied: "コピー完了!",
-      cfgApplied: "適用完了!",
-      cfgInvalid: "無効なJSON",
-      xhair: "照準カーソル",
-      xhPlus: "プラス (+)",
-      xhCross: "クロス (×)",
-      curArr: "カーソルライン",
-      mapGrid: "マップグリッド",
-      gridOver: "前面表示",
-      gridBg: "背景",
-      updRec: "アップデート可能: v{n}（推奨）",
-    },
-    ko: {
-      cfg: "설정",
-      soloDel: "Solo-Trick 지연",
-      ffDel: "Fast-Feed 지연",
-      ffDelN: "Fast-Feed {n} 지연",
-      ff: "Fast-Feed",
-      ffAdd: "Fast-Feed 추가",
-      ffRem: "삭제",
-      trick: "Trick",
-      secRev: "AUTO-REV",
-      tipRev:
-        "대상 세포가 다른 세포나 화면 가장자리에 가리지 않고 완전히 보여야 합니다. 질량 표시, 스킨, 상대 닉네임을 반드시 끄세요. 카메라를 고정하고 줌을 변경하지 마세요. ~10ms 처리 지연이 있지만 업데이트와 무관하게 안정적으로 작동합니다.",
-      lock: "대상 고정",
-      unlock: "고정 해제",
-      revSp: "Rev 분열",
-      revNot: "Rev 알림",
-      posTop: "위",
-      posBot: "아래",
-      selRev: "Rev 선택",
-      secOpt: "최적화",
-      tipOpt:
-        '"화면 밖 컬링"은 화면 밖 엔티티 렌더링을 꺼서 FPS를 높입니다. "컬링 여백"은 세포가 부드럽게 나타나도록 여유 버퍼를 줍니다. "화면 밖 컬링"이 꺼져 있으면 여백이 적용되지 않습니다.',
-      cull: "화면 밖 컬링",
-      filt: "무거운 필터 제거",
-      marg: "컬링 여백",
-      rScale: "렌더 스케일 (%)",
-      secBg: "맵 및 배경",
-
-      mapBg: "맵 배경",
-      fixBg: "고정 배경",
-      fFile: "파일",
-      fUrl: "URL",
-      promptUrl: "이미지, 동영상 또는 색상 입력:",
-      secMisc: "기타",
-      fixFeed: "피드 버튼 수정",
-      selTxt: "텍스트 선택",
-      secName: "닉네임 변경",
-      skinSt: "스킨 스틸러",
-      nameSt: "닉네임 / 스킨 스틸러",
-      custSw: "커스텀 닉 / 스킨 전환",
-      menuBind: "메뉴 단축키",
-      rst: "초기화",
-      none: "없음",
-      rstAll: "기본값으로 초기화",
-      tut: "튜토리얼 및 가이드",
-      secIf: "인터페이스",
-      geo: "기하학 효과",
-      syncSz: "메뉴 크기에 콘텐츠 맞춤",
-      pillTr: "반투명 MULTIBOX 버튼",
-      secCol: "색상",
-      mCol: "메뉴 색상",
-      bCol: "버튼 및 스크롤바",
-      secLang: "언어",
-      lang: "언어",
-      secCfg: "컨피그",
-      cfgPh: "여기에 설정 JSON을 붙여넣으세요...",
-      cfgCopy: "설정 복사",
-      cfgApply: "설정 적용",
-      cfgCopied: "복사됨!",
-      cfgApplied: "적용됨!",
-      cfgInvalid: "잘못된 JSON",
-      xhair: "조준선 커서",
-      xhPlus: "플러스 (+)",
-      xhCross: "크로스 (×)",
-      curArr: "커서 화살표",
-      mapGrid: "맵 섹터 격자",
-      gridOver: "캔버스 위",
-      gridBg: "배경",
-      updRec: "업데이트 가능: v{n} (권장)",
-    },
-    id: {
-      cfg: "Pengaturan",
-      soloDel: "Jeda Solo-Trick",
-      ffDel: "Jeda Fast-Feed",
-      ffDelN: "Jeda Fast-Feed {n}",
-      ff: "Fast-Feed",
-      ffAdd: "Tambah Fast-Feed",
-      ffRem: "Hapus",
-      trick: "Trik",
-      secRev: "AUTO-REV",
-      tipRev:
-        "Sel target harus terlihat penuh dan tidak tertutup sel lain atau tepi layar. WAJIB matikan tampilan massa, skin, dan nama musuh agar tidak salah pemicu. Jaga kamera tetap diam dan jangan zoom. Ada jeda proses ~10ms dengan sedikit toleransi, tetap stabil di update mendatang.",
-      lock: "Kunci Target",
-      unlock: "Batal Kunci",
-      revSp: "Split Rev",
-      revNot: "Notif Rev",
-      posTop: "Atas",
-      posBot: "Bawah",
-      selRev: "Pilih Rev",
-      secOpt: "OPTIMASI",
-      tipOpt:
-        '"Sembunyikan Luar Layar" menghentikan render objek di luar layar untuk menaikkan FPS. "Batas Jarak" menambah zona penyangga agar sel muncul mulus. Jika "Sembunyikan Luar Layar" mati, batas jarak tidak berpengaruh.',
-      cull: "Sembunyikan Luar Layar",
-      filt: "Hapus Filter Berat",
-      marg: "Batas Jarak",
-      rScale: "Skala Render (%)",
-      secBg: "PETA & LATAR",
-
-      mapBg: "Latar Peta",
-      fixBg: "Latar Tetap",
-      fFile: "Berkas",
-      fUrl: "URL",
-      promptUrl: "Masukkan gambar, video, atau warna:",
-      secMisc: "LAINNYA",
-      fixFeed: "Perbaiki Tombol Feed",
-      selTxt: "Teks Dapat Dipilih",
-      secName: "PENGUBAH NAMA",
-      skinSt: "Pencuri Skin",
-      nameSt: "Pencuri Nama / Skin",
-      custSw: "Nama / Skin Kustom",
-      menuBind: "Tombol Menu",
-      rst: "Reset",
-      none: "Tidak Ada",
-      rstAll: "Reset ke Default",
-      tut: "Tutorial & Panduan",
-      secIf: "ANTARMUKA",
-      geo: "Efek Geometris",
-      syncSz: "Sesuaikan Ukuran Konten",
-      pillTr: "Tombol MULTIBOX Transparan",
-      secCol: "WARNA",
-      mCol: "Warna Menu",
-      bCol: "Tombol & Scrollbar",
-      secLang: "BAHASA",
-      lang: "Bahasa",
-      secCfg: "KONFIGURASI",
-      cfgPh: "Tempel JSON konfigurasi di sini...",
-      cfgCopy: "Salin Config",
-      cfgApply: "Terapkan Config",
-      cfgCopied: "Tersalin!",
-      cfgApplied: "Diterapkan!",
-      cfgInvalid: "JSON tidak valid",
-      xhair: "Kursor Bidik",
-      xhPlus: "Plus (+)",
-      xhCross: "Silang (×)",
-      curArr: "Panah Kursor",
-      mapGrid: "Grid Sektor Peta",
-      gridOver: "Di Atas Kanvas",
-      gridBg: "Latar Belakang",
-      updRec: "Pembaruan tersedia: v{n} (disarankan)",
-    },
-    vi: {
-      cfg: "Cài đặt",
-      soloDel: "Độ trễ Solo-Trick",
-      ffDel: "Độ trễ Fast-Feed",
-      ffDelN: "Độ trễ Fast-Feed {n}",
-      ff: "Fast-Feed",
-      ffAdd: "Thêm Fast-Feed",
-      ffRem: "Xóa",
-      trick: "Trick",
-      secRev: "AUTO-REV",
-      tipRev:
-        "Tế bào mục tiêu phải hiển thị đầy đủ, không bị che bởi tế bào khác hay mép màn hình. BẮT BUỘC tắt hiển thị khối lượng, skin và tên địch để tránh kích hoạt nhầm. Giữ camera đứng yên và không zoom. Có độ trễ xử lý ~10ms nhưng hoạt động ổn định qua các bản cập nhật.",
-      lock: "Khóa mục tiêu",
-      unlock: "Hủy khóa",
-      revSp: "Số lần Rev",
-      revNot: "Thông báo Rev",
-      posTop: "Trên",
-      posBot: "Dưới",
-      selRev: "Chọn Rev",
-      secOpt: "TỐI ƯU HÓA",
-      tipOpt:
-        '"Ẩn ngoài màn hình" ngừng vẽ các vật thể ngoài màn hình để tăng FPS. "Vùng đệm" giúp tế bào xuất hiện mượt mà hơn. Nếu tắt "Ẩn ngoài màn hình", vùng đệm sẽ không có tác dụng.',
-      cull: "Ẩn ngoài màn hình",
-      filt: "Bỏ bộ lọc nặng",
-      marg: "Vùng đệm",
-      rScale: "Tỷ lệ render (%)",
-      secBg: "BẢN ĐỒ & NỀN",
-
-      mapBg: "Nền bản đồ",
-      fixBg: "Nền cố định",
-      fFile: "Tệp",
-      fUrl: "URL",
-      promptUrl: "Nhập ảnh, video hoặc màu sắc:",
-      secMisc: "KHÁC",
-      fixFeed: "Sửa nút Feed",
-      selTxt: "Chọn văn bản",
-      secName: "ĐỔI TÊN",
-      skinSt: "Sao chép Skin",
-      nameSt: "Sao chép Tên / Skin",
-      custSw: "Đổi Tên / Skin tùy chỉnh",
-      menuBind: "Phím mở Menu",
-      rst: "Đặt lại",
-      none: "Không",
-      rstAll: "Khôi phục mặc định",
-      tut: "Hướng dẫn sử dụng",
-      secIf: "GIAO DIỆN",
-      geo: "Hiệu ứng hình học",
-      syncSz: "Co giãn theo cỡ Menu",
-      pillTr: "Nút MULTIBOX trong suốt",
-      secCol: "MÀU SẮC",
-      mCol: "Màu Menu",
-      bCol: "Nút & Thanh cuộn",
-      secLang: "NGÔN NGỮ",
-      lang: "Ngôn ngữ",
-      secCfg: "CẤU HÌNH",
-      cfgPh: "Dán JSON cấu hình vào đây...",
-      cfgCopy: "Sao chép Config",
-      cfgApply: "Áp dụng Config",
-      cfgCopied: "Đã chép!",
-      cfgApplied: "Đã áp dụng!",
-      cfgInvalid: "JSON không hợp lệ",
-      xhair: "Con trỏ tâm ngắm",
-      xhPlus: "Cộng (+)",
-      xhCross: "Chéo (×)",
-      curArr: "Mũi tên con trỏ",
-      mapGrid: "Lưới khu vực",
-      gridOver: "Trên khung vẽ",
-      gridBg: "Nền sau",
-      updRec: "Có bản cập nhật: v{n} (khuyên dùng)",
-    },
-    th: {
-      cfg: "การตั้งค่า",
-      soloDel: "หน่วงเวลา Solo-Trick",
-      ffDel: "หน่วงเวลา Fast-Feed",
-      ffDelN: "หน่วงเวลา Fast-Feed {n}",
-      ff: "Fast-Feed",
-      ffAdd: "เพิ่ม Fast-Feed",
-      ffRem: "ลบ",
-      trick: "ทริก",
-      secRev: "AUTO-REV",
-      tipRev:
-        "เซลล์เป้าหมายต้องมองเห็นได้เต็มวง ไม่ถูกบังด้วยเซลล์อื่นหรือขอบจอ ต้องปิดการแสดงมวล สกิน และชื่อศัตรู มิฉะนั้นจะทำงานผิดพลาด ให้นิ่งกล้องไว้และอย่าซูมระหว่างใช้งาน มีดีเลย์ประมวลผล ~10ms แต่เสถียรกับทุกอัปเดต",
-      lock: "ล็อกเป้าหมาย",
-      unlock: "ยกเลิกล็อก",
-      revSp: "จำนวนแบ่ง Rev",
-      revNot: "แจ้งเตือน Rev",
-      posTop: "บน",
-      posBot: "ล่าง",
-      selRev: "เลือก Rev",
-      secOpt: "ปรับแต่งประสิทธิภาพ",
-      tipOpt:
-        '"ซ่อนนอกหน้าจอ" จะหยุดเรนเดอร์วัตถุนอกจอเพื่อเพิ่ม FPS "ขอบเขตเผื่อ" ช่วยให้เซลล์ปรากฏอย่างลื่นไหล หากปิด "ซ่อนนอกหน้าจอ" ค่าขอบเขตจะไม่มีผล',
-      cull: "ซ่อนนอกหน้าจอ",
-      filt: "ปิดฟิลเตอร์หนัก",
-      marg: "ขอบเขตเผื่อ",
-      rScale: "สเกลเรนเดอร์ (%)",
-      secBg: "แผนที่และพื้นหลัง",
-
-      mapBg: "พื้นหลังแผนที่",
-      fixBg: "พื้นหลังคงที่",
-      fFile: "ไฟล์",
-      fUrl: "URL",
-      promptUrl: "ใส่ลิงก์รูป วิดีโอ หรือสี:",
-      secMisc: "เบ็ดเตล็ด",
-      fixFeed: "แก้ปุ่มฟีดค้าง",
-      selTxt: "เลือกข้อความได้",
-      secName: "เปลี่ยนชื่อ",
-      skinSt: "ขโมยสกิน",
-      nameSt: "ขโมยชื่อ / สกิน",
-      custSw: "สลับชื่อ / สกินที่ตั้งเอง",
-      menuBind: "ปุ่มเปิดเมนู",
-      rst: "รีเซ็ต",
-      none: "ไม่มี",
-      rstAll: "รีเซ็ตเป็นค่าเริ่มต้น",
-      tut: "คู่มือและวิธีใช้",
-      secIf: "อินเทอร์เฟซ",
-      geo: "เอฟเฟกต์เรขาคณิต",
-      syncSz: "ปรับขนาดเนื้อหาตามเมนู",
-      pillTr: "ปุ่ม MULTIBOX โปร่งใส",
-      secCol: "สี",
-      mCol: "สีเมนู",
-      bCol: "ปุ่มและแถบเลื่อน",
-      secLang: "ภาษา",
-      lang: "ภาษา",
-      secCfg: "คอนฟิก",
-      cfgPh: "วาง JSON คอนฟิกที่นี่...",
-      cfgCopy: "คัดลอกคอนฟิก",
-      cfgApply: "ใช้คอนฟิก",
-      cfgCopied: "คัดลอกแล้ว!",
-      cfgApplied: "ใช้งานแล้ว!",
-      cfgInvalid: "JSON ไม่ถูกต้อง",
-      xhair: "เคอร์เซอร์เป้าเล็ง",
-      xhPlus: "บวก (+)",
-      xhCross: "กากบาท (×)",
-      curArr: "เส้นชี้เคอร์เซอร์",
-      mapGrid: "ตารางโซนแผนที่",
-      gridOver: "ทับแคนวาส",
-      gridBg: "พื้นหลัง",
-      updRec: "มีอัปเดตใหม่: v{n} (แนะนำ)",
-    },
-  };
-
-  const k2SoftTr = {
-    en: "Soft Colors",
-    ru: "Мягкие цвета",
-    uk: "М'які кольори",
-    es: "Colores suaves",
-    pt: "Cores suaves",
-    fr: "Couleurs douces",
-    de: "Weiche Farben",
-    it: "Colori tenui",
-    pl: "Miękkie kolory",
-    nl: "Zachte kleuren",
-    ro: "Culori moi",
-    tr: "Yumuşak Renkler",
-    ar: "ألوان ناعمة",
-    hi: "सॉफ्ट कलर्स",
-    zh: "柔和颜色",
-    ja: "ソフトカラー",
-    ko: "부드러운 색상",
-    id: "Warna Lembut",
-    vi: "Màu dịu mắt",
-    th: "สีซอฟต์",
-  };
-  for (const k in k2SoftTr) {
-    if (t3LangDict[k]) t3LangDict[k].softCol = k2SoftTr[k];
-  }
-
-  const k2RevMtdTr = {
-    en: "Method",
-    ru: "Метод",
-    uk: "Метод",
-    es: "Método",
-    pt: "Método",
-    fr: "Méthode",
-    de: "Methode",
-    it: "Metodo",
-    pl: "Metoda",
-    nl: "Methode",
-    ro: "Metodă",
-    tr: "Yöntem",
-    ar: "الطريقة",
-    hi: "तरीका",
-    zh: "方法",
-    ja: "方式",
-    ko: "방식",
-    id: "Metode",
-    vi: "Phương thức",
-    th: "วิธี",
-  };
-  for (const k in k2RevMtdTr) {
-    if (t3LangDict[k]) t3LangDict[k].revMtd = k2RevMtdTr[k];
-  }
-
-  const k2FfTr = {
-    en: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "Lock / Unlock",
-      ffAct: "Activate",
-      ffMan: "Manual",
-      ffAuto: "Auto",
-    },
-    ru: {
+      softCol: "Мягкие цвета",
+      revMtd: "Метод",
       secFf: "FAST-FEED",
       secSolo: "SOLO-TRICK",
       ffLock: "Лок / Анлок",
       ffAct: "Активация",
       ffMan: "Ручной",
       ffAuto: "Авто",
-    },
-    uk: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "Лок / Анлок",
-      ffAct: "Активація",
-      ffMan: "Ручний",
-      ffAuto: "Авто",
-    },
-    es: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "Bloquear / Soltar",
-      ffAct: "Activar",
-      ffMan: "Manual",
-      ffAuto: "Auto",
-    },
-    pt: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "Travar / Destravar",
-      ffAct: "Ativar",
-      ffMan: "Manual",
-      ffAuto: "Auto",
-    },
-    fr: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "Verrouiller / Libérer",
-      ffAct: "Activer",
-      ffMan: "Manuel",
-      ffAuto: "Auto",
-    },
-    de: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "Fixieren / Lösen",
-      ffAct: "Aktivieren",
-      ffMan: "Manuell",
-      ffAuto: "Auto",
-    },
-    it: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "Blocca / Sblocca",
-      ffAct: "Attiva",
-      ffMan: "Manuale",
-      ffAuto: "Auto",
-    },
-    pl: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "Zablokuj / Odblokuj",
-      ffAct: "Aktywuj",
-      ffMan: "Ręczny",
-      ffAuto: "Auto",
-    },
-    nl: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "Lock / Unlock",
-      ffAct: "Activeren",
-      ffMan: "Handmatig",
-      ffAuto: "Auto",
-    },
-    ro: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "Blochează / Debloc.",
-      ffAct: "Activează",
-      ffMan: "Manual",
-      ffAuto: "Auto",
-    },
-    tr: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "Kilitle / Aç",
-      ffAct: "Başlat",
-      ffMan: "Manuel",
-      ffAuto: "Oto",
-    },
-    ar: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "قفل / إلغاء القفل",
-      ffAct: "تفعيل",
-      ffMan: "يدوي",
-      ffAuto: "تلقائي",
-    },
-    hi: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "लॉक / अनलॉक",
-      ffAct: "सक्रिय करें",
-      ffMan: "मैनुअल",
-      ffAuto: "ऑटो",
-    },
-    zh: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "锁定 / 解锁",
-      ffAct: "触发",
-      ffMan: "手动",
-      ffAuto: "自动",
-    },
-    ja: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "固定 / 解除",
-      ffAct: "発動",
-      ffMan: "手動",
-      ffAuto: "自動",
-    },
-    ko: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "고정 / 해제",
-      ffAct: "실행",
-      ffMan: "수동",
-      ffAuto: "자동",
-    },
-    id: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "Kunci / Buka",
-      ffAct: "Aktifkan",
-      ffMan: "Manual",
-      ffAuto: "Otomatis",
-    },
-    vi: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "Khóa / Mở khóa",
-      ffAct: "Kích hoạt",
-      ffMan: "Thủ công",
-      ffAuto: "Tự động",
-    },
-    th: {
-      secFf: "FAST-FEED",
-      secSolo: "SOLO-TRICK",
-      ffLock: "ล็อก / ปลดล็อก",
-      ffAct: "เปิดใช้งาน",
-      ffMan: "กำหนดเอง",
-      ffAuto: "อัตโนมัติ",
+      secBypass: "ОБХОД ДАЛЬНОСТИ ОБЗОРА",
+      tipBypass:
+        'Сначала включите "Радар-карта", настройте его положение и размер как вам удобно, и после этого включите "Зафиксировать радар", чтобы он не мешал при геймплее. Если вы привыкли играть через два окна, придётся переучиться на внутренний мультибокс, потому что второе окно здесь занято обзором карты. При включении главного тогла автоматически открывается дополнительное окно, но если другая вкладка готы уже запущена, новое окно не откроется. После включения всё уже работает, так что во втором окне остаётся только зайти на тот же сервер и вручную зайти в наблюдатели, а дальше скрипт сделает всё сам.',
+      bpEnable: "Включить",
+      bpMethod: "Метод",
+      bpTtl: "Время жизни фантомов",
+      bpPhantoms: "Фантомы",
+      bpRadar: "Радар-карта",
+      bpRadReal: "Реальный",
+      bpRadFixed: "Фикс.",
+      bpLockRadar: "Зафиксировать радар",
+      splitsLbl: "Сплиты",
+      hmHold: "Фон: Держать",
+      hmDrop: "Фон: Сброс",
     },
   };
-  for (const k in k2FfTr) {
-    if (t3LangDict[k]) Object.assign(t3LangDict[k], k2FfTr[k]);
-  }
 
   if (typeof m9TvL2sP.lang !== "string" || !t3LangDict[m9TvL2sP.lang])
     m9TvL2sP.lang = "en";
@@ -2417,6 +1011,84 @@
   delete m9TvL2sP.outerBgSrc;
 
   let e7CfgBoxSync = null;
+  let b6BcSyncFn = null;
+  let b6RebuildFfFn = null;
+  let b6ApplyLangFn = null;
+  let b6ClearPalHistFn = null;
+  let b6NormCfgFn = null;
+  let b6BpWinEl = null;
+  const b6SyncKeys = [
+    "soloDelay",
+    "autoDelay",
+    "keyMenu",
+    "ffMethod",
+    "keyAuto",
+    "keyFfLock",
+    "keyFfActivate",
+    "extraFastFeeds",
+    "keyT2",
+    "keyT4",
+    "keyT8",
+    "keyT16",
+    "keyT32",
+    "keyT64",
+    "keyT128",
+    "keyT256",
+    "keyRevLock",
+    "keyRevUnlock",
+    "keyRevSplit1",
+    "keyRevSplit2",
+    "keyRevSplit3",
+    "keyRevSplit4",
+    "keyRevSplit5",
+    "keyRevSplit6",
+    "keyRevSplit7",
+    "keyRevSplit8",
+    "keyHoldSpam",
+    "holdSpamMode",
+    "revSplits",
+    "revMethod",
+    "skinStealer",
+    "nameStealer",
+    "customSwitcher",
+    "customNicks",
+    "frustumCulling",
+    "stripFilters",
+    "cullMarginToggle",
+    "cullMargin",
+    "renderScaleToggle",
+    "renderScale",
+    "mapBgEnabled",
+    "fixedBackgroundEnabled",
+    "mapBgSrc",
+    "fixedBgSrc",
+    "mapGridEnabled",
+    "mapGridMode",
+    "crosshairEnabled",
+    "crosshairStyle",
+    "cursorArrow",
+    "softColors",
+    "plexusEnabled",
+    "syncScale",
+    "pillTransparent",
+    "revNotify",
+    "revNotifyPos",
+    "selectableText",
+    "bypassEnabled",
+    "bypassMethod",
+    "bypassTtl",
+    "bypassPhantoms",
+    "bypassRadar",
+    "bypassRadarMode",
+    "bypassRadarLock",
+    "bypassMapX",
+    "bypassMapY",
+    "bypassMapSize",
+    "menuColor",
+    "buttonsColor",
+    "plexusColor",
+    "lang",
+  ];
 
   function e7BuildCfgJson() {
     const out = {};
@@ -2430,6 +1102,7 @@
       localStorage.setItem("gota_macro_overlay_v2", JSON.stringify(m9TvL2sP));
     } catch (e) {}
     if (e7CfgBoxSync) e7CfgBoxSync(false);
+    if (b6BcSyncFn) b6BcSyncFn();
   }
 
   function k2DbOp() {
@@ -2562,14 +1235,15 @@
       m9TvL2sP[enKey] = false;
       return;
     }
-    if (val === "idb:" + dbKey) {
+    const idbKey = "idb:" + dbKey;
+    if (val === idbKey || val.startsWith(idbKey + ":")) {
       k2DbGet(dbKey).then((rec) => {
-        if (rec && rec.file && m9TvL2sP[srcKey] === "idb:" + dbKey) {
+        if (rec && rec.file && m9TvL2sP[srcKey] === val) {
           setFn(
             URL.createObjectURL(rec.file) +
               (rec.isVid ? "#type=video" : "#type=image"),
           );
-        } else if (m9TvL2sP[srcKey] === "idb:" + dbKey) {
+        } else if (m9TvL2sP[srcKey] === val) {
           m9TvL2sP[srcKey] = null;
           m9TvL2sP[enKey] = false;
           x3QnK8wR();
@@ -2661,8 +1335,7 @@
       let hB=null;
       self.onmessage=e=>{
         const m=e.data;
-        if(m.type==='startHeartbeat'){ if(!hB) hB=setInterval(()=>self.postMessage({type:'pulse'}),m.interval||30); }
-        else if(m.type==='stopHeartbeat'){ if(hB){ clearInterval(hB); hB=null; } }
+        if(m.type==='startHeartbeat'&&!hB)hB=setInterval(()=>self.postMessage({type:'pulse'}),m.interval||30);
       };
     `,
         ],
@@ -2675,6 +1348,7 @@
     const m = e.data;
     if (m.type === "pulse") {
       if (
+        m9TvL2sP.holdSpamMode !== "release" &&
         !k4FeedLock &&
         hSt2xK9m &&
         (!document.hasFocus() || document.hidden)
@@ -2690,9 +1364,10 @@
           b5TxM1wP = false;
         }
       }
+      if (b6TickScan) b6TickScan();
     }
   };
-  g6VwN3tK.postMessage({ type: "startHeartbeat", interval: 30 });
+  g6VwN3tK.postMessage({ type: "startHeartbeat", interval: 20 });
 
   const f2QpL8xN = new Worker(
     URL.createObjectURL(
@@ -2839,6 +1514,7 @@
   const v4SelfOids = new Set();
   const v4SeenBuf = new WeakSet();
   let v4MyOid = 0;
+  let v4ActOid = 0;
   let v4OwnSeen = false;
   const nFfMinMassPct = 15;
   const nFfSurgeMs = 805;
@@ -2851,6 +1527,103 @@
   let v4FfRadMul = 1;
   const v4FfVis = { active: false, cx: 0, cy: 0, r: 0, alpha: 0, pop: 1.0 };
   let v4InU8 = false;
+  let v4ProtoOk = false;
+  let v4U8ProxyRef = null;
+  const b6ModeList = ["smart", "nearme", "cursor", "biggest", "lb"];
+  const b6ScanIntMs = 520;
+  const b6BpSt = {
+    scanning: false,
+    inMatch: false,
+    specEntered: false,
+    wasAlive: false,
+    bounds: [-9000, -9000, 9000, 9000],
+    camX: 0,
+    camY: 0,
+    camZoom: 0.1,
+    camAt: 0,
+    liveAoi: null,
+    safeAoi: null,
+    mainAoi: null,
+    mainSelf: null,
+    mainCursor: null,
+    lb: [],
+    curSpecNick: "",
+    curSpecOid: 0,
+    got46At: 0,
+    got02After46: false,
+    hopFlushSent: false,
+    lastAggAt: 0,
+    bestSpecOid: 0,
+    bestSpecNick: "",
+    bestSpecArea: 0,
+    bestSpecAt: 0,
+    bestSpecAoi: null,
+    curHoldMs: 0,
+    aoiHalfW: 700,
+    aoiHalfH: 450,
+    safeHalfW: 700,
+    safeHalfH: 450,
+    avgSpecHW: 2600,
+    avgSpecHH: 2600,
+    menuHid: false,
+    menuChkAt: 0,
+    rcCache: null,
+    rcChkAt: 0,
+    lastPruneAt: 0,
+    lastRxAt: 0,
+    bcAt: 0,
+    mainBcAt: 0,
+    lastOvAt: 0,
+    lastRdAt: 0,
+    bcPending: false,
+    phase: "idle",
+    phaseUntil: 0,
+    sentAt: 0,
+    lastClickAt: 0,
+    landedAt: 0,
+    holdUntil: 0,
+    needPeek: false,
+    wasPeek: false,
+    nextIsPeek: false,
+    returnToBest: false,
+    pendKind: "lb",
+    pendCid: 0,
+    pendOid: 0,
+    pendNick: "",
+    rrIdx: 0,
+    cvsMiss: 0,
+    cancelTm: null,
+    curRole: "menu",
+    menuHidAt: 0,
+    lastPlayAt: 0,
+    lastPingAt: 0,
+    enableGraceUntil: m9TvL2sP.bypassEnabled ? performance.now() + 5000 : 0,
+  };
+
+  const b6Plrs = new Map();
+  const b6DelTs = new Map();
+  const b6SeenOid = new Map();
+  const b6OidAgg = new Map();
+  const b6OidAoi = new Map();
+  const b6SpecOid = new Map();
+  const b6SpecNick = new Map();
+  const b6BadOid = new Map();
+  const b6Claims = new Map();
+  const b6GridTs = new Float64Array(36);
+  const b6NearTs = new Float64Array(8);
+  const b6SentPlr = new Map();
+  const b6Phantoms = new Map();
+  const b6RemPlrs = new Map();
+  const b6LblCache = new Map();
+  let b6BpOvCv = null;
+  let b6BpOvCtx = null;
+  let b6BpRdCv = null;
+  let b6BpRdCtx = null;
+  let b6BpMapWin = null;
+  let b6BpOvDirty = false;
+  let b6TickScan = null;
+  let b6FitMapWin = null;
+  let b6SyncRadarLock = null;
 
   (function q7BrdInit() {
     const hsh =
@@ -2955,12 +1728,16 @@
   })();
 
   function q9ReadSelfOid() {
+    if (b6BpSt.specEntered) return 0;
     const el = document.getElementById("playerId");
-    if (!el) return 0;
-    const id = parseInt((el.textContent || "").trim(), 10);
+    const id = el ? parseInt((el.textContent || "").trim(), 10) : 0;
     if (Number.isSafeInteger(id) && id > 0) {
       v4SelfOids.add(id);
       return id;
+    }
+    if (v4ActOid > 0) {
+      v4SelfOids.add(v4ActOid);
+      return v4ActOid;
     }
     return 0;
   }
@@ -2975,8 +1752,14 @@
   }
 
   function k2WsDead() {
+    if (b6BpSt.specEntered) return true;
     const mp = document.getElementById("main-panel");
     if (mp && window.getComputedStyle(mp).display !== "none") return true;
+    let own = 0;
+    if (v4SelfOids.size > 0) {
+      for (const oid of v4SelfOids) own += q9CntParts(oid);
+    }
+    if (own > 0) return false;
     const sp =
       s8XnL3wP && document.contains(s8XnL3wP)
         ? s8XnL3wP
@@ -2992,11 +1775,7 @@
         if (val <= 0 || isNaN(val)) return true;
       }
     }
-    if (v4OwnSeen && v4SelfOids.size > 0) {
-      let own = 0;
-      for (const oid of v4SelfOids) own += q9CntParts(oid);
-      if (own === 0) return true;
-    }
+    if (v4OwnSeen && v4SelfOids.size > 0) return true;
     return false;
   }
 
@@ -3014,6 +1793,17 @@
       if (p + 1 > len) return -1;
       if (vw.getUint8(p++) === 0) return p;
     }
+  }
+
+  function b6RdU16Str(vw, p, len, eofOk) {
+    let s = "";
+    while (p + 2 <= len) {
+      const ch = vw.getUint16(p, true);
+      p += 2;
+      if (ch === 0) return { s, p };
+      s += String.fromCharCode(ch);
+    }
+    return eofOk && s.length > 0 ? { s, p } : null;
   }
 
   function p9WsWorld(u8, vw, len) {
@@ -3038,15 +1828,18 @@
       p += 2;
     }
 
+    const newPlrs = [];
     while (true) {
       if (p + 2 > len) return false;
       const oid = vw.getUint16(p, true);
       p += 2;
       if (oid === 0) break;
       if (p + 3 > len) return false;
+      const rgb = [vw.getUint8(p), vw.getUint8(p + 1), vw.getUint8(p + 2)];
       p += 3;
-      p = q9SkU16(vw, p, len);
-      if (p < 0) return false;
+      const nm = b6RdU16Str(vw, p, len);
+      if (!nm) return false;
+      p = nm.p;
       p = q9SkU8(vw, p, len);
       if (p < 0 || p + 1 > len) return false;
       const pEx = vw.getUint8(p++);
@@ -3056,8 +1849,17 @@
       } else if (pEx !== 0x00) {
         return false;
       }
+      newPlrs.push({ oid, name: nm.s, rgb });
     }
 
+    let pMinX = Infinity,
+      pMinY = Infinity,
+      pMaxX = -Infinity,
+      pMaxY = -Infinity;
+    let fMinX = Infinity,
+      fMinY = Infinity,
+      fMaxX = -Infinity,
+      fMaxY = -Infinity;
     const adds = [];
     while (true) {
       if (p + 1 > len) return false;
@@ -3070,6 +1872,16 @@
           p += 2;
           if (cid === 0) break;
           if (p + 4 > len) return false;
+          const px = vw.getInt16(p, true),
+            py = vw.getInt16(p + 2, true);
+          if (px < pMinX) pMinX = px;
+          if (px > pMaxX) pMaxX = px;
+          if (py < pMinY) pMinY = py;
+          if (py > pMaxY) pMaxY = py;
+          if (px < fMinX) fMinX = px;
+          if (px > fMaxX) fMaxX = px;
+          if (py < fMinY) fMinY = py;
+          if (py > fMaxY) fMaxY = py;
           p += 4;
         }
       } else if (tag === 1) {
@@ -3096,14 +1908,14 @@
           p += 2;
           if (cid === 0) break;
           if (p + 6 > len) return false;
-          adds.push({
-            cid,
-            tag,
-            oid: 0,
-            x: vw.getInt16(p, true),
-            y: vw.getInt16(p + 2, true),
-            r: vw.getUint16(p + 4, true),
-          });
+          const px = vw.getInt16(p, true),
+            py = vw.getInt16(p + 2, true),
+            pr = vw.getUint16(p + 4, true);
+          if (px < pMinX) pMinX = px;
+          if (px > pMaxX) pMaxX = px;
+          if (py < pMinY) pMinY = py;
+          if (py > pMaxY) pMaxY = py;
+          adds.push({ cid, tag, oid: 0, x: px, y: py, r: pr });
           p += 6;
         }
       } else if (tag === 2) {
@@ -3118,14 +1930,14 @@
             p += 2;
             if (cid === 0) break;
             if (p + 6 > len) return false;
-            adds.push({
-              cid,
-              tag: 2,
-              oid,
-              x: vw.getInt16(p, true),
-              y: vw.getInt16(p + 2, true),
-              r: vw.getUint16(p + 4, true),
-            });
+            const px = vw.getInt16(p, true),
+              py = vw.getInt16(p + 2, true),
+              pr = vw.getUint16(p + 4, true);
+            if (px < pMinX) pMinX = px;
+            if (px > pMaxX) pMaxX = px;
+            if (py < pMinY) pMinY = py;
+            if (py > pMaxY) pMaxY = py;
+            adds.push({ cid, tag: 2, oid, x: px, y: py, r: pr });
             p += 6;
           }
         }
@@ -3146,22 +1958,42 @@
           p += 2;
           if (cid === 0) break;
           if (p + 6 > len) return false;
-          upds.push({
-            cid,
-            tag: uTag,
-            x: vw.getInt16(p, true),
-            y: vw.getInt16(p + 2, true),
-            r: vw.getUint16(p + 4, true),
-          });
+          const px = vw.getInt16(p, true),
+            py = vw.getInt16(p + 2, true),
+            pr = vw.getUint16(p + 4, true);
+          if (px < pMinX) pMinX = px;
+          if (px > pMaxX) pMaxX = px;
+          if (py < pMinY) pMinY = py;
+          if (py > pMaxY) pMaxY = py;
+          upds.push({ cid, tag: uTag, x: px, y: py, r: pr });
           p += 6;
         }
-      } else if (uTag === 1 || uTag === 6) {
+      } else if (uTag === 1) {
         while (true) {
           if (p + 2 > len) return false;
           const cid = vw.getUint16(p, true);
           p += 2;
           if (cid === 0) break;
           if (p + 4 > len) return false;
+          p += 4;
+        }
+      } else if (uTag === 6) {
+        while (true) {
+          if (p + 2 > len) return false;
+          const cid = vw.getUint16(p, true);
+          p += 2;
+          if (cid === 0) break;
+          if (p + 4 > len) return false;
+          const px = vw.getInt16(p, true),
+            py = vw.getInt16(p + 2, true);
+          if (px < pMinX) pMinX = px;
+          if (px > pMaxX) pMaxX = px;
+          if (py < pMinY) pMinY = py;
+          if (py > pMaxY) pMaxY = py;
+          if (px < fMinX) fMinX = px;
+          if (px > fMaxX) fMaxX = px;
+          if (py < fMinY) fMinY = py;
+          if (py > fMaxY) fMaxY = py;
           p += 4;
         }
       } else {
@@ -3268,10 +2100,70 @@
       }
     }
 
-    for (let i = 0; i < dels.length; i++) v4WsCells.delete(dels[i]);
+    const nw02 = performance.now();
+    const nowWall = Date.now();
+    for (let i = 0; i < newPlrs.length; i++) {
+      const pl = newPlrs[i];
+      b6Plrs.set(pl.oid, { oid: pl.oid, name: pl.name, rgb: pl.rgb, at: nw02 });
+      b6SentPlr.delete(pl.oid);
+    }
+    const locBox = b6SafeBox();
+    const hasLocBox = Boolean(
+      locBox &&
+      locBox.maxX - locBox.minX > 900 &&
+      locBox.maxY - locBox.minY > 900,
+    );
+    const keepLocPh =
+      !b6BpSt.scanning &&
+      !b6BpSt.specEntered &&
+      (m9TvL2sP.bypassPhantoms || m9TvL2sP.bypassRadar) &&
+      hasLocBox &&
+      b6IsMenuHidden() &&
+      (adds.length > 0 ||
+        dels.length + remPlrs.length < Math.max(4, v4WsCells.size));
+    const pushLocPh = (c) => {
+      if (
+        !keepLocPh ||
+        !c ||
+        v4SelfOids.has(c.oid) ||
+        !(c.tag === 3 || c.tag === 4 || (c.tag === 2 && c.r >= 10)) ||
+        b6InBox(c.x, c.y, locBox, 180)
+      )
+        return;
+      b6BpSt.lastRxAt = nw02;
+      b6Phantoms.set(c.cid, {
+        cid: c.cid,
+        tag: c.tag,
+        oid: c.oid,
+        dx: c.x,
+        dy: c.y,
+        dr: c.r,
+        tx: c.x,
+        ty: c.y,
+        tr: c.r,
+        vx: c.vx || 0,
+        vy: c.vy || 0,
+        vInit: Boolean(c.vx || c.vy),
+        ts: nowWall,
+        rxAt: nw02,
+      });
+    };
+    for (let i = 0; i < dels.length; i++) {
+      const cid = dels[i];
+      const dc = v4WsCells.get(cid);
+      if (dc) {
+        pushLocPh(dc);
+        v4WsCells.delete(cid);
+      }
+      b6DelTs.set(cid, nowWall);
+    }
     if (remSet.size > 0) {
       for (const [cid, c] of v4WsCells) {
-        if (c.tag === 2 && remSet.has(c.oid)) v4WsCells.delete(cid);
+        if (c.tag === 2 && remSet.has(c.oid)) {
+          pushLocPh(c);
+          v4WsCells.delete(cid);
+          b6DelTs.set(cid, nowWall);
+        }
       }
     }
     let gotFfSplit = false;
@@ -3287,15 +2179,31 @@
         v4FfAuto.splitConfirmed = true;
         gotFfSplit = true;
       }
+      a.vx = 0;
+      a.vy = 0;
+      a.at = nw02;
       v4WsCells.set(a.cid, a);
+      b6Phantoms.delete(a.cid);
+      if (a.tag === 2 && a.oid) b6SeenOid.set(a.oid, nw02);
     }
     for (let i = 0; i < upds.length; i++) {
       const u = upds[i];
       const ex = v4WsCells.get(u.cid);
       if (ex) {
+        const dtS = ex.at ? (nw02 - ex.at) * 0.001 : 0;
+        if (dtS >= 0.015 && dtS <= 0.6) {
+          const nvx = (u.x - ex.x) / dtS;
+          const nvy = (u.y - ex.y) / dtS;
+          if (Math.hypot(nvx, nvy) < 4200) {
+            ex.vx = ex.at ? (ex.vx || 0) * 0.45 + nvx * 0.55 : nvx;
+            ex.vy = ex.at ? (ex.vy || 0) * 0.45 + nvy * 0.55 : nvy;
+          }
+        }
+        ex.at = nw02;
         ex.x = u.x;
         ex.y = u.y;
         ex.r = u.r;
+        if (ex.tag === 2 && ex.oid) b6SeenOid.set(ex.oid, nw02);
       }
     }
 
@@ -3326,7 +2234,26 @@
     }
 
     const sOid = q9ReadSelfOid() || v4MyOid;
-    if (sOid && q9CntParts(sOid) > 0) v4OwnSeen = true;
+    if (sOid && q9CntParts(sOid) > 0) {
+      v4OwnSeen = true;
+      if (!b6BpSt.specEntered) b6BpSt.wasAlive = true;
+    }
+
+    b6OnWorldTick(
+      adds.length,
+      dels.length,
+      remPlrs.length,
+      pMinX,
+      pMinY,
+      pMaxX,
+      pMaxY,
+      fMinX,
+      fMinY,
+      fMaxX,
+      fMaxY,
+      nw02,
+      nowWall,
+    );
 
     if (!triggered && m9TvL2sP.revMethod === "ws" && v4WsLock) {
       if (
@@ -3339,11 +2266,7 @@
     }
 
     if (v4FfLock) {
-      if (
-        k2WsDead() ||
-        (v4FfLock.ownerId && remSet.has(v4FfLock.ownerId)) ||
-        !v4WsCells.has(v4FfLock.cellId)
-      ) {
+      if (k2WsDead() || !v4WsCells.has(v4FfLock.cellId)) {
         k4FfCancel(true);
       }
     }
@@ -3386,13 +2309,11 @@
   function p9WsPkt(u8, keyObj = null) {
     if (!u8 || u8.length === 0) return false;
     const k = keyObj || u8.buffer;
-    if (k && typeof k === "object") {
-      if (v4SeenBuf.has(k)) return true;
-      v4SeenBuf.add(k);
-    }
+    if (k && typeof k === "object" && v4SeenBuf.has(k)) return true;
     const len = u8.length;
     const vw = new DataView(u8.buffer, u8.byteOffset, len);
     const op = vw.getUint8(0);
+    let ok = false;
 
     if (op === 0xf0) {
       if (len < 3) return false;
@@ -3406,22 +2327,50 @@
         p9WsPkt(u8.subarray(p, p + sLen), {});
         p += sLen;
       }
-      return true;
-    }
-    if (op === 0x02) return p9WsWorld(u8, vw, len);
-    if (op === 0x40 && len === 16) {
+      ok = true;
+    } else if (op === 0x02) {
+      ok = p9WsWorld(u8, vw, len);
+    } else if ((op === 0x0a || op === 0xd2) && len >= 13) {
+      b6BpSt.inMatch = true;
+      b6BpSt.camX = vw.getFloat32(1, true);
+      b6BpSt.camY = vw.getFloat32(5, true);
+      b6BpSt.camZoom = vw.getFloat32(9, true);
+      b6BpSt.camAt = performance.now();
+      if (op === 0xd2 && len >= 16) {
+        const act = vw.getUint8(13);
+        const actOid = vw.getUint16(14, true);
+        if (act !== 0 && actOid > 0 && !b6BpSt.specEntered) {
+          v4ActOid = actOid;
+          v4SelfOids.add(actOid);
+        } else if (act === 0) {
+          v4ActOid = 0;
+        }
+      }
+      ok = true;
+    } else if (op === 0x40 && len >= 16) {
       v4MyOid = vw.getUint16(1, true);
+      v4ActOid = 0;
       v4SelfOids.clear();
       if (v4MyOid) v4SelfOids.add(v4MyOid);
       v4OwnSeen = false;
       v4WsCells.clear();
       v4PtyOids.clear();
+      m9MbSt.box1Id = v4MyOid ? String(v4MyOid) : "";
+      m9MbSt.box2Id = "";
+      m9MbSt.activeId = "";
+      m9MbSt.activeBox = 0;
+      m9MbSt.matchGen++;
       if (m9TvL2sP.revMethod === "ws") q2WnS7xM(false);
       else v4WsLock = null;
       k4FfCancel(false);
-      return true;
-    }
-    if (op === 0x29 && len >= 3) {
+      b6ResetWorld(true, [
+        vw.getInt16(4, true),
+        vw.getInt16(6, true),
+        vw.getInt16(8, true),
+        vw.getInt16(10, true),
+      ]);
+      ok = true;
+    } else if (op === 0x29 && len >= 3) {
       const cnt = vw.getUint16(1, true);
       let p = 3;
       v4PtyOids.clear();
@@ -3434,15 +2383,85 @@
         if (p < 0) break;
         v4PtyOids.add(oid);
       }
-      return true;
+      ok = true;
+    } else if (op === 0x31 && len >= 5) {
+      const cnt = vw.getUint32(1, true);
+      if (cnt <= 50) {
+        let p = 5;
+        const arr = [];
+        for (let i = 0; i < cnt; i++) {
+          if (p + 2 > len) return false;
+          const oid = vw.getUint16(p, true);
+          p += 2;
+          const nm = b6RdU16Str(vw, p, len);
+          if (!nm) return false;
+          p = nm.p;
+          arr.push({ oid, nick: nm.s });
+        }
+        if (p === len) {
+          b6BpSt.lb = arr;
+          if (arr.length > 0) b6BpSt.inMatch = true;
+          if (arr.length === 0) {
+            b6ResetWorld(false);
+            if (b6BpSt.scanning) {
+              try {
+                q5RzL9wK.postMessage({
+                  type: "BYPASS_WORLD_RESET",
+                  senderId: v8WpM2tL,
+                });
+              } catch (_) {}
+            }
+          }
+        }
+      }
+      ok = true;
+    } else if (op === 0x46 && len >= 3) {
+      const nm = b6RdU16Str(vw, 1, len, true);
+      if (nm && nm.s.startsWith("Spectating: ")) {
+        const nick = nm.s.slice(12).trim();
+        b6BpSt.curSpecNick = nick;
+        const match = b6BpSt.lb.find((x) => x.nick === nick);
+        let oid = match ? match.oid : 0;
+        if (!oid) {
+          for (const pl of b6Plrs.values()) {
+            if (pl.name === nick) {
+              oid = pl.oid;
+              break;
+            }
+          }
+        }
+        b6BpSt.curSpecOid = oid;
+        b6BpSt.got46At = performance.now();
+        b6BpSt.got02After46 = false;
+        b6BpSt.liveAoi = null;
+        let ownLive = false;
+        for (const sid of v4SelfOids) {
+          if (q9CntParts(sid) > 0) {
+            ownLive = true;
+            break;
+          }
+        }
+        if (
+          !b6BpSt.wasAlive ||
+          (b6IsMenuHidden() && !ownLive && !b6HasLiveMassHud())
+        ) {
+          b6BpSt.specEntered = true;
+          b6BpSt.wasAlive = false;
+          v4ActOid = 0;
+          v4SelfOids.clear();
+          if (v4MyOid) v4SelfOids.add(v4MyOid);
+        }
+      }
+      ok = true;
     }
-    return false;
+    if (ok && k && typeof k === "object") v4SeenBuf.add(k);
+    return ok;
   }
 
-  window.Uint8Array = new Proxy(v4OrigU8, {
+  v4U8ProxyRef = new Proxy(v4OrigU8, {
     construct(t, a, nt) {
       const inst = Reflect.construct(t, a, nt === window.Uint8Array ? t : nt);
-      if (!v4InU8) {
+      if (!v4ProtoOk && !v4InU8) {
         v4InU8 = true;
         try {
           const b0 = a[0];
@@ -3457,7 +2476,16 @@
             const len = inst.length;
             if (len > 0 && len < 524288) {
               const op = inst[0];
-              if (op === 0x02 || op === 0x40 || op === 0xf0 || op === 0x29) {
+              if (
+                op === 0x02 ||
+                op === 0x40 ||
+                op === 0xf0 ||
+                op === 0x29 ||
+                op === 0x0a ||
+                op === 0xd2 ||
+                op === 0x31 ||
+                op === 0x46
+              ) {
                 p9WsPkt(inst, b0);
               }
             }
@@ -3470,14 +2498,25 @@
       return inst;
     },
   });
+  window.Uint8Array = v4U8ProxyRef;
 
   window.gotaClientProtocol = Object.freeze({
     observeIncoming(buf) {
       if (!buf) return false;
-      const u8 = ArrayBuffer.isView(buf)
+      if (!v4ProtoOk) {
+        v4ProtoOk = true;
+        if (window.Uint8Array === v4U8ProxyRef) window.Uint8Array = v4OrigU8;
+      }
+      const isVw = ArrayBuffer.isView(buf);
+      const u8 = isVw
         ? new v4OrigU8(buf.buffer, buf.byteOffset, buf.byteLength)
         : new v4OrigU8(buf);
-      return p9WsPkt(u8, ArrayBuffer.isView(buf) ? buf.buffer : buf);
+      const kObj = isVw
+        ? buf.byteOffset === 0 && buf.byteLength === buf.buffer.byteLength
+          ? buf.buffer
+          : buf
+        : buf;
+      return p9WsPkt(u8, kObj);
     },
   });
 
@@ -3508,6 +2547,2369 @@
       return true;
     },
   });
+
+  function b6ModeLabel(m) {
+    if (m === "nearme") return "Near Me";
+    if (m === "cursor") return "Cursor";
+    if (m === "biggest") return "Biggest";
+    if (m === "lb") return "Leaderboard";
+    return "Smart";
+  }
+
+  function b6IsMenuHidden() {
+    const nw = performance.now();
+    if (nw - b6BpSt.menuChkAt < 180) return b6BpSt.menuHid;
+    b6BpSt.menuChkAt = nw;
+    const mp =
+      document.getElementById("main-panel") ||
+      document.getElementById("login-panel");
+    if (!mp) {
+      b6BpSt.menuHid = b6BpSt.inMatch;
+      return b6BpSt.menuHid;
+    }
+    const cs = window.getComputedStyle(mp);
+    b6BpSt.menuHid =
+      cs.display === "none" ||
+      cs.visibility === "hidden" ||
+      parseFloat(cs.opacity) <= 0.02 ||
+      mp.getClientRects().length === 0;
+    return b6BpSt.menuHid;
+  }
+
+  function b6HasLiveMassHud() {
+    const sp =
+      s8XnL3wP && document.contains(s8XnL3wP)
+        ? s8XnL3wP
+        : (s8XnL3wP =
+            document.getElementById("score-panel") ||
+            document.getElementById("stats") ||
+            document.querySelector('[id*="score"]') ||
+            document.querySelector(".main-bottom-stats"));
+    if (!sp) return false;
+    const cs = window.getComputedStyle(sp);
+    if (
+      cs.display === "none" ||
+      cs.visibility === "hidden" ||
+      sp.getClientRects().length === 0
+    ) {
+      return false;
+    }
+    const m = (sp.textContent || "").match(/Mass\s*:\s*([0-9\s,]+)/i);
+    if (!m) return false;
+    const val = parseInt(m[1].replace(/[\s,]/g, ""), 10);
+    return Number.isFinite(val) && val > 0;
+  }
+
+  function b6UpdateRole(nw) {
+    const hid = b6IsMenuHidden();
+    let nxt = "menu";
+    if (!hid) {
+      b6BpSt.menuHidAt = 0;
+      nxt = "menu";
+    } else {
+      if (!b6BpSt.menuHidAt) b6BpSt.menuHidAt = nw;
+      let ownLive = false;
+      for (const sid of v4SelfOids) {
+        if (q9CntParts(sid) > 0) {
+          ownLive = true;
+          break;
+        }
+      }
+      const hudLive = !b6BpSt.specEntered && b6HasLiveMassHud();
+      if (ownLive || hudLive || nw - b6BpSt.lastPlayAt < 1800) {
+        b6BpSt.wasAlive = true;
+        b6BpSt.specEntered = false;
+        nxt = "play";
+      } else if (
+        b6BpSt.specEntered ||
+        (!b6BpSt.wasAlive &&
+          nw - b6BpSt.menuHidAt >= 350 &&
+          nw - b6BpSt.lastPlayAt > 2500)
+      ) {
+        if (!b6BpSt.specEntered) {
+          b6BpSt.specEntered = true;
+          v4SelfOids.clear();
+          if (v4MyOid) v4SelfOids.add(v4MyOid);
+        }
+        nxt = "spec";
+      } else {
+        nxt = b6BpSt.wasAlive ? "play" : "menu";
+      }
+    }
+    if (b6BpSt.curRole !== nxt) {
+      b6BpSt.curRole = nxt;
+      v5PingPeers();
+    }
+    return nxt;
+  }
+
+  function b6CheckPeerAlive(nw) {
+    if (!m9TvL2sP.bypassEnabled) return;
+    if (nw < b6BpSt.enableGraceUntil) return;
+    if (!h4HasPeerTab()) {
+      m9TvL2sP.bypassEnabled = false;
+      b6BpSt.enableGraceUntil = 0;
+      b6ScanStop();
+      if (!m9TvL2sP.bypassPhantoms && !m9TvL2sP.bypassRadar)
+        b6ResetWorld(false);
+      x3QnK8wR();
+      if (document.getElementById("macro-window")) r8QnM4tL();
+    }
+  }
+
+  function b6GetCamCtr() {
+    const scn = v4WsScene;
+    const wt = scn && scn.camera && scn.camera.worldTransform;
+    if (wt && performance.now() - scn.at < 500) {
+      const det = wt.a * wt.d - wt.b * wt.c;
+      if (Math.abs(det) > 1e-8) {
+        return {
+          x:
+            (wt.d * (scn.screenWidth * 0.5 - wt.tx) -
+              wt.c * (scn.screenHeight * 0.5 - wt.ty)) /
+            det,
+          y:
+            (-wt.b * (scn.screenWidth * 0.5 - wt.tx) +
+              wt.a * (scn.screenHeight * 0.5 - wt.ty)) /
+            det,
+        };
+      }
+    }
+    return b6BpSt.camAt > 0 ? { x: b6BpSt.camX, y: b6BpSt.camY } : null;
+  }
+
+  function b6InBox(x, y, box, pad = 0) {
+    return Boolean(
+      box &&
+      x >= box.minX + pad &&
+      x <= box.maxX - pad &&
+      y >= box.minY + pad &&
+      y <= box.maxY - pad,
+    );
+  }
+
+  function b6InMainAoi(x, y, pad = 0) {
+    const m = b6BpSt.mainAoi;
+    return Boolean(
+      m && performance.now() - m.at <= 2200 && b6InBox(x, y, m, pad),
+    );
+  }
+
+  function b6LiveBox() {
+    const cam = b6GetCamCtr();
+    if (!cam) return b6BpSt.liveAoi;
+    const x0 = cam.x - b6BpSt.aoiHalfW,
+      y0 = cam.y - b6BpSt.aoiHalfH;
+    const x1 = cam.x + b6BpSt.aoiHalfW,
+      y1 = cam.y + b6BpSt.aoiHalfH;
+    const a = b6BpSt.liveAoi;
+    if (a && a.maxX > a.minX) {
+      return {
+        minX: Math.min(x0, a.minX),
+        minY: Math.min(y0, a.minY),
+        maxX: Math.max(x1, a.maxX),
+        maxY: Math.max(y1, a.maxY),
+      };
+    }
+    return { minX: x0, minY: y0, maxX: x1, maxY: y1 };
+  }
+
+  function b6SafeBox() {
+    const cam = b6GetCamCtr();
+    if (!cam) return b6BpSt.safeAoi;
+    const b = b6BpSt.bounds;
+    const hw = Math.max(550, b6BpSt.safeHalfW || 550);
+    const hh = Math.max(380, b6BpSt.safeHalfH || 380);
+    let minX = cam.x - hw,
+      maxX = cam.x + hw;
+    let minY = cam.y - hh,
+      maxY = cam.y + hh;
+    if (minX <= b[0] + 220) minX = b[0] - 500;
+    if (maxX >= b[2] - 220) maxX = b[2] + 500;
+    if (minY <= b[1] + 220) minY = b[1] - 500;
+    if (maxY >= b[3] - 220) maxY = b[3] + 500;
+    return { minX, minY, maxX, maxY };
+  }
+
+  function b6OverlapArea(ax0, ay0, ax1, ay1, bx0, by0, bx1, by1) {
+    const ox = Math.min(ax1, bx1) - Math.max(ax0, bx0);
+    if (ox <= 0) return 0;
+    const oy = Math.min(ay1, by1) - Math.max(ay0, by0);
+    return oy > 0 ? ox * oy : 0;
+  }
+
+  function b6NearSlots() {
+    const m = b6BpSt.mainAoi;
+    if (!m || performance.now() - m.at > 3500) return [];
+    const b = b6BpSt.bounds;
+    const cx = (m.minX + m.maxX) * 0.5;
+    const cy = (m.minY + m.maxY) * 0.5;
+    const hw = Math.max(1800, Math.min(6000, b6BpSt.avgSpecHW || 2600));
+    const hh = Math.max(1800, Math.min(6000, b6BpSt.avgSpecHH || 2600));
+    const seam = 180;
+    const raw = [
+      [cx, m.minY - hh + seam],
+      [m.maxX + hw - seam, m.minY - hh + seam],
+      [m.maxX + hw - seam, cy],
+      [m.maxX + hw - seam, m.maxY + hh - seam],
+      [cx, m.maxY + hh - seam],
+      [m.minX - hw + seam, m.maxY + hh - seam],
+      [m.minX - hw + seam, cy],
+      [m.minX - hw + seam, m.minY - hh + seam],
+    ];
+    return raw.map(([sx, sy]) =>
+      sx < b[0] - hw * 0.35 ||
+      sx > b[2] + hw * 0.35 ||
+      sy < b[1] - hh * 0.35 ||
+      sy > b[3] + hh * 0.35
+        ? null
+        : [
+            Math.max(b[0] + 400, Math.min(b[2] - 400, sx)),
+            Math.max(b[1] + 400, Math.min(b[3] - 400, sy)),
+          ],
+    );
+  }
+
+  function b6MarkCov(aoi, nw) {
+    if (!aoi || aoi.maxX <= aoi.minX || aoi.maxY <= aoi.minY) return;
+    const b = b6BpSt.bounds;
+    const sw = Math.max(500, (b[2] - b[0]) / 6);
+    const sh = Math.max(500, (b[3] - b[1]) / 6);
+    for (let gy = 0; gy < 6; gy++) {
+      const cy = b[1] + (gy + 0.5) * sh;
+      if (cy < aoi.minY || cy > aoi.maxY) continue;
+      for (let gx = 0; gx < 6; gx++) {
+        const cx = b[0] + (gx + 0.5) * sw;
+        if (cx >= aoi.minX && cx <= aoi.maxX) b6GridTs[gy * 6 + gx] = nw;
+      }
+    }
+    const slots = b6NearSlots();
+    for (let i = 0; i < slots.length; i++) {
+      const s = slots[i];
+      if (
+        s &&
+        s[0] >= aoi.minX + 120 &&
+        s[0] <= aoi.maxX - 120 &&
+        s[1] >= aoi.minY + 120 &&
+        s[1] <= aoi.maxY - 120
+      ) {
+        b6NearTs[i] = nw;
+      }
+    }
+  }
+
+  function b6CountGain(aoi, nw) {
+    if (!aoi || aoi.maxX <= aoi.minX || aoi.maxY <= aoi.minY) return 0;
+    const b = b6BpSt.bounds;
+    const sw = Math.max(500, (b[2] - b[0]) / 6);
+    const sh = Math.max(500, (b[3] - b[1]) / 6);
+    let gain = 0;
+    for (let gy = 0; gy < 6; gy++) {
+      const cy = b[1] + (gy + 0.5) * sh;
+      if (cy < aoi.minY || cy > aoi.maxY) continue;
+      for (let gx = 0; gx < 6; gx++) {
+        const cx = b[0] + (gx + 0.5) * sw;
+        if (cx < aoi.minX || cx > aoi.maxX || b6InMainAoi(cx, cy)) continue;
+        const age = nw - b6GridTs[gy * 6 + gx];
+        if (age > 1100) gain += Math.min(10000, age);
+      }
+    }
+    return gain;
+  }
+
+  function b6BlindPt(nw) {
+    const b = b6BpSt.bounds;
+    const sw = Math.max(500, (b[2] - b[0]) / 6);
+    const sh = Math.max(500, (b[3] - b[1]) / 6);
+    let bestAge = -1,
+      bx = 0,
+      by = 0,
+      found = false;
+    for (let gy = 0; gy < 6; gy++) {
+      const cy = b[1] + (gy + 0.5) * sh;
+      for (let gx = 0; gx < 6; gx++) {
+        const cx = b[0] + (gx + 0.5) * sw;
+        if (b6InMainAoi(cx, cy)) continue;
+        const age = nw - b6GridTs[gy * 6 + gx];
+        if (age > bestAge) {
+          bestAge = age;
+          bx = cx;
+          by = cy;
+          found = true;
+        }
+      }
+    }
+    return found ? { x: bx, y: by, age: bestAge } : null;
+  }
+
+  function b6ScoreNear(cx, cy, oid, rHint, nw, m, slots) {
+    const b = b6BpSt.bounds;
+    const stats = oid ? b6OidAoi.get(oid) : null;
+    let hw = b6BpSt.avgSpecHW || 2600;
+    let hh = b6BpSt.avgSpecHH || 2600;
+    if (stats && nw - stats.at < 20000) {
+      hw = Math.max(1600, Math.min(7500, (stats.maxX - stats.minX) * 0.5));
+      hh = Math.max(1600, Math.min(7500, (stats.maxY - stats.minY) * 0.5));
+    } else if (rHint > 0) {
+      hw = hh = Math.max(2000, Math.min(6000, rHint * 13));
+    }
+    const x0 = Math.max(b[0], cx - hw),
+      y0 = Math.max(b[1], cy - hh);
+    const x1 = Math.min(b[2], cx + hw),
+      y1 = Math.min(b[3], cy + hh);
+    const inMapArea = Math.max(0, x1 - x0) * Math.max(0, y1 - y0);
+    const ovArea = b6OverlapArea(
+      x0,
+      y0,
+      x1,
+      y1,
+      m.minX,
+      m.minY,
+      m.maxX,
+      m.maxY,
+    );
+    const usefulFrac =
+      Math.max(0, inMapArea - ovArea) / Math.max(1, hw * 2 * (hh * 2));
+    const gx = Math.max(0, Math.max(cx - hw - m.maxX, m.minX - (cx + hw)));
+    const gy = Math.max(0, Math.max(cy - hh - m.maxY, m.minY - (cy + hh)));
+    const boxGap = Math.hypot(gx, gy);
+
+    let slotGain = 0,
+      bestSlotDist = Infinity;
+    for (let i = 0; i < slots.length; i++) {
+      const s = slots[i];
+      if (!s) continue;
+      const age = nw - b6NearTs[i];
+      if (s[0] >= x0 && s[0] <= x1 && s[1] >= y0 && s[1] <= y1)
+        slotGain += Math.min(9000, age);
+      if (age > 900)
+        bestSlotDist = Math.min(bestSlotDist, Math.hypot(cx - s[0], cy - s[1]));
+    }
+    if (!Number.isFinite(bestSlotDist)) {
+      bestSlotDist = Math.hypot(
+        cx - (m.minX + m.maxX) * 0.5,
+        cy - (m.minY + m.maxY) * 0.5,
+      );
+    }
+    const seenAge = oid ? nw - (b6SeenOid.get(oid) || 0) : 5000;
+    return (
+      usefulFrac * 180000 +
+      slotGain * 14 +
+      Math.min(5000, seenAge) * 4 -
+      boxGap * 38 -
+      bestSlotDist * 8 +
+      (usefulFrac < 0.2 ? -220000 : 0)
+    );
+  }
+
+  function b6RebuildAgg(nw) {
+    const tmp = new Map();
+    for (const c of v4WsCells.values()) {
+      if (c.tag !== 2 || !c.oid) continue;
+      const r2 = c.r * c.r;
+      let rec = tmp.get(c.oid);
+      if (!rec) tmp.set(c.oid, { totalR2: r2, wx: c.x * r2, wy: c.y * r2 });
+      else {
+        rec.totalR2 += r2;
+        rec.wx += c.x * r2;
+        rec.wy += c.y * r2;
+      }
+    }
+    for (const [oid, rec] of tmp) {
+      const d = Math.max(1, rec.totalR2);
+      b6OidAgg.set(oid, {
+        totalR2: rec.totalR2,
+        cx: rec.wx / d,
+        cy: rec.wy / d,
+        at: nw,
+      });
+    }
+  }
+
+  function b6ResetWorld(full, newBounds) {
+    if (full) {
+      b6BpSt.inMatch = true;
+      if (!b6IsMenuHidden()) b6BpSt.specEntered = false;
+      b6BpSt.wasAlive = false;
+      if (b6BpSt.scanning) {
+        b6ScanStop();
+        try {
+          q5RzL9wK.postMessage({
+            type: "BYPASS_WORLD_RESET",
+            senderId: v8WpM2tL,
+          });
+        } catch (_) {}
+      }
+      if (Array.isArray(newBounds) && newBounds.length === 4) {
+        b6BpSt.bounds = newBounds;
+      }
+      b6Plrs.clear();
+      b6DelTs.clear();
+      b6SeenOid.clear();
+      b6OidAgg.clear();
+      b6OidAoi.clear();
+      b6SpecOid.clear();
+      b6SpecNick.clear();
+      b6BadOid.clear();
+      b6Claims.clear();
+      b6SentPlr.clear();
+      b6Phantoms.clear();
+      b6RemPlrs.clear();
+      b6LblCache.clear();
+      b6GridTs.fill(0);
+      b6NearTs.fill(0);
+      b6BpSt.liveAoi = null;
+      b6BpSt.safeAoi = null;
+      b6BpSt.lb = [];
+      b6BpSt.curSpecNick = "";
+      b6BpSt.curSpecOid = 0;
+      b6BpSt.bestSpecOid = 0;
+      b6BpSt.bestSpecNick = "";
+      b6BpSt.bestSpecArea = 0;
+      b6BpSt.bestSpecAt = 0;
+      b6BpSt.bestSpecAoi = null;
+      b6BpSt.curHoldMs = 0;
+      b6BpSt.aoiHalfW = 700;
+      b6BpSt.aoiHalfH = 450;
+      b6BpSt.safeHalfW = 700;
+      b6BpSt.safeHalfH = 450;
+      return;
+    }
+    b6Phantoms.clear();
+    b6RemPlrs.clear();
+    b6LblCache.clear();
+  }
+
+  function b6PruneMem(nw, nowWall) {
+    if (nw - b6BpSt.lastPruneAt <= 15000) return;
+    b6BpSt.lastPruneAt = nw;
+    for (const [k, ts] of b6DelTs) if (nowWall - ts > 3000) b6DelTs.delete(k);
+    for (const [k, ts] of b6SeenOid) if (nw - ts > 45000) b6SeenOid.delete(k);
+    for (const [k, v] of b6OidAgg) if (nw - v.at > 45000) b6OidAgg.delete(k);
+    for (const [k, v] of b6OidAoi) if (nw - v.at > 45000) b6OidAoi.delete(k);
+    for (const [k, ts] of b6SpecOid) if (nw - ts > 45000) b6SpecOid.delete(k);
+    for (const [k, ts] of b6SpecNick) if (nw - ts > 45000) b6SpecNick.delete(k);
+    for (const [k, ts] of b6BadOid) if (nw - ts > 10000) b6BadOid.delete(k);
+    for (const [k, cl] of b6Claims) if (nw - cl.ts > 2000) b6Claims.delete(k);
+    for (const [k, ts] of b6SentPlr) if (nw - ts > 30000) b6SentPlr.delete(k);
+    const activeOids = new Set();
+    for (const c of v4WsCells.values()) {
+      if (c.tag === 2 && c.oid) activeOids.add(c.oid);
+    }
+    for (const p of b6Phantoms.values()) {
+      if (p.tag === 2 && p.oid) activeOids.add(p.oid);
+    }
+    for (const [k, v] of b6Plrs) {
+      if (!activeOids.has(k) && nw - v.at > 60000) b6Plrs.delete(k);
+    }
+    for (const [k, v] of b6RemPlrs) {
+      if (!activeOids.has(k) && nw - v.at > 60000) b6RemPlrs.delete(k);
+    }
+  }
+
+  function b6FlushBc(force) {
+    if (!b6BpSt.scanning || !b6BpSt.inMatch) return;
+    const nw = performance.now();
+    if (!force && nw - b6BpSt.bcAt < 70) {
+      b6BpSt.bcPending = true;
+      return;
+    }
+    b6BpSt.bcPending = false;
+    b6BpSt.bcAt = nw;
+
+    const cells = [];
+    const plrs = [];
+    const seenPlr = new Set();
+    for (const c of v4WsCells.values()) {
+      if (c.tag === 2) {
+        if (c.r < 10) continue;
+        cells.push([c.cid, 2, c.oid, c.x, c.y, c.r]);
+        if (c.oid && !seenPlr.has(c.oid)) {
+          seenPlr.add(c.oid);
+          if (nw - (b6SentPlr.get(c.oid) || 0) > 2000) {
+            const pl = b6Plrs.get(c.oid);
+            if (pl) {
+              b6SentPlr.set(c.oid, nw);
+              plrs.push([pl.oid, pl.name, pl.rgb]);
+            }
+          }
+        }
+      } else if (c.tag === 3 || c.tag === 4) {
+        cells.push([c.cid, c.tag, 0, c.x, c.y, c.r]);
+      }
+    }
+    const a = b6BpSt.liveAoi;
+    try {
+      q5RzL9wK.postMessage({
+        type: "BYPASS_FRAME",
+        senderId: v8WpM2tL,
+        ts: Date.now(),
+        bounds: b6BpSt.bounds,
+        aoi: a && a.maxX > a.minX ? [a.minX, a.minY, a.maxX, a.maxY] : null,
+        cells,
+        plrs,
+      });
+    } catch (_) {}
+  }
+
+  function b6GetSelfPt() {
+    const sOid = w4GetCurSelfOid();
+    if (sOid) {
+      let sx = 0,
+        sy = 0,
+        sw = 0;
+      for (const c of v4WsCells.values()) {
+        if (c.tag === 2 && c.oid === sOid) {
+          const w = c.r * c.r;
+          sx += c.x * w;
+          sy += c.y * w;
+          sw += w;
+        }
+      }
+      if (sw > 0) return [Math.round(sx / sw), Math.round(sy / sw), sOid];
+    }
+    const cam = b6GetCamCtr();
+    return cam ? [Math.round(cam.x), Math.round(cam.y), sOid || 0] : null;
+  }
+
+  function b6CurBeamPt(liveBox, selfPt) {
+    const scn = v4WsScene;
+    const wt = scn && scn.camera && scn.camera.worldTransform;
+    const nw = performance.now();
+    if (!wt || nw - scn.at > 600) return null;
+    if (!b6BpSt.rcCache || nw - b6BpSt.rcChkAt > 250) {
+      b6BpSt.rcChkAt = nw;
+      b6BpSt.rcCache = scn.canvas ? scn.canvas.getBoundingClientRect() : null;
+    }
+    const rc = b6BpSt.rcCache;
+    if (!rc || rc.width <= 0 || rc.height <= 0) return null;
+    const det = wt.a * wt.d - wt.b * wt.c;
+    if (Math.abs(det) < 1e-8) return null;
+    const sx = (t2QnL9wP - rc.left) * (scn.screenWidth / rc.width);
+    const sy = (b8VmK3xT - rc.top) * (scn.screenHeight / rc.height);
+    let ax = (wt.d * (sx - wt.tx) - wt.c * (sy - wt.ty)) / det;
+    let ay = (-wt.b * (sx - wt.tx) + wt.a * (sy - wt.ty)) / det;
+    if (!Number.isFinite(ax) || !Number.isFinite(ay)) return null;
+    if (liveBox && b6InBox(ax, ay, liveBox, 120)) {
+      const ox = selfPt ? selfPt[0] : (liveBox.minX + liveBox.maxX) * 0.5;
+      const oy = selfPt ? selfPt[1] : (liveBox.minY + liveBox.maxY) * 0.5;
+      const dx = ax - ox,
+        dy = ay - oy,
+        len = Math.hypot(dx, dy);
+      if (len > 25) {
+        const push = Math.max(2200, (liveBox.maxX - liveBox.minX) * 0.55);
+        ax += (dx / len) * push;
+        ay += (dy / len) * push;
+      }
+    }
+    const b = b6BpSt.bounds;
+    return [
+      Math.round(Math.max(b[0] + 400, Math.min(b[2] - 400, ax))),
+      Math.round(Math.max(b[1] + 400, Math.min(b[3] - 400, ay))),
+    ];
+  }
+
+  function b6SendMainAoi(nw) {
+    if (
+      !m9TvL2sP.bypassEnabled ||
+      b6BpSt.scanning ||
+      b6BpSt.specEntered ||
+      !b6BpSt.inMatch ||
+      !b6IsMenuHidden() ||
+      nw - b6BpSt.mainBcAt < 100
+    ) {
+      return;
+    }
+    const a = b6LiveBox();
+    if (!a || a.maxX - a.minX < 800 || a.maxY - a.minY < 800) return;
+    b6BpSt.mainBcAt = nw;
+    const selfPt = b6GetSelfPt();
+    try {
+      q5RzL9wK.postMessage({
+        type: "BYPASS_MAIN_AOI",
+        senderId: v8WpM2tL,
+        aoi: [a.minX, a.minY, a.maxX, a.maxY],
+        self: selfPt,
+        cur: b6CurBeamPt(a, selfPt),
+      });
+    } catch (_) {}
+  }
+
+  function b6OnWorldTick(
+    addN,
+    delN,
+    remN,
+    pMinX,
+    pMinY,
+    pMaxX,
+    pMaxY,
+    fMinX,
+    fMinY,
+    fMaxX,
+    fMaxY,
+    nw,
+    nowWall,
+  ) {
+    b6BpSt.inMatch = true;
+    if (b6BpSt.scanning && b6BpSt.curSpecNick && !b6BpSt.curSpecOid) {
+      for (const pl of b6Plrs.values()) {
+        if (pl.name === b6BpSt.curSpecNick) {
+          b6BpSt.curSpecOid = pl.oid;
+          break;
+        }
+      }
+    }
+    if (
+      b6BpSt.scanning &&
+      (addN > 0 || delN > 0 || remN > 0 || nw - b6BpSt.lastAggAt > 250)
+    ) {
+      b6BpSt.lastAggAt = nw;
+      b6RebuildAgg(nw);
+    }
+    b6PruneMem(nw, nowWall);
+
+    const camNow = b6GetCamCtr();
+    let sMinX = Infinity,
+      sMinY = Infinity,
+      sMaxX = -Infinity,
+      sMaxY = -Infinity;
+    for (const lc of v4WsCells.values()) {
+      if (lc.x < pMinX) pMinX = lc.x;
+      if (lc.x > pMaxX) pMaxX = lc.x;
+      if (lc.y < pMinY) pMinY = lc.y;
+      if (lc.y > pMaxY) pMaxY = lc.y;
+      const ix = camNow
+        ? lc.x < camNow.x
+          ? Math.min(camNow.x, lc.x + lc.r)
+          : Math.max(camNow.x, lc.x - lc.r)
+        : lc.x;
+      const iy = camNow
+        ? lc.y < camNow.y
+          ? Math.min(camNow.y, lc.y + lc.r)
+          : Math.max(camNow.y, lc.y - lc.r)
+        : lc.y;
+      if (ix < sMinX) sMinX = ix;
+      if (ix > sMaxX) sMaxX = ix;
+      if (iy < sMinY) sMinY = iy;
+      if (iy > sMaxY) sMaxY = iy;
+    }
+    if (Number.isFinite(sMinX) && sMaxX > sMinX && sMaxY > sMinY) {
+      b6BpSt.safeAoi = { minX: sMinX, minY: sMinY, maxX: sMaxX, maxY: sMaxY };
+    }
+    if (!b6BpSt.scanning) {
+      const cam = camNow;
+      if (cam) {
+        let obsW = 0,
+          obsH = 0;
+        if (Number.isFinite(sMinX)) {
+          obsW = Math.max(obsW, cam.x - sMinX, sMaxX - cam.x);
+          obsH = Math.max(obsH, cam.y - sMinY, sMaxY - cam.y);
+        }
+        if (Number.isFinite(fMinX)) {
+          obsW = Math.max(obsW, cam.x - (fMinX + 15), fMaxX - 15 - cam.x);
+          obsH = Math.max(obsH, cam.y - (fMinY + 15), fMaxY - 15 - cam.y);
+        }
+        if (obsW > 300) {
+          const wC = Math.min(9500, obsW);
+          b6BpSt.safeHalfW =
+            wC >= b6BpSt.safeHalfW
+              ? b6BpSt.safeHalfW * 0.35 + wC * 0.65
+              : b6BpSt.safeHalfW * 0.994 + wC * 0.006;
+        }
+        if (obsH > 250) {
+          const hC = Math.min(9500, obsH);
+          b6BpSt.safeHalfH =
+            hC >= b6BpSt.safeHalfH
+              ? b6BpSt.safeHalfH * 0.35 + hC * 0.65
+              : b6BpSt.safeHalfH * 0.994 + hC * 0.006;
+        }
+      }
+    }
+    if (Number.isFinite(pMinX) && pMaxX > pMinX && pMaxY > pMinY) {
+      if (!b6BpSt.scanning) {
+        const cam = camNow;
+        const uMinX = Number.isFinite(sMinX) ? sMinX : pMinX;
+        const uMaxX = Number.isFinite(sMaxX) ? sMaxX : pMaxX;
+        const uMinY = Number.isFinite(sMinY) ? sMinY : pMinY;
+        const uMaxY = Number.isFinite(sMaxY) ? sMaxY : pMaxY;
+        if (cam && uMaxX > uMinX && uMaxY > uMinY) {
+          b6BpSt.aoiHalfW =
+            b6BpSt.aoiHalfW * 0.65 +
+            Math.max(
+              550,
+              Math.min(9500, Math.max(uMaxX - cam.x, cam.x - uMinX)),
+            ) *
+              0.35;
+          b6BpSt.aoiHalfH =
+            b6BpSt.aoiHalfH * 0.65 +
+            Math.max(
+              380,
+              Math.min(9500, Math.max(uMaxY - cam.y, cam.y - uMinY)),
+            ) *
+              0.35;
+        }
+      }
+      b6BpSt.liveAoi = {
+        minX: pMinX,
+        minY: pMinY,
+        maxX: pMaxX,
+        maxY: pMaxY,
+        ts: nw,
+      };
+      if (b6BpSt.scanning) {
+        b6MarkCov(b6BpSt.liveAoi, nw);
+        const spHW = (pMaxX - pMinX) * 0.5,
+          spHH = (pMaxY - pMinY) * 0.5;
+        if (spHW > 900 && spHH > 900) {
+          b6BpSt.avgSpecHW = b6BpSt.avgSpecHW * 0.7 + spHW * 0.3;
+          b6BpSt.avgSpecHH = b6BpSt.avgSpecHH * 0.7 + spHH * 0.3;
+        }
+        const area = (pMaxX - pMinX) * (pMaxY - pMinY);
+        const cov =
+          area /
+          Math.max(
+            1e6,
+            (b6BpSt.bounds[2] - b6BpSt.bounds[0]) *
+              (b6BpSt.bounds[3] - b6BpSt.bounds[1]),
+          );
+        if (b6BpSt.curSpecOid) {
+          b6OidAoi.set(b6BpSt.curSpecOid, {
+            minX: pMinX,
+            minY: pMinY,
+            maxX: pMaxX,
+            maxY: pMaxY,
+            area,
+            cov,
+            at: nw,
+          });
+          if (
+            cov >= 0.16 &&
+            (b6BpSt.curSpecOid === b6BpSt.bestSpecOid ||
+              area >= b6BpSt.bestSpecArea * 0.85 ||
+              nw - b6BpSt.bestSpecAt > 12000)
+          ) {
+            b6BpSt.bestSpecOid = b6BpSt.curSpecOid;
+            b6BpSt.bestSpecNick = b6BpSt.curSpecNick;
+            b6BpSt.bestSpecArea = area;
+            b6BpSt.bestSpecAt = nw;
+            b6BpSt.bestSpecAoi = {
+              minX: pMinX,
+              minY: pMinY,
+              maxX: pMaxX,
+              maxY: pMaxY,
+            };
+          }
+          b6BpSt.curHoldMs =
+            cov > 0.14 ? Math.min(2000, Math.round((cov - 0.13) * 4500)) : 0;
+        }
+      }
+    }
+
+    if (b6BpSt.scanning && remN >= 2 && v4WsCells.size === 0 && addN === 0) {
+      b6ResetWorld(false);
+      try {
+        q5RzL9wK.postMessage({
+          type: "BYPASS_WORLD_RESET",
+          senderId: v8WpM2tL,
+        });
+      } catch (_) {}
+    }
+    if (b6BpSt.got46At > 0 && !b6BpSt.got02After46 && nw >= b6BpSt.got46At) {
+      b6BpSt.got02After46 = true;
+    }
+    if (b6BpSt.scanning && b6BpSt.inMatch) {
+      const forceBc = b6BpSt.got02After46 && !b6BpSt.hopFlushSent;
+      if (forceBc) b6BpSt.hopFlushSent = true;
+      b6FlushBc(forceBc);
+    } else if (!b6BpSt.scanning && b6BpSt.inMatch) {
+      b6SendMainAoi(nw);
+    }
+  }
+
+  function b6DispMouse(el, tp, btn, x, y, usePtr) {
+    if (usePtr && typeof PointerEvent === "function") {
+      const pTp =
+        tp === "mousedown"
+          ? "pointerdown"
+          : tp === "mouseup"
+            ? "pointerup"
+            : "pointermove";
+      el.dispatchEvent(
+        new PointerEvent(pTp, {
+          button: btn,
+          buttons: tp === "mouseup" ? 0 : btn === 2 ? 2 : 1,
+          clientX: x,
+          clientY: y,
+          pointerId: 1,
+          pointerType: "mouse",
+          isPrimary: true,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    }
+    const ev = new MouseEvent(tp, {
+      button: btn,
+      buttons: tp === "mouseup" ? 0 : btn === 2 ? 2 : 1,
+      clientX: x,
+      clientY: y,
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    });
+    Object.defineProperty(ev, "which", { value: btn + 1, writable: false });
+    el.dispatchEvent(ev);
+  }
+
+  function b6CloseCtx() {
+    const cm = document.getElementById("context-menu");
+    if (cm && window.getComputedStyle(cm).display !== "none") {
+      cm.style.display = "none";
+    }
+  }
+
+  function b6GameCanvas() {
+    return v4WsScene && v4WsScene.canvas && v4WsScene.canvas.isConnected
+      ? v4WsScene.canvas
+      : t8VwM4xK();
+  }
+
+  function b6ScreenClear(px, py) {
+    if (
+      px < 65 ||
+      px > window.innerWidth - 65 ||
+      py < 65 ||
+      py > window.innerHeight - 65
+    ) {
+      return false;
+    }
+    const wn = document.getElementById("macro-window");
+    if (wn && wn.classList.contains("open")) {
+      const r = wn.getBoundingClientRect();
+      if (px >= r.left && px <= r.right && py >= r.top && py <= r.bottom)
+        return false;
+    }
+    const pl = document.getElementById("macro-toggle-pill");
+    if (pl) {
+      const r = pl.getBoundingClientRect();
+      if (px >= r.left && px <= r.right && py >= r.top && py <= r.bottom)
+        return false;
+    }
+    if (
+      b6BpMapWin &&
+      b6BpMapWin.style.display !== "none" &&
+      !m9TvL2sP.bypassRadarLock
+    ) {
+      const r = b6BpMapWin.getBoundingClientRect();
+      if (px >= r.left && px <= r.right && py >= r.top && py <= r.bottom)
+        return false;
+    }
+    return true;
+  }
+
+  function b6WorldToScr(wx, wy, wr) {
+    const cv = b6GameCanvas();
+    if (!cv) return null;
+    const scn = v4WsScene;
+    const wt = scn && scn.camera && scn.camera.worldTransform;
+    if (scn && scn.canvas === cv && wt && performance.now() - scn.at < 250) {
+      const rc = cv.getBoundingClientRect();
+      if (rc.width > 0 && rc.height > 0) {
+        const rx = rc.width / scn.screenWidth,
+          ry = rc.height / scn.screenHeight;
+        const sx = Math.hypot(wt.a, wt.b);
+        return {
+          px: rc.left + (wt.a * wx + wt.c * wy + wt.tx) * rx,
+          py: rc.top + (wt.b * wx + wt.d * wy + wt.ty) * ry,
+          pr: wr * sx * (rx + ry) * 0.5,
+        };
+      }
+    }
+    if (b6BpSt.camAt > 0 && b6BpSt.camZoom > 0.005) {
+      return {
+        px: window.innerWidth * 0.5 + (wx - b6BpSt.camX) * b6BpSt.camZoom,
+        py: window.innerHeight * 0.5 + (wy - b6BpSt.camY) * b6BpSt.camZoom,
+        pr: wr * b6BpSt.camZoom,
+      };
+    }
+    return null;
+  }
+
+  function b6ClaimedElsewhere(oid, agg, nw) {
+    if (!oid) return false;
+    const cl = b6Claims.get(oid);
+    if (cl && nw - cl.ts < 1800) return true;
+    if (agg) {
+      for (const [k, c] of b6Claims) {
+        if (
+          k !== oid &&
+          nw - c.ts < 1500 &&
+          Math.hypot(agg.cx - c.cx, agg.cy - c.cy) < 2200
+        ) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  function b6PickLb(nw, avoidAoi, smartDedupe) {
+    const rows = Array.from(
+      document.querySelectorAll("#leaderboard-list > div"),
+    );
+    if (rows.length < 1) return null;
+    const lb = b6BpSt.lb,
+      n = rows.length;
+    let realCnt = 0;
+    for (let i = 0; i < n; i++) {
+      if (
+        !((lb[i] && lb[i].nick) || rows[i].textContent || "").includes(
+          "\uD83E\uDD16",
+        )
+      )
+        realCnt++;
+    }
+    let best = null;
+    for (let k = 0; k < n; k++) {
+      const i = (b6BpSt.rrIdx + k) % n;
+      const row = rows[i];
+      const dNick = (row.textContent || "").trim().replace(/^\d+\.\s*/, "");
+      const rec =
+        lb[i] && (!dNick || lb[i].nick === dNick)
+          ? lb[i]
+          : dNick
+            ? lb.find((x) => x.nick === dNick)
+            : lb[i];
+      const oid = rec ? rec.oid : 0;
+      const nick = dNick || (rec ? rec.nick : "");
+      if (
+        (!nick && !oid) ||
+        (oid && oid === b6BpSt.curSpecOid) ||
+        (nick && nick === b6BpSt.curSpecNick)
+      )
+        continue;
+      if (oid && nw - (b6BadOid.get(oid) || 0) < 1500) continue;
+      if (realCnt >= 2 && nick.includes("\uD83E\uDD16")) continue;
+      const agg = oid ? b6OidAgg.get(oid) : null;
+      const inMain =
+        agg && nw - agg.at < 8000 && b6InMainAoi(agg.cx, agg.cy, 200) ? 1 : 0;
+      const inAvoid =
+        avoidAoi &&
+        agg &&
+        nw - agg.at < 8000 &&
+        b6InBox(agg.cx, agg.cy, avoidAoi, 200)
+          ? 1
+          : 0;
+      const specAge = oid
+        ? nw - (b6SpecOid.get(oid) || 0)
+        : nw - (b6SpecNick.get(nick) || 0);
+      if (specAge < 950 && n > 2) continue;
+      const seenAge = oid ? nw - (b6SeenOid.get(oid) || 0) : Infinity;
+
+      let score =
+        (1 - inMain) * 1e9 +
+        (1 - inAvoid) * 1e7 +
+        (seenAge > 900 ? 1e6 + seenAge : specAge);
+      if (smartDedupe) {
+        if (b6ClaimedElsewhere(oid, agg, nw)) score -= 5e6;
+        const aoiInfo = oid ? b6OidAoi.get(oid) : null;
+        if (aoiInfo) score += b6CountGain(aoiInfo, nw) * 15;
+        if (
+          agg &&
+          b6BpSt.liveAoi &&
+          nw - agg.at < 2000 &&
+          b6InBox(agg.cx, agg.cy, b6BpSt.liveAoi, -400)
+        ) {
+          score -= 2e6;
+        }
+      }
+      if (!best || score > best.score)
+        best = { kind: "lb", idx: i, row, oid, nick, score };
+    }
+    if (best) b6BpSt.rrIdx = (best.idx + 1) % n;
+    return best;
+  }
+
+  function b6PickBlind(nw, avoidAoi) {
+    if (b6BpSt.camAt === 0 || v4WsCells.size === 0) return null;
+    const blind = b6BlindPt(nw);
+    if (!blind) return null;
+    const camDist = Math.hypot(b6BpSt.camX - blind.x, b6BpSt.camY - blind.y);
+    let maxR2 = 1;
+    for (const a of b6OidAgg.values()) {
+      if (nw - a.at < 1500 && a.totalR2 > maxR2) maxR2 = a.totalR2;
+    }
+    let best = null,
+      bestScore = -Infinity;
+    for (const c of v4WsCells.values()) {
+      if (
+        c.tag !== 2 ||
+        !c.oid ||
+        c.oid === b6BpSt.curSpecOid ||
+        nw - (b6BadOid.get(c.oid) || 0) < 1500 ||
+        nw - (b6SpecOid.get(c.oid) || 0) < 4000
+      )
+        continue;
+      const pl = b6Plrs.get(c.oid),
+        nm = pl ? pl.name : "";
+      if (
+        nm.includes("\uD83E\uDD16") ||
+        (nm && nm === b6BpSt.curSpecNick) ||
+        b6InMainAoi(c.x, c.y, 180)
+      )
+        continue;
+      const sc = b6WorldToScr(c.x, c.y, c.r);
+      if (!sc || sc.pr < 11 || !b6ScreenClear(sc.px, sc.py)) continue;
+      const d = Math.hypot(c.x - blind.x, c.y - blind.y);
+      if (d >= camDist - 600) continue;
+      const agg = b6OidAgg.get(c.oid);
+      const ratio = (agg ? agg.totalR2 : c.r * c.r) / maxR2;
+      const score =
+        ((camDist - d) / Math.max(1000, camDist)) * 10 +
+        ratio * 4 +
+        (avoidAoi && !b6InBox(c.x, c.y, avoidAoi, 150) ? 5 : 0);
+      if (score > bestScore) {
+        bestScore = score;
+        best = {
+          kind: "cvs",
+          cid: c.cid,
+          oid: c.oid,
+          nick: nm,
+          px: Math.round(sc.px),
+          py: Math.round(sc.py),
+        };
+      }
+    }
+    return best;
+  }
+
+  function b6PickToward(nw, tx, ty, minDistGain) {
+    if (b6BpSt.camAt === 0 || v4WsCells.size === 0) return null;
+    const camDist = Math.hypot(b6BpSt.camX - tx, b6BpSt.camY - ty);
+    let best = null,
+      bestScore = -Infinity;
+    for (const c of v4WsCells.values()) {
+      if (
+        c.tag !== 2 ||
+        !c.oid ||
+        c.oid === b6BpSt.curSpecOid ||
+        v4SelfOids.has(c.oid)
+      )
+        continue;
+      if (
+        nw - (b6BadOid.get(c.oid) || 0) < 1500 ||
+        nw - (b6SpecOid.get(c.oid) || 0) < 2400
+      )
+        continue;
+      const pl = b6Plrs.get(c.oid),
+        nm = pl ? pl.name : "";
+      if (nm.includes("\uD83E\uDD16") || (nm && nm === b6BpSt.curSpecNick))
+        continue;
+      const sc = b6WorldToScr(c.x, c.y, c.r);
+      if (!sc || sc.pr < 10 || !b6ScreenClear(sc.px, sc.py)) continue;
+      const d = Math.hypot(c.x - tx, c.y - ty);
+      if (minDistGain > 0 && d >= camDist - minDistGain) continue;
+      const score =
+        (b6InMainAoi(c.x, c.y, 120) ? 0 : 100000) -
+        d +
+        Math.min(4000, nw - (b6SeenOid.get(c.oid) || 0)) * 0.5;
+      if (score > bestScore) {
+        bestScore = score;
+        best = {
+          kind: "cvs",
+          cid: c.cid,
+          oid: c.oid,
+          nick: nm,
+          px: Math.round(sc.px),
+          py: Math.round(sc.py),
+          dist: d,
+        };
+      }
+    }
+    return best;
+  }
+
+  function b6PickNear(nw) {
+    const m = b6BpSt.mainAoi,
+      ms = b6BpSt.mainSelf;
+    if ((!m || nw - m.at > 3500) && (!ms || nw - ms.at > 3500))
+      return b6PickLb(nw, null, false);
+    const aoi =
+      m && nw - m.at <= 3500
+        ? m
+        : {
+            minX: ms.x - 1900,
+            minY: ms.y - 1900,
+            maxX: ms.x + 1900,
+            maxY: ms.y + 1900,
+          };
+    const mCX = (aoi.minX + aoi.maxX) * 0.5,
+      mCY = (aoi.minY + aoi.maxY) * 0.5;
+    const slots = b6NearSlots();
+
+    let bestCvs = null;
+    if (b6BpSt.cvsMiss < 2 && b6BpSt.camAt > 0 && v4WsCells.size > 0) {
+      let bestScore = -Infinity;
+      for (const c of v4WsCells.values()) {
+        if (
+          c.tag !== 2 ||
+          !c.oid ||
+          c.oid === b6BpSt.curSpecOid ||
+          v4SelfOids.has(c.oid)
+        )
+          continue;
+        if (
+          nw - (b6BadOid.get(c.oid) || 0) < 1500 ||
+          nw - (b6SpecOid.get(c.oid) || 0) < 2000
+        )
+          continue;
+        const pl = b6Plrs.get(c.oid),
+          nm = pl ? pl.name : "";
+        if (nm.includes("\uD83E\uDD16") || (nm && nm === b6BpSt.curSpecNick))
+          continue;
+        const sc = b6WorldToScr(c.x, c.y, c.r);
+        if (!sc || sc.pr < 10 || !b6ScreenClear(sc.px, sc.py)) continue;
+        const score = b6ScoreNear(c.x, c.y, c.oid, c.r, nw, aoi, slots);
+        if (score > bestScore) {
+          bestScore = score;
+          bestCvs = {
+            kind: "cvs",
+            cid: c.cid,
+            oid: c.oid,
+            nick: nm,
+            px: Math.round(sc.px),
+            py: Math.round(sc.py),
+            score,
+          };
+        }
+      }
+    }
+
+    let bestLb = null,
+      bestLbScore = -Infinity;
+    const rows = Array.from(
+      document.querySelectorAll("#leaderboard-list > div"),
+    );
+    const lb = b6BpSt.lb,
+      n = rows.length;
+    let realCnt = 0;
+    for (let i = 0; i < n; i++) {
+      if (
+        !((lb[i] && lb[i].nick) || rows[i].textContent || "").includes(
+          "\uD83E\uDD16",
+        )
+      )
+        realCnt++;
+    }
+
+    for (let k = 0; k < n; k++) {
+      const i = (b6BpSt.rrIdx + k) % n,
+        row = rows[i];
+      const dNick = (row.textContent || "").trim().replace(/^\d+\.\s*/, "");
+      const rec =
+        lb[i] && (!dNick || lb[i].nick === dNick)
+          ? lb[i]
+          : dNick
+            ? lb.find((x) => x.nick === dNick)
+            : lb[i];
+      const oid = rec ? rec.oid : 0;
+      const nick = dNick || (rec ? rec.nick : "");
+      if (
+        (!nick && !oid) ||
+        (oid && oid === b6BpSt.curSpecOid) ||
+        (nick && nick === b6BpSt.curSpecNick)
+      )
+        continue;
+      if (
+        (oid && nw - (b6BadOid.get(oid) || 0) < 1500) ||
+        (realCnt >= 2 && nick.includes("\uD83E\uDD16"))
+      )
+        continue;
+      const isSelf = Boolean(oid && v4SelfOids.has(oid));
+      const specAge = oid
+        ? nw - (b6SpecOid.get(oid) || 0)
+        : nw - (b6SpecNick.get(nick) || 0);
+      if (specAge < (isSelf ? 6000 : 1000) && n > 2) continue;
+      const agg = oid ? b6OidAgg.get(oid) : null;
+      const score = isSelf
+        ? b6BpSt.camAt > 0 &&
+          Math.hypot(b6BpSt.camX - mCX, b6BpSt.camY - mCY) > 6500
+          ? 60000
+          : -400000
+        : agg && nw - agg.at < 20000
+          ? b6ScoreNear(
+              agg.cx,
+              agg.cy,
+              oid,
+              Math.sqrt(agg.totalR2),
+              nw,
+              aoi,
+              slots,
+            )
+          : 45000 + Math.min(8000, specAge);
+      if (score > bestLbScore) {
+        bestLbScore = score;
+        bestLb = { kind: "lb", idx: i, row, oid, nick, score };
+      }
+    }
+    if (bestLb) b6BpSt.rrIdx = (bestLb.idx + 1) % n;
+    if (
+      bestCvs &&
+      bestCvs.score >= 20000 &&
+      (!bestLb || bestCvs.score >= bestLb.score)
+    )
+      return bestCvs;
+    if (bestLb && bestLb.score >= 20000) {
+      b6BpSt.cvsMiss = 0;
+      return bestLb;
+    }
+
+    if (b6BpSt.cvsMiss < 2 && slots.length > 0) {
+      let oldestIdx = -1,
+        maxAge = -1;
+      for (let i = 0; i < slots.length; i++) {
+        if (slots[i] && nw - b6NearTs[i] > maxAge) {
+          maxAge = nw - b6NearTs[i];
+          oldestIdx = i;
+        }
+      }
+      if (oldestIdx >= 0) {
+        const stp = b6PickToward(
+          nw,
+          slots[oldestIdx][0],
+          slots[oldestIdx][1],
+          350,
+        );
+        if (stp) return stp;
+      }
+    }
+    b6BpSt.cvsMiss = 0;
+    return bestCvs || bestLb || b6PickLb(nw, null, false);
+  }
+
+  function b6PickCur(nw) {
+    const mc = b6BpSt.mainCursor;
+    if (!mc || nw - mc.at > 4000) return b6PickLb(nw, null, false);
+    if (b6BpSt.liveAoi && b6InBox(mc.x, mc.y, b6BpSt.liveAoi, 350)) return null;
+    const camDist =
+      b6BpSt.camAt > 0
+        ? Math.hypot(b6BpSt.camX - mc.x, b6BpSt.camY - mc.y)
+        : Infinity;
+    if (b6BpSt.cvsMiss < 2) {
+      const cTgt = b6PickToward(nw, mc.x, mc.y, camDist > 2600 ? 350 : 0);
+      if (cTgt && (cTgt.dist < 2400 || cTgt.dist < camDist - 350)) return cTgt;
+    }
+    b6BpSt.cvsMiss = 0;
+    const rows = Array.from(
+      document.querySelectorAll("#leaderboard-list > div"),
+    );
+    let best = null;
+    for (let i = 0; i < rows.length; i++) {
+      const dNick = (rows[i].textContent || "").trim().replace(/^\d+\.\s*/, "");
+      const rec =
+        b6BpSt.lb[i] && (!dNick || b6BpSt.lb[i].nick === dNick)
+          ? b6BpSt.lb[i]
+          : dNick
+            ? b6BpSt.lb.find((x) => x.nick === dNick)
+            : b6BpSt.lb[i];
+      const oid = rec ? rec.oid : 0;
+      const nick = dNick || (rec ? rec.nick : "");
+      if (
+        (!nick && !oid) ||
+        (oid && oid === b6BpSt.curSpecOid) ||
+        (nick && nick === b6BpSt.curSpecNick) ||
+        (oid && v4SelfOids.has(oid))
+      )
+        continue;
+      if (
+        nick.includes("\uD83E\uDD16") ||
+        (oid && nw - (b6BadOid.get(oid) || 0) < 1500)
+      )
+        continue;
+      const specAge = oid
+        ? nw - (b6SpecOid.get(oid) || 0)
+        : nw - (b6SpecNick.get(nick) || 0);
+      if (specAge < 1000 && rows.length > 2) continue;
+      const agg = oid ? b6OidAgg.get(oid) : null;
+      const aoiInfo = oid ? b6OidAoi.get(oid) : null;
+      const score =
+        aoiInfo && nw - aoiInfo.at < 15000 && b6InBox(mc.x, mc.y, aoiInfo, 250)
+          ? 500000 + specAge
+          : agg && nw - agg.at < 15000
+            ? 300000 - Math.hypot(agg.cx - mc.x, agg.cy - mc.y)
+            : 100000 + Math.min(8000, specAge);
+      if (!best || score > best.score) {
+        best = { kind: "lb", idx: i, row: rows[i], oid, nick, score };
+      }
+    }
+    return best || b6PickLb(nw, null, false);
+  }
+
+  function b6PickBig(nw) {
+    const rows = Array.from(
+      document.querySelectorAll("#leaderboard-list > div"),
+    );
+    let firstValid = null,
+      firstFallback = null;
+    for (let i = 0; i < rows.length; i++) {
+      const dNick = (rows[i].textContent || "").trim().replace(/^\d+\.\s*/, "");
+      const rec =
+        b6BpSt.lb[i] && (!dNick || b6BpSt.lb[i].nick === dNick)
+          ? b6BpSt.lb[i]
+          : dNick
+            ? b6BpSt.lb.find((x) => x.nick === dNick)
+            : b6BpSt.lb[i];
+      const oid = rec ? rec.oid : 0;
+      const nick = dNick || (rec ? rec.nick : "");
+      if ((!nick && !oid) || (oid && nw - (b6BadOid.get(oid) || 0) < 1500))
+        continue;
+      if (!firstFallback)
+        firstFallback = { kind: "lb", idx: i, row: rows[i], oid, nick };
+      if (!nick.includes("\uD83E\uDD16")) {
+        firstValid = { kind: "lb", idx: i, row: rows[i], oid, nick };
+        break;
+      }
+    }
+    const tgt = firstValid || firstFallback;
+    if (
+      !tgt ||
+      (tgt.oid && tgt.oid === b6BpSt.curSpecOid) ||
+      (tgt.nick && tgt.nick === b6BpSt.curSpecNick)
+    )
+      return null;
+    return tgt;
+  }
+
+  function b6PickBest(nw) {
+    const oid = b6BpSt.bestSpecOid,
+      nick = b6BpSt.bestSpecNick;
+    if (!oid || nw - (b6BadOid.get(oid) || 0) < 1500) return null;
+    const rows = Array.from(
+      document.querySelectorAll("#leaderboard-list > div"),
+    );
+    for (let i = 0; i < rows.length; i++) {
+      const dNick = (rows[i].textContent || "").trim().replace(/^\d+\.\s*/, "");
+      const rec =
+        b6BpSt.lb[i] && (!dNick || b6BpSt.lb[i].nick === dNick)
+          ? b6BpSt.lb[i]
+          : dNick
+            ? b6BpSt.lb.find((x) => x.nick === dNick)
+            : b6BpSt.lb[i];
+      const rNick = dNick || (rec ? rec.nick : "");
+      if ((rec && rec.oid === oid) || (nick && rNick === nick)) {
+        return { kind: "lb", idx: i, row: rows[i], oid, nick: rNick };
+      }
+    }
+    return null;
+  }
+
+  function b6ScanStop() {
+    b6BpSt.scanning = false;
+    b6BpSt.phase = "idle";
+    b6BpSt.holdUntil = 0;
+    b6BpSt.needPeek = false;
+    b6BpSt.wasPeek = false;
+    b6BpSt.nextIsPeek = false;
+    b6BpSt.returnToBest = false;
+    b6BpSt.landedAt = 0;
+    if (b6BpSt.cancelTm) {
+      b6BpSt.cancelTm();
+      b6BpSt.cancelTm = null;
+    }
+    b6CloseCtx();
+  }
+
+  function b6ScanStart() {
+    p2LxQ8vM();
+    b6BpSt.scanning = true;
+    b6BpSt.phase = "idle";
+    b6BpSt.phaseUntil = 0;
+    b6BpSt.holdUntil = 0;
+    b6BpSt.needPeek = false;
+    b6BpSt.wasPeek = false;
+    b6BpSt.nextIsPeek = false;
+    b6BpSt.returnToBest = false;
+    b6BpSt.cvsMiss = 0;
+    b6ScanStep();
+  }
+
+  function b6ScanStep() {
+    if (
+      !b6BpSt.scanning ||
+      !m9TvL2sP.bypassEnabled ||
+      !b6BpSt.specEntered ||
+      b6BpSt.wasAlive ||
+      !b6IsMenuHidden()
+    ) {
+      b6ScanStop();
+      return;
+    }
+    const nw = performance.now();
+
+    if (b6BpSt.phase === "cvs_rmb") {
+      if (nw < b6BpSt.phaseUntil) return;
+      const cv = b6GameCanvas();
+      const c = b6BpSt.pendCid ? v4WsCells.get(b6BpSt.pendCid) : null;
+      const sc = cv && c ? b6WorldToScr(c.x, c.y, c.r) : null;
+      if (!sc || sc.pr < 8 || !b6ScreenClear(sc.px, sc.py)) {
+        b6BpSt.phase = "idle";
+        b6BpSt.cvsMiss++;
+        return;
+      }
+      const px = Math.round(sc.px),
+        py = Math.round(sc.py);
+      b6CloseCtx();
+      b6DispMouse(window, "mousemove", 0, px, py, true);
+      b6DispMouse(cv, "mousemove", 0, px, py, true);
+      b6DispMouse(cv, "mousedown", 2, px, py, true);
+      b6DispMouse(cv, "mouseup", 2, px, py, true);
+      b6DispMouse(cv, "contextmenu", 2, px, py, false);
+      b6BpSt.phase = "menu";
+      b6BpSt.phaseUntil = nw + 130;
+      if (b6BpSt.cancelTm) b6BpSt.cancelTm();
+      b6BpSt.cancelTm = k7RunDelay(
+        12,
+        () => {
+          b6BpSt.cancelTm = null;
+          if (b6BpSt.scanning && b6BpSt.phase === "menu") b6ScanStep();
+        },
+        1,
+      );
+      return;
+    }
+
+    if (b6BpSt.phase === "menu") {
+      const cm = document.getElementById("context-menu");
+      const ms = document.getElementById("menu-spectate");
+      const cn = document.getElementById("context-name");
+      if (
+        cm &&
+        window.getComputedStyle(cm).display === "block" &&
+        ms &&
+        window.getComputedStyle(ms).display !== "none"
+      ) {
+        const menuNick = (cn && cn.textContent ? cn.textContent : "").trim();
+        if (menuNick && menuNick === b6BpSt.curSpecNick) {
+          b6CloseCtx();
+          if (b6BpSt.pendKind === "cvs") b6BpSt.cvsMiss++;
+          b6BpSt.nextIsPeek = false;
+          b6BpSt.phase = "idle";
+          return;
+        }
+        const mr = ms.getBoundingClientRect();
+        const cx = Math.round(mr.left + mr.width * 0.5);
+        const cy = Math.round(mr.top + mr.height * 0.5);
+        b6BpSt.sentAt = nw;
+        b6BpSt.lastClickAt = nw;
+        b6BpSt.got46At = 0;
+        b6BpSt.got02After46 = false;
+        b6BpSt.hopFlushSent = false;
+        b6BpSt.curHoldMs = 0;
+        b6BpSt.wasPeek = b6BpSt.nextIsPeek;
+        b6BpSt.nextIsPeek = false;
+        if (b6BpSt.pendOid) {
+          b6SpecOid.set(b6BpSt.pendOid, nw);
+          const ag = b6OidAgg.get(b6BpSt.pendOid);
+          try {
+            q5RzL9wK.postMessage({
+              type: "BYPASS_SCOUT_CLAIM",
+              senderId: v8WpM2tL,
+              oid: b6BpSt.pendOid,
+              cx: ag ? ag.cx : 0,
+              cy: ag ? ag.cy : 0,
+            });
+          } catch (_) {}
+        }
+        if (b6BpSt.pendNick) b6SpecNick.set(b6BpSt.pendNick, nw);
+        b6DispMouse(ms, "mousedown", 0, cx, cy, true);
+        b6DispMouse(ms, "mouseup", 0, cx, cy, true);
+        b6DispMouse(ms, "click", 0, cx, cy, false);
+        if (typeof ms.click === "function") ms.click();
+        b6BpSt.phase = "confirm";
+        b6BpSt.phaseUntil = nw + 780;
+        return;
+      }
+      if (nw >= b6BpSt.phaseUntil) {
+        b6CloseCtx();
+        if (b6BpSt.pendKind === "cvs") b6BpSt.cvsMiss++;
+        b6BpSt.nextIsPeek = false;
+        b6BpSt.phase = "idle";
+      } else {
+        if (b6BpSt.cancelTm) b6BpSt.cancelTm();
+        b6BpSt.cancelTm = k7RunDelay(
+          12,
+          () => {
+            b6BpSt.cancelTm = null;
+            if (b6BpSt.scanning && b6BpSt.phase === "menu") b6ScanStep();
+          },
+          1,
+        );
+      }
+      return;
+    }
+
+    if (b6BpSt.phase === "confirm") {
+      if (b6BpSt.got46At > b6BpSt.sentAt && b6BpSt.got02After46) {
+        b6BpSt.cvsMiss = 0;
+        b6BpSt.landedAt = nw;
+        if (m9TvL2sP.bypassMethod !== "smart") {
+          b6BpSt.wasPeek = false;
+          b6BpSt.returnToBest = false;
+          b6BpSt.needPeek = false;
+          b6BpSt.holdUntil = 0;
+        } else if (b6BpSt.wasPeek) {
+          b6BpSt.wasPeek = false;
+          b6BpSt.returnToBest = true;
+          b6BpSt.holdUntil = 0;
+        } else if (b6BpSt.curHoldMs > 0) {
+          b6BpSt.holdUntil = nw + b6BpSt.curHoldMs;
+          b6BpSt.needPeek = true;
+        } else {
+          b6BpSt.holdUntil = 0;
+        }
+        b6BpSt.phase = "idle";
+      } else if (nw >= b6BpSt.phaseUntil) {
+        if (b6BpSt.pendOid) b6BadOid.set(b6BpSt.pendOid, nw);
+        b6BpSt.lastClickAt = nw + 220;
+        if (b6BpSt.pendKind === "cvs") b6BpSt.cvsMiss++;
+        b6BpSt.wasPeek = false;
+        b6BpSt.phase = "idle";
+      } else {
+        return;
+      }
+    }
+
+    if (b6BpSt.phase === "idle") {
+      const useAnchor = m9TvL2sP.bypassMethod === "smart";
+      if (
+        useAnchor &&
+        !b6BpSt.returnToBest &&
+        b6BpSt.landedAt > 0 &&
+        b6BpSt.curHoldMs > 0
+      ) {
+        const dyn = b6BpSt.landedAt + b6BpSt.curHoldMs;
+        if (dyn > b6BpSt.holdUntil) {
+          b6BpSt.holdUntil = dyn;
+          if (b6BpSt.curHoldMs >= 350) b6BpSt.needPeek = true;
+        }
+      }
+      if (
+        (useAnchor && nw < b6BpSt.holdUntil) ||
+        nw - b6BpSt.lastClickAt < b6ScanIntMs
+      )
+        return;
+
+      let tgt = null;
+      if (
+        useAnchor &&
+        b6BpSt.returnToBest &&
+        b6BpSt.bestSpecOid &&
+        nw - b6BpSt.bestSpecAt < 15000 &&
+        b6BpSt.bestSpecOid !== b6BpSt.curSpecOid
+      ) {
+        tgt = b6PickBest(nw);
+        b6BpSt.returnToBest = false;
+      }
+      if (useAnchor && !tgt && b6BpSt.needPeek) {
+        b6BpSt.needPeek = false;
+        const avAoi =
+          b6BpSt.curSpecOid === b6BpSt.bestSpecOid
+            ? b6BpSt.liveAoi
+            : b6BpSt.bestSpecAoi;
+        const lbP = b6PickLb(nw, avAoi, true);
+        if (lbP && lbP.oid && nw - (b6SeenOid.get(lbP.oid) || 0) > 1300) {
+          tgt = lbP;
+        } else {
+          tgt = (b6BpSt.cvsMiss < 2 ? b6PickBlind(nw, avAoi) : null) || lbP;
+        }
+        if (tgt && tgt.oid !== b6BpSt.bestSpecOid) b6BpSt.nextIsPeek = true;
+      }
+
+      if (!tgt) {
+        if (m9TvL2sP.bypassMethod === "biggest") tgt = b6PickBig(nw);
+        else if (m9TvL2sP.bypassMethod === "nearme") tgt = b6PickNear(nw);
+        else if (m9TvL2sP.bypassMethod === "cursor") tgt = b6PickCur(nw);
+        else if (m9TvL2sP.bypassMethod === "smart") {
+          const lbT = b6PickLb(nw, null, true);
+          if (lbT && lbT.oid && nw - (b6SeenOid.get(lbT.oid) || 0) > 1300) {
+            tgt = lbT;
+            b6BpSt.cvsMiss = 0;
+          } else if (b6BpSt.cvsMiss < 2) {
+            tgt = b6PickBlind(nw, null) || lbT;
+          } else {
+            tgt = lbT;
+            b6BpSt.cvsMiss = 0;
+          }
+        } else {
+          tgt = b6PickLb(nw, null, false);
+        }
+      }
+      if (!tgt) return;
+
+      b6BpSt.pendKind = tgt.kind;
+      b6BpSt.pendOid = tgt.oid;
+      b6BpSt.pendNick = tgt.nick;
+      if (tgt.kind === "cvs") {
+        const cv = b6GameCanvas();
+        if (!cv) return;
+        b6BpSt.pendCid = tgt.cid;
+        b6DispMouse(window, "mousemove", 0, tgt.px, tgt.py, true);
+        b6DispMouse(cv, "mousemove", 0, tgt.px, tgt.py, true);
+        b6BpSt.phase = "cvs_rmb";
+        b6BpSt.phaseUntil = nw + 20;
+        if (b6BpSt.cancelTm) b6BpSt.cancelTm();
+        b6BpSt.cancelTm = k7RunDelay(
+          22,
+          () => {
+            b6BpSt.cancelTm = null;
+            if (b6BpSt.scanning && b6BpSt.phase === "cvs_rmb") b6ScanStep();
+          },
+          1,
+        );
+        return;
+      }
+
+      const lr = tgt.row.getBoundingClientRect();
+      if (lr.width < 5 || lr.height < 5) return;
+      const lx = Math.round(lr.left + lr.width * 0.5);
+      const ly = Math.round(lr.top + lr.height * 0.5);
+      b6BpSt.pendCid = 0;
+      b6CloseCtx();
+      b6DispMouse(tgt.row, "mousemove", 0, lx, ly, true);
+      b6DispMouse(tgt.row, "mousedown", 2, lx, ly, true);
+      b6DispMouse(tgt.row, "mouseup", 2, lx, ly, true);
+      b6DispMouse(tgt.row, "contextmenu", 2, lx, ly, false);
+      b6BpSt.phase = "menu";
+      b6BpSt.phaseUntil = nw + 130;
+      if (b6BpSt.cancelTm) b6BpSt.cancelTm();
+      b6BpSt.cancelTm = k7RunDelay(
+        12,
+        () => {
+          b6BpSt.cancelTm = null;
+          if (b6BpSt.scanning && b6BpSt.phase === "menu") b6ScanStep();
+        },
+        1,
+      );
+    }
+  }
+
+  b6TickScan = function () {
+    const nw = performance.now();
+    if (nw - b6BpSt.lastPingAt >= 480) {
+      b6BpSt.lastPingAt = nw;
+      v5PingPeers();
+    }
+    b6CheckPeerAlive(nw);
+    const role = b6UpdateRole(nw);
+    const canScan = Boolean(m9TvL2sP.bypassEnabled && role === "spec");
+    if (canScan) {
+      if (!b6BpSt.scanning) b6ScanStart();
+      else {
+        if (b6BpSt.bcPending) b6FlushBc(false);
+        b6ScanStep();
+      }
+    } else if (b6BpSt.scanning) {
+      b6ScanStop();
+    }
+  };
+
+  function b6LblSprite(oid, name, mass, fz) {
+    const mStr = mass > 0 ? String(mass) : "";
+    const key = `${oid}|${name}|${mStr}|${fz}`;
+    let sp = b6LblCache.get(key);
+    if (sp) return sp;
+    if (b6LblCache.size > 140)
+      b6LblCache.delete(b6LblCache.keys().next().value);
+    const c = document.createElement("canvas");
+    const cx = c.getContext("2d");
+    const fzM = Math.max(8, Math.round(fz * 0.78));
+    cx.font = `700 ${fz}px Ubuntu,Arial,sans-serif`;
+    const w1 = cx.measureText(name).width;
+    let w2 = 0;
+    if (mStr) {
+      cx.font = `700 ${fzM}px Ubuntu,Arial,sans-serif`;
+      w2 = cx.measureText(mStr).width;
+    }
+    const pad = Math.ceil(fz * 0.45);
+    const w = Math.max(8, Math.ceil(Math.max(w1, w2)) + pad * 2);
+    const h = mStr
+      ? Math.ceil(fz + fzM + pad * 1.4)
+      : Math.ceil(fz + pad * 1.4);
+    c.width = w;
+    c.height = h;
+    cx.textAlign = "center";
+    cx.textBaseline = "middle";
+    cx.lineJoin = "round";
+    const midX = w * 0.5;
+    const drawTxt = (txt, sz, y) => {
+      cx.font = `700 ${sz}px Ubuntu,Arial,sans-serif`;
+      cx.lineWidth = Math.max(2, sz * 0.22);
+      cx.strokeStyle = "rgba(0,0,0,0.82)";
+      cx.fillStyle = "#ffffff";
+      cx.strokeText(txt, midX, y);
+      cx.fillText(txt, midX, y);
+    };
+    if (mStr) {
+      drawTxt(name, fz, h * 0.34);
+      drawTxt(mStr, fzM, h * 0.73);
+    } else {
+      drawTxt(name, fz, h * 0.5);
+    }
+    sp = { c, w, h };
+    b6LblCache.set(key, sp);
+    return sp;
+  }
+
+  function b6EnsureOv(gameCv) {
+    if (!b6BpOvCv) {
+      b6BpOvCv = document.createElement("canvas");
+      b6BpOvCv.id = "macro-bypass-field";
+      b6BpOvCv.style.cssText =
+        "position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:1;";
+      b6BpOvCtx = b6BpOvCv.getContext("2d");
+    }
+    if (gameCv && gameCv.parentNode) {
+      if (
+        b6BpOvCv.parentNode !== gameCv.parentNode ||
+        b6BpOvCv.previousSibling !== gameCv
+      ) {
+        gameCv.parentNode.insertBefore(b6BpOvCv, gameCv.nextSibling);
+      }
+    } else if (!b6BpOvCv.isConnected && document.body) {
+      document.body.appendChild(b6BpOvCv);
+    }
+  }
+
+  function b6StepPhantoms(nw, sm, aoi, hasAoi) {
+    const b = b6BpSt.bounds;
+    const virusTTL = Math.max(m9TvL2sP.bypassTtl, 35000);
+    for (const [cid, p] of b6Phantoms) {
+      const ttl = p.tag === 3 || p.tag === 4 ? virusTTL : m9TvL2sP.bypassTtl;
+      if (!b6BpSt.scanning && nw - p.rxAt > ttl) {
+        b6Phantoms.delete(cid);
+        continue;
+      }
+      if (v4WsCells.has(cid)) {
+        b6Phantoms.delete(cid);
+        continue;
+      }
+      if (
+        hasAoi &&
+        nw - p.rxAt > 250 &&
+        b6InBox(p.tx, p.ty, aoi, 90) &&
+        b6InBox(p.dx, p.dy, aoi, 90)
+      ) {
+        b6Phantoms.delete(cid);
+        continue;
+      }
+      let gx = p.tx,
+        gy = p.ty;
+      if (p.tag === 2 && (p.vx !== 0 || p.vy !== 0)) {
+        const ageSec = Math.max(0, (nw - p.rxAt) * 0.001);
+        const spd = Math.hypot(p.vx, p.vy);
+        const tau = spd > 650 ? 0.48 : 0.85;
+        const tEff = Math.min(ageSec, spd > 650 ? 1.8 : 2.2);
+        const disp = tau * (1 - Math.exp(-tEff / tau));
+        gx = Math.max(b[0], Math.min(b[2], p.tx + p.vx * disp));
+        gy = Math.max(b[1], Math.min(b[3], p.ty + p.vy * disp));
+      }
+      p.dx += (gx - p.dx) * sm;
+      p.dy += (gy - p.dy) * sm;
+      p.dr += (p.tr - p.dr) * sm;
+    }
+  }
+
+  function b6RenderFrame() {
+    try {
+      const nw = performance.now();
+      b6CheckPeerAlive(nw);
+      const menuHid = b6IsMenuHidden();
+      const scn = v4WsScene;
+      const wt = scn && scn.camera && scn.camera.worldTransform;
+
+      const dlt = Math.min(50, Math.max(8, nw - b6BpSt.lastOvAt));
+      const sm = 1 - Math.exp(-14 * dlt * 0.001);
+
+      if (
+        (m9TvL2sP.bypassPhantoms || m9TvL2sP.bypassRadar) &&
+        !b6BpSt.scanning &&
+        b6Phantoms.size > 0
+      ) {
+        const aoi = b6SafeBox();
+        const hasAoi = Boolean(
+          aoi && aoi.maxX - aoi.minX > 600 && aoi.maxY - aoi.minY > 600,
+        );
+        b6StepPhantoms(nw, sm, aoi, hasAoi);
+      }
+
+      const hasCam = Boolean(
+        (scn && scn.canvas && wt && nw - scn.at < 500) ||
+        (b6BpSt.camAt > 0 && b6BpSt.camZoom > 0.005),
+      );
+      const active = Boolean(
+        m9TvL2sP.bypassPhantoms &&
+        !b6BpSt.scanning &&
+        hasCam &&
+        b6Phantoms.size > 0 &&
+        nw - b6BpSt.lastRxAt < Math.max(m9TvL2sP.bypassTtl, 35000) + 500 &&
+        menuHid,
+      );
+
+      if (
+        b6BpOvCv &&
+        (!active || !m9TvL2sP.bypassPhantoms || b6Phantoms.size === 0)
+      ) {
+        if (b6BpOvDirty) {
+          b6BpOvCtx.setTransform(1, 0, 0, 1, 0, 0);
+          b6BpOvCtx.clearRect(0, 0, b6BpOvCv.width, b6BpOvCv.height);
+          b6BpOvDirty = false;
+        }
+      } else if (
+        active &&
+        m9TvL2sP.bypassPhantoms &&
+        b6Phantoms.size > 0 &&
+        nw - b6BpSt.lastOvAt >= 13
+      ) {
+        b6BpSt.lastOvAt = nw;
+        const gameCv = b6GameCanvas();
+        b6EnsureOv(gameCv);
+        const vw = window.innerWidth,
+          vh = window.innerHeight;
+        if (b6BpOvCv.width !== vw || b6BpOvCv.height !== vh) {
+          b6BpOvCv.width = vw;
+          b6BpOvCv.height = vh;
+          b6BpSt.rcCache = null;
+        }
+        if (!b6BpSt.rcCache || nw - b6BpSt.rcChkAt > 250) {
+          b6BpSt.rcChkAt = nw;
+          b6BpSt.rcCache = gameCv
+            ? gameCv.getBoundingClientRect()
+            : { left: 0, top: 0, right: vw, bottom: vh, width: vw, height: vh };
+        }
+        const rc = b6BpSt.rcCache;
+
+        if (rc && rc.width > 0 && rc.height > 0) {
+          const useWt = Boolean(scn && wt && nw - scn.at < 500);
+          const rx = useWt ? rc.width / scn.screenWidth : 1;
+          const ry = useWt ? rc.height / scn.screenHeight : 1;
+          const sx = useWt ? Math.hypot(wt.a, wt.b) : b6BpSt.camZoom;
+          const sAvg = useWt ? (rx + ry) * 0.5 : 1;
+
+          const visReal = [];
+          if (useWt && scn.models) {
+            for (const m of scn.models.values()) {
+              const wc = v4WsCells.get(m.lX);
+              const nd = m && m._$;
+              if (
+                !wc ||
+                !nd ||
+                nd.destroyed ||
+                nd.visible === false ||
+                !Number.isFinite(m.LM) ||
+                !Number.isFinite(m.JI) ||
+                m.G <= 0
+              )
+                continue;
+              const pr = m.G * sx * sAvg;
+              if (pr < 8) continue;
+              const px = rc.left + (wt.a * m.LM + wt.c * m.JI + wt.tx) * rx;
+              const py = rc.top + (wt.b * m.LM + wt.d * m.JI + wt.ty) * ry;
+              if (
+                px + pr >= rc.left &&
+                px - pr <= rc.right &&
+                py + pr >= rc.top &&
+                py - pr <= rc.bottom
+              ) {
+                visReal.push({ isMask: true, px, py, pr });
+              }
+            }
+          }
+
+          const visPh = [];
+          const virusTTL = Math.max(m9TvL2sP.bypassTtl, 35000);
+          for (const [cid, p] of b6Phantoms) {
+            if (
+              (scn && scn.models && scn.models.has(cid)) ||
+              (p.tag === 2 && !b6BpSt.specEntered && v4SelfOids.has(p.oid))
+            )
+              continue;
+            const ttl =
+              p.tag === 3 || p.tag === 4 ? virusTTL : m9TvL2sP.bypassTtl;
+            const age = nw - p.rxAt;
+            const fade = age > ttl - 900 ? Math.max(0, (ttl - age) / 900) : 1;
+            if (fade <= 0.02) continue;
+
+            const px = useWt
+              ? rc.left + (wt.a * p.dx + wt.c * p.dy + wt.tx) * rx
+              : vw * 0.5 + (p.dx - b6BpSt.camX) * b6BpSt.camZoom;
+            const py = useWt
+              ? rc.top + (wt.b * p.dx + wt.d * p.dy + wt.ty) * ry
+              : vh * 0.5 + (p.dy - b6BpSt.camY) * b6BpSt.camZoom;
+            const pr = p.dr * sx * sAvg;
+            if (
+              pr < 2 ||
+              px + pr < rc.left ||
+              px - pr > rc.right ||
+              py + pr < rc.top ||
+              py - pr > rc.bottom
+            )
+              continue;
+
+            let hidden = false;
+            for (let j = 0; j < visReal.length; j++) {
+              const m = visReal[j],
+                lim = m.pr + 1.5 - pr;
+              if (
+                m.pr >= pr * 0.96 &&
+                lim >= 0 &&
+                (px - m.px) ** 2 + (py - m.py) ** 2 <= lim * lim
+              ) {
+                hidden = true;
+                break;
+              }
+            }
+            if (!hidden) visPh.push({ isMask: false, p, px, py, pr, fade });
+          }
+
+          visPh.sort((a, b) => a.pr - b.pr);
+          const drawList = [];
+          for (let i = 0; i < visPh.length; i++) {
+            const it = visPh[i];
+            let covered = false;
+            for (let j = i + 1; j < visPh.length; j++) {
+              const big = visPh[j],
+                lim = big.pr + 1.5 - it.pr;
+              if (
+                lim >= 0 &&
+                (it.px - big.px) ** 2 + (it.py - big.py) ** 2 <= lim * lim
+              ) {
+                covered = true;
+                break;
+              }
+            }
+            if (!covered) drawList.push(it);
+          }
+          for (let i = 0; i < visReal.length; i++) drawList.push(visReal[i]);
+          drawList.sort((a, b) =>
+            a.pr !== b.pr ? a.pr - b.pr : a.isMask ? 1 : -1,
+          );
+
+          b6BpOvCtx.setTransform(1, 0, 0, 1, 0, 0);
+          b6BpOvCtx.clearRect(0, 0, vw, vh);
+          const needClip =
+            rc.left > 1 ||
+            rc.top > 1 ||
+            rc.right < vw - 1 ||
+            rc.bottom < vh - 1;
+          if (needClip) {
+            b6BpOvCtx.save();
+            b6BpOvCtx.beginPath();
+            b6BpOvCtx.rect(rc.left, rc.top, rc.width, rc.height);
+            b6BpOvCtx.clip();
+          }
+
+          const drawnPh = [];
+          let curComp = "source-over";
+          b6BpOvCtx.globalCompositeOperation = "source-over";
+
+          for (let i = 0; i < drawList.length; i++) {
+            const it = drawList[i];
+            let ov = false;
+            if (it.pr >= 8) {
+              for (let k = drawnPh.length - 1; k >= 0; k--) {
+                const dp = drawnPh[k],
+                  lim = it.pr + dp.pr + 3;
+                if (
+                  Math.abs(it.px - dp.px) <= lim &&
+                  Math.abs(it.py - dp.py) <= lim &&
+                  (it.px - dp.px) ** 2 + (it.py - dp.py) ** 2 < lim * lim
+                ) {
+                  ov = true;
+                  break;
+                }
+              }
+            }
+            if (it.isMask) {
+              if (!ov) continue;
+              if (curComp !== "destination-out") {
+                b6BpOvCtx.globalCompositeOperation = "destination-out";
+                curComp = "destination-out";
+              }
+              b6BpOvCtx.fillStyle = "#000";
+              b6BpOvCtx.globalAlpha = 1;
+              b6BpOvCtx.beginPath();
+              b6BpOvCtx.arc(it.px, it.py, it.pr + 1.2, 0, Math.PI * 2);
+              b6BpOvCtx.fill();
+              continue;
+            }
+            const { p, px, py, pr, fade } = it;
+            const lw = Math.max(1.3, Math.min(2.6, pr * 0.035));
+            if (ov) {
+              if (curComp !== "destination-out") {
+                b6BpOvCtx.globalCompositeOperation = "destination-out";
+                curComp = "destination-out";
+              }
+              b6BpOvCtx.fillStyle = "#000";
+              b6BpOvCtx.globalAlpha = 1;
+              b6BpOvCtx.beginPath();
+              b6BpOvCtx.arc(px, py, pr + Math.max(1, lw * 0.6), 0, Math.PI * 2);
+              b6BpOvCtx.fill();
+            }
+            if (curComp !== "source-over") {
+              b6BpOvCtx.globalCompositeOperation = "source-over";
+              curComp = "source-over";
+            }
+
+            if (p.tag === 3 || p.tag === 4) {
+              const col = p.tag === 4 ? "245,158,11" : "52,211,153";
+              b6BpOvCtx.beginPath();
+              b6BpOvCtx.arc(px, py, pr, 0, Math.PI * 2);
+              b6BpOvCtx.fillStyle = `rgba(${col},${0.16 * fade})`;
+              b6BpOvCtx.fill();
+              b6BpOvCtx.strokeStyle = `rgba(${col},${0.8 * fade})`;
+              b6BpOvCtx.lineWidth = 1.4;
+              b6BpOvCtx.stroke();
+              drawnPh.push(it);
+              continue;
+            }
+
+            const pl = b6Plrs.get(p.oid) || b6RemPlrs.get(p.oid);
+            if (pl) pl.at = nw;
+            const col =
+              pl && pl.rgb
+                ? `${pl.rgb[0]},${pl.rgb[1]},${pl.rgb[2]}`
+                : "120,190,255";
+            b6BpOvCtx.beginPath();
+            b6BpOvCtx.arc(px, py, pr, 0, Math.PI * 2);
+            b6BpOvCtx.fillStyle = `rgba(${col},${0.24 * fade})`;
+            b6BpOvCtx.fill();
+            b6BpOvCtx.strokeStyle = `rgba(${col},${0.94 * fade})`;
+            b6BpOvCtx.lineWidth = lw;
+            b6BpOvCtx.stroke();
+
+            if (pr >= 15) {
+              const fzB = Math.max(
+                10,
+                Math.round(
+                  Math.max(10, Math.min(26, Math.round(pr * 0.27))) / 4,
+                ) * 4,
+              );
+              const nm = pl && pl.name ? pl.name : `#${p.oid}`;
+              const massB =
+                pr >= 26
+                  ? Math.round((((p.dr * p.dr) / 25) | 0) / 100) * 100
+                  : 0;
+              const sp = b6LblSprite(p.oid, nm, massB, fzB);
+              b6BpOvCtx.globalAlpha = 0.94 * fade;
+              b6BpOvCtx.drawImage(
+                sp.c,
+                Math.round(px - sp.w * 0.5),
+                Math.round(py - sp.h * 0.5),
+              );
+              b6BpOvCtx.globalAlpha = 1;
+            }
+            if (pr >= 8) drawnPh.push(it);
+          }
+          b6BpOvCtx.globalCompositeOperation = "source-over";
+          b6BpOvCtx.globalAlpha = 1;
+          if (needClip) b6BpOvCtx.restore();
+          b6BpOvDirty = true;
+        }
+      }
+
+      if (b6BpRdCv && b6BpRdCtx && b6BpMapWin) {
+        const winOpen = Boolean(
+          b6BpWinEl && b6BpWinEl.classList.contains("open"),
+        );
+        const showR = Boolean(
+          m9TvL2sP.bypassRadar && !b6BpSt.scanning && (menuHid || winOpen),
+        );
+        if (b6BpMapWin.style.display !== (showR ? "block" : "none")) {
+          b6BpMapWin.style.display = showR ? "block" : "none";
+        }
+        if (showR && nw - b6BpSt.lastRdAt >= 14) {
+          b6BpSt.lastRdAt = nw;
+          const S = b6BpMapWin.clientWidth || m9TvL2sP.bypassMapSize;
+          const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+          const tS = Math.round(S * dpr);
+          if (b6BpRdCv.width !== tS || b6BpRdCv.height !== tS) {
+            b6BpRdCv.width = tS;
+            b6BpRdCv.height = tS;
+          }
+          b6BpRdCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          b6BpRdCtx.clearRect(0, 0, S, S);
+
+          const b = b6BpSt.bounds;
+          const mw = Math.max(1000, b[2] - b[0]);
+          const mh = Math.max(1000, b[3] - b[1]);
+          const toX = (wx) => ((wx - b[0]) / mw) * S;
+          const toY = (wy) => ((wy - b[1]) / mh) * S;
+
+          b6BpRdCtx.strokeStyle = "rgba(255,255,255,0.06)";
+          b6BpRdCtx.lineWidth = 1;
+          b6BpRdCtx.beginPath();
+          for (let g = 1; g < 5; g++) {
+            const p = (S * g) / 5;
+            b6BpRdCtx.moveTo(p, 0);
+            b6BpRdCtx.lineTo(p, S);
+            b6BpRdCtx.moveTo(0, p);
+            b6BpRdCtx.lineTo(S, p);
+          }
+          b6BpRdCtx.stroke();
+
+          if (menuHid) {
+            const isFixedRad = m9TvL2sP.bypassRadarMode === "fixed";
+            const fixEnemyR = Math.max(2.4, Math.round(S * 0.013 * 10) / 10);
+            const fixSelfR = Math.max(3.2, Math.round(S * 0.017 * 10) / 10);
+            const rList = [];
+
+            for (const [cid, p] of b6Phantoms) {
+              if (
+                p.tag !== 2 ||
+                v4WsCells.has(cid) ||
+                (!b6BpSt.specEntered && v4SelfOids.has(p.oid))
+              )
+                continue;
+              const age = nw - p.rxAt;
+              const fade =
+                age > m9TvL2sP.bypassTtl - 900
+                  ? Math.max(0.12, (m9TvL2sP.bypassTtl - age) / 900)
+                  : 1;
+              const pl = b6Plrs.get(p.oid) || b6RemPlrs.get(p.oid);
+              if (pl) pl.at = nw;
+              const rawR = (p.dr * S) / mw;
+              rList.push({
+                x: toX(p.dx),
+                y: toY(p.dy),
+                rawR,
+                r: isFixedRad ? fixEnemyR : Math.max(1.8, rawR),
+                rgb: pl && pl.rgb ? pl.rgb : [120, 190, 255],
+                fade,
+                live: false,
+                me: false,
+              });
+            }
+
+            const useModels = Boolean(scn && scn.models && nw - scn.at < 300);
+            for (const c of v4WsCells.values()) {
+              if (c.tag !== 2) continue;
+              const md = useModels ? scn.models.get(c.cid) : null;
+              const cx = md && Number.isFinite(md.LM) ? md.LM : c.x;
+              const cy = md && Number.isFinite(md.JI) ? md.JI : c.y;
+              const cr = md && Number.isFinite(md.G) && md.G > 0 ? md.G : c.r;
+              const rawR = (cr * S) / mw;
+              const isMe = !b6BpSt.specEntered && v4SelfOids.has(c.oid);
+              const pl = b6Plrs.get(c.oid);
+              if (pl) pl.at = nw;
+              rList.push({
+                x: toX(cx),
+                y: toY(cy),
+                rawR,
+                r: isFixedRad
+                  ? isMe
+                    ? fixSelfR
+                    : fixEnemyR
+                  : Math.max(isMe ? 2.5 : 2, rawR),
+                rgb: isMe
+                  ? [255, 255, 255]
+                  : pl && pl.rgb
+                    ? pl.rgb
+                    : [250, 204, 21],
+                fade: 1,
+                live: true,
+                me: isMe,
+              });
+            }
+
+            rList.sort((a, b) => {
+              if (isFixedRad && a.me !== b.me) return a.me ? 1 : -1;
+              return a.rawR !== b.rawR ? a.rawR - b.rawR : a.live ? 1 : -1;
+            });
+            for (let i = 0; i < rList.length; i++) {
+              const d = rList[i];
+              if (d.me) {
+                b6BpRdCtx.fillStyle = "#ffffff";
+                b6BpRdCtx.beginPath();
+                b6BpRdCtx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+                b6BpRdCtx.fill();
+                continue;
+              }
+              const k = d.fade * (d.live ? 0.94 : 0.86);
+              const cr = Math.round(14 + (d.rgb[0] - 14) * k);
+              const cg = Math.round(15 + (d.rgb[1] - 15) * k);
+              const cb = Math.round(19 + (d.rgb[2] - 19) * k);
+              b6BpRdCtx.beginPath();
+              b6BpRdCtx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+              b6BpRdCtx.fillStyle = `rgb(${cr},${cg},${cb})`;
+              b6BpRdCtx.fill();
+              if (d.r >= 3) {
+                b6BpRdCtx.strokeStyle = `rgba(255,255,255,${0.18 * d.fade})`;
+                b6BpRdCtx.lineWidth = 0.8;
+                b6BpRdCtx.stroke();
+              }
+            }
+          }
+        }
+      }
+
+      if (!b6BpSt.scanning && b6BpSt.inMatch && nw - b6BpSt.mainBcAt >= 110) {
+        b6SendMainAoi(nw);
+      }
+    } catch (_) {}
+  }
+
+  let b6InPeerSync = false;
+  let b6LastSyncStr = "";
+
+  function b6PickSyncCfg(src) {
+    const out = {};
+    for (let i = 0; i < b6SyncKeys.length; i++) {
+      const k = b6SyncKeys[i];
+      if (Object.prototype.hasOwnProperty.call(src, k)) out[k] = src[k];
+    }
+    return out;
+  }
+
+  b6LastSyncStr = JSON.stringify(b6PickSyncCfg(m9TvL2sP));
+
+  b6BcSyncFn = function (force) {
+    if (b6InPeerSync) return;
+    const snap = b6PickSyncCfg(m9TvL2sP);
+    const str = JSON.stringify(snap);
+    if (!force && str === b6LastSyncStr) return;
+    b6LastSyncStr = str;
+    try {
+      q5RzL9wK.postMessage({
+        type: "MACRO_FULL_CFG_SYNC",
+        senderId: v8WpM2tL,
+        cfg: snap,
+      });
+    } catch (_) {}
+  };
+
+  function b6ApplyPeerCfg(src) {
+    if (!src || typeof src !== "object") return;
+    const data = b6NormCfgFn
+      ? b6NormCfgFn(Object.assign({}, m9TvL2sP, src))
+      : src;
+    let chg = false;
+    let ffChg = false;
+    let langChg = false;
+    let palChg = false;
+    let mapBgChg = false;
+    let fixBgChg = false;
+    let rScaleChg = false;
+    let plexusChg = false;
+    let syncScaleChg = false;
+    let mapPosChg = false;
+    for (let i = 0; i < b6SyncKeys.length; i++) {
+      const k = b6SyncKeys[i];
+      if (!Object.prototype.hasOwnProperty.call(data, k)) continue;
+      const nv = data[k];
+      const ov = m9TvL2sP[k];
+      const eq =
+        k === "extraFastFeeds"
+          ? JSON.stringify(ov) === JSON.stringify(nv)
+          : ov === nv;
+      if (eq) continue;
+      chg = true;
+      if (k === "extraFastFeeds") {
+        m9TvL2sP[k] = Array.isArray(nv)
+          ? nv.map((x) => ({ delay: x.delay, key: x.key }))
+          : [];
+        c6RmP3xW.clear();
+        ffChg = true;
+        continue;
+      }
+      m9TvL2sP[k] = nv;
+      if (k === "bypassEnabled") {
+        b6BpSt.enableGraceUntil = 0;
+        if (!nv) {
+          b6ScanStop();
+          if (!m9TvL2sP.bypassPhantoms && !m9TvL2sP.bypassRadar)
+            b6ResetWorld(false);
+        }
+      } else if (k === "bypassMethod") {
+        b6BpSt.cvsMiss = 0;
+        b6BpSt.holdUntil = 0;
+        b6BpSt.needPeek = false;
+        b6BpSt.wasPeek = false;
+        b6BpSt.nextIsPeek = false;
+        b6BpSt.returnToBest = false;
+      } else if (k === "revMethod") {
+        q2WnS7xM(false);
+      } else if (k === "ffMethod") {
+        k4FfCancel(false);
+      } else if (k === "keyHoldSpam" && !nv) {
+        hCl2xK9m();
+      } else if (
+        k === "holdSpamMode" &&
+        nv === "release" &&
+        (!document.hasFocus() || document.hidden)
+      ) {
+        hCl2xK9m();
+      } else if (k === "softColors" && !nv) {
+        j2RstSoft();
+      } else if (k === "revNotify" && !nv) {
+        if (r9RevNotClr) r9RevNotClr();
+      } else if (k === "mapBgSrc") {
+        mapBgChg = true;
+      } else if (k === "fixedBgSrc") {
+        fixBgChg = true;
+      } else if (k === "renderScaleToggle" || k === "renderScale") {
+        rScaleChg = true;
+      } else if (k === "plexusEnabled") {
+        plexusChg = true;
+      } else if (k === "syncScale") {
+        syncScaleChg = true;
+      } else if (
+        k === "bypassMapX" ||
+        k === "bypassMapY" ||
+        k === "bypassMapSize"
+      ) {
+        mapPosChg = true;
+      } else if (
+        k === "menuColor" ||
+        k === "buttonsColor" ||
+        k === "plexusColor"
+      ) {
+        palChg = true;
+      } else if (k === "lang") {
+        langChg = true;
+      }
+    }
+    if (!chg) return;
+    b6InPeerSync = true;
+    try {
+      b6LastSyncStr = JSON.stringify(b6PickSyncCfg(m9TvL2sP));
+      if (palChg && b6ClearPalHistFn) b6ClearPalHistFn();
+      if (mapBgChg) {
+        if (!m9TvL2sP.mapBgSrc) window.setMapBackground(null);
+        else
+          k2LoadBg("mapBgSrc", "map", window.setMapBackground, "mapBgEnabled");
+      }
+      if (fixBgChg) {
+        if (!m9TvL2sP.fixedBgSrc) window.setFixedBackground(null);
+        else
+          k2LoadBg(
+            "fixedBgSrc",
+            "fixed",
+            window.setFixedBackground,
+            "fixedBackgroundEnabled",
+          );
+      }
+      if (rScaleChg && p9RndRef) p9ApplyRes(p9RndRef);
+      if (plexusChg && s2NpK7wL) s2NpK7wL();
+      if (syncScaleChg && b6BpWinEl) q6VxM4tN(b6BpWinEl);
+      if (mapPosChg && b6FitMapWin) b6FitMapWin();
+      if (ffChg && b6RebuildFfFn) b6RebuildFfFn();
+      if (langChg && b6ApplyLangFn) b6ApplyLangFn();
+      else if (document.getElementById("macro-window")) r8QnM4tL();
+      if (e7CfgBoxSync) e7CfgBoxSync(false);
+    } finally {
+      b6InPeerSync = false;
+    }
+  }
 
   function w4Descends(node, root) {
     for (let i = 0; node && i < 64; i++, node = node.parent) {
@@ -3584,6 +4986,7 @@
   function w4GetCurSelfOid() {
     const id = parseInt(g5ReadPid(), 10);
     if (Number.isSafeInteger(id) && id > 0) return id;
+    if (v4ActOid > 0) return v4ActOid;
     return v4MyOid;
   }
 
@@ -3815,6 +5218,16 @@
       CONTROL: 17,
       ALT: 18,
       LALT: 18,
+      RALT: 18,
+      "LEFT SHIFT": 16,
+      "RIGHT SHIFT": 16,
+      "LEFT CTRL": 17,
+      "RIGHT CTRL": 17,
+      "LEFT ALT": 18,
+      "RIGHT ALT": 18,
+      "CAPS LOCK": 20,
+      "PAGE UP": 33,
+      "PAGE DOWN": 34,
       CAPS: 20,
       CAPSLOCK: 20,
       ESC: 27,
@@ -3979,6 +5392,7 @@
   }
 
   function u2SyncPidState() {
+    if (b6BpSt.specEntered) return;
     const id = g5ReadPid();
     m9MbSt.activeId = id;
     const nId = parseInt(id, 10);
@@ -4037,15 +5451,21 @@
     const nw = performance.now();
     let alive = false;
     v5PeerMap.forEach((ts, id) => {
-      if (nw - ts > 10000) v5PeerMap.delete(id);
-      else alive = true;
+      if (nw - ts > 6500) {
+        v5PeerMap.delete(id);
+      } else {
+        alive = true;
+      }
     });
     return alive;
   }
 
   function v5PingPeers() {
     try {
-      q5RzL9wK.postMessage({ type: "MB_PING", senderId: v8WpM2tL });
+      q5RzL9wK.postMessage({
+        type: "MB_PING",
+        senderId: v8WpM2tL,
+      });
     } catch (_) {}
   }
 
@@ -4087,7 +5507,13 @@
       return;
     }
     const actEl = document.activeElement;
-    if (actEl && actEl.tagName === "BUTTON" && actEl.blur) actEl.blur();
+    if (
+      actEl &&
+      (actEl.tagName === "BUTTON" ||
+        (actEl.tagName === "INPUT" && actEl.type === "checkbox")) &&
+      actEl.blur
+    )
+      actEl.blur();
     const tg = document;
     for (let i = 0; i < times; i++) {
       const kd = new KeyboardEvent("keydown", {
@@ -4151,7 +5577,7 @@
     }
     if (
       el.closest(
-        '#macro-window, #macro-toggle-pill, #main-panel, #login-panel, #party-panel, #chat-container, #chat-panel, .chat-panel, button, a, input, textarea, select, [role="button"], .macro-cvs-txt, .macro-pe-txt',
+        '#macro-window, #macro-toggle-pill, #macro-bypass-map, #main-panel, #login-panel, #party-panel, #chat-container, #chat-panel, .chat-panel, button, a, input, textarea, select, [role="button"], .macro-cvs-txt, .macro-pe-txt',
       )
     ) {
       curOverUi = true;
@@ -4205,19 +5631,189 @@
   q5RzL9wK.onmessage = function (ev) {
     const dt = ev.data;
     if (!dt || dt.senderId === v8WpM2tL) return;
-    if (dt.type === "MB_PING") {
+    if (dt.senderId && dt.type !== "MB_BYE") {
       v5PeerMap.set(dt.senderId, performance.now());
+    }
+    if (dt.type === "MB_PING") {
+      b6BpSt.enableGraceUntil = 0;
       try {
-        q5RzL9wK.postMessage({ type: "MB_PONG", senderId: v8WpM2tL });
+        q5RzL9wK.postMessage({
+          type: "MB_PONG",
+          senderId: v8WpM2tL,
+        });
       } catch (_) {}
       return;
     }
     if (dt.type === "MB_PONG") {
-      v5PeerMap.set(dt.senderId, performance.now());
+      b6BpSt.enableGraceUntil = 0;
       return;
     }
     if (dt.type === "MB_BYE") {
       v5PeerMap.delete(dt.senderId);
+      b6BpSt.enableGraceUntil = 0;
+      b6CheckPeerAlive(performance.now());
+      return;
+    }
+    if (dt.type === "MACRO_FULL_CFG_SYNC") {
+      b6ApplyPeerCfg(dt.cfg);
+      return;
+    }
+    if (dt.type === "BYPASS_WORLD_RESET") {
+      b6ResetWorld(false);
+      return;
+    }
+    if (dt.type === "BYPASS_SCOUT_CLAIM") {
+      if (dt.oid) {
+        b6Claims.set(dt.oid, {
+          cx: dt.cx || 0,
+          cy: dt.cy || 0,
+          ts: performance.now(),
+        });
+      }
+      return;
+    }
+    if (dt.type === "BYPASS_MAIN_AOI") {
+      const nw = performance.now();
+      if (Array.isArray(dt.aoi) && dt.aoi.length === 4) {
+        b6BpSt.mainAoi = {
+          minX: dt.aoi[0],
+          minY: dt.aoi[1],
+          maxX: dt.aoi[2],
+          maxY: dt.aoi[3],
+          at: nw,
+        };
+      }
+      if (Array.isArray(dt.self) && dt.self.length >= 2) {
+        const prev = b6BpSt.mainSelf;
+        const nx = dt.self[0],
+          ny = dt.self[1],
+          noid = dt.self[2] || 0;
+        if (
+          !prev ||
+          (noid && prev.oid && noid !== prev.oid) ||
+          Math.hypot(nx - prev.x, ny - prev.y) > 1600
+        ) {
+          b6NearTs.fill(0);
+        }
+        b6BpSt.mainSelf = { x: nx, y: ny, oid: noid, at: nw };
+      }
+      if (Array.isArray(dt.cur) && dt.cur.length === 2) {
+        b6BpSt.mainCursor = { x: dt.cur[0], y: dt.cur[1], at: nw };
+      }
+      return;
+    }
+    if (dt.type === "BYPASS_FRAME") {
+      if (
+        (!m9TvL2sP.bypassEnabled &&
+          !m9TvL2sP.bypassPhantoms &&
+          !m9TvL2sP.bypassRadar) ||
+        b6BpSt.scanning ||
+        Date.now() - dt.ts > 950
+      )
+        return;
+      const nw = performance.now();
+      b6BpSt.lastRxAt = nw;
+      if (Array.isArray(dt.bounds) && dt.bounds.length === 4) {
+        b6BpSt.bounds = dt.bounds;
+      }
+      if (Array.isArray(dt.plrs)) {
+        for (let i = 0; i < dt.plrs.length; i++) {
+          const p = dt.plrs[i];
+          if (p && p[0]) {
+            b6RemPlrs.set(p[0], {
+              oid: p[0],
+              name: p[1] || "",
+              rgb: p[2] || [140, 200, 255],
+              at: nw,
+            });
+          }
+        }
+      }
+      const liveBox = b6SafeBox();
+      const hasLive = Boolean(
+        liveBox &&
+        liveBox.maxX - liveBox.minX > 600 &&
+        liveBox.maxY - liveBox.minY > 600,
+      );
+      const seenNow = new Set();
+      if (Array.isArray(dt.cells)) {
+        for (let i = 0; i < dt.cells.length; i++) {
+          const [cid, tag, oid, x, y, r] = dt.cells[i];
+          if (v4WsCells.has(cid) || (tag === 2 && v4SelfOids.has(oid)))
+            continue;
+          const lDel = b6DelTs.get(cid);
+          if (lDel && dt.ts - lDel < 180) continue;
+          if (hasLive && b6InBox(x, y, liveBox, 90)) {
+            b6Phantoms.delete(cid);
+            continue;
+          }
+          seenNow.add(cid);
+          const ex = b6Phantoms.get(cid);
+          if (ex) {
+            if (dt.ts > ex.ts) {
+              const dtSec = (dt.ts - ex.ts) * 0.001;
+              if (dtSec >= 0.015 && dtSec <= 1.2) {
+                const nvx = (x - ex.tx) / dtSec,
+                  nvy = (y - ex.ty) / dtSec;
+                if (Math.hypot(nvx, nvy) < 4200) {
+                  if (!ex.vInit) {
+                    ex.vx = nvx;
+                    ex.vy = nvy;
+                    ex.vInit = true;
+                  } else {
+                    ex.vx = ex.vx * 0.45 + nvx * 0.55;
+                    ex.vy = ex.vy * 0.45 + nvy * 0.55;
+                  }
+                }
+              }
+              ex.tag = tag;
+              ex.oid = oid;
+              ex.tx = x;
+              ex.ty = y;
+              ex.tr = r;
+              ex.ts = dt.ts;
+              ex.rxAt = nw;
+            }
+          } else {
+            b6Phantoms.set(cid, {
+              cid,
+              tag,
+              oid,
+              dx: x,
+              dy: y,
+              dr: r,
+              tx: x,
+              ty: y,
+              tr: r,
+              vx: 0,
+              vy: 0,
+              vInit: false,
+              ts: dt.ts,
+              rxAt: nw,
+            });
+          }
+        }
+      }
+      if (Array.isArray(dt.aoi) && dt.aoi.length === 4) {
+        const [ax0, ay0, ax1, ay1] = dt.aoi;
+        if (ax1 - ax0 > 1500 && ay1 - ay0 > 1500) {
+          const box = {
+            minX: ax0 + 480,
+            minY: ay0 + 480,
+            maxX: ax1 - 480,
+            maxY: ay1 - 480,
+          };
+          for (const [cid, p] of b6Phantoms) {
+            if (
+              !seenNow.has(cid) &&
+              p.ts < dt.ts - 240 &&
+              b6InBox(p.tx, p.ty, box)
+            ) {
+              b6Phantoms.delete(cid);
+            }
+          }
+        }
+      }
       return;
     }
     if (document.hasFocus() && !document.hidden) return;
@@ -4838,28 +6434,98 @@
       hk.addEventListener("keyup", u7Hk, true);
     }
 
-    ["btn-play", "btn-spec", "btn-leave-match"].forEach((bid) => {
-      const b = document.getElementById(bid);
-      if (b && !b.__mbRstOn) {
-        b.__mbRstOn = true;
-        b.addEventListener(
-          "click",
-          () => {
-            m9MbSt.box1Id = "";
-            m9MbSt.box2Id = "";
-            m9MbSt.activeBox = 0;
-            m9MbSt.matchGen++;
-            v4OwnSeen = false;
-            k4FfCancel(false);
-          },
-          true,
-        );
-      }
-    });
+    if (!document.__mbBpClkOn) {
+      document.__mbBpClkOn = true;
+      const onMatchBtn = (e) => {
+        const tg = e.target;
+        const btn =
+          tg && tg.closest
+            ? tg.closest("#btn-play, #btn-spec, #btn-leave-match, button")
+            : null;
+        if (!btn) return;
+        const bid = btn.id || "";
+        const txt = (btn.textContent || "").trim().toLowerCase();
+        const inMenu = Boolean(btn.closest("#main-panel, #login-panel"));
+        const isSpec =
+          bid === "btn-spec" ||
+          (bid.includes("spec") && inMenu) ||
+          (txt === "spectate" && inMenu);
+        const isPlay = bid === "btn-play";
+        const isLeave = bid === "btn-leave-match";
+        if (!isSpec && !isPlay && !isLeave) return;
+        if (
+          e.type === "click" &&
+          (!isPlay || b6BpSt.specEntered || k2WsDead())
+        ) {
+          m9MbSt.box1Id = "";
+          m9MbSt.box2Id = "";
+          m9MbSt.activeBox = 0;
+          m9MbSt.matchGen++;
+          v4OwnSeen = false;
+          k4FfCancel(false);
+        }
+        if (isSpec) {
+          p2LxQ8vM();
+          b6BpSt.specEntered = true;
+          b6BpSt.wasAlive = false;
+          b6BpSt.lastPlayAt = 0;
+          v4ActOid = 0;
+          v4SelfOids.clear();
+          if (v4MyOid) v4SelfOids.add(v4MyOid);
+          b6UpdateRole(performance.now());
+        } else if (isPlay) {
+          b6BpSt.specEntered = false;
+          b6BpSt.wasAlive = true;
+          b6BpSt.lastPlayAt = performance.now();
+          b6ScanStop();
+          b6UpdateRole(performance.now());
+        } else {
+          b6BpSt.specEntered = false;
+          b6BpSt.wasAlive = false;
+          b6BpSt.lastPlayAt = 0;
+          v4ActOid = 0;
+          b6ScanStop();
+          b6UpdateRole(performance.now());
+        }
+      };
+      document.addEventListener("pointerdown", onMatchBtn, true);
+      document.addEventListener("click", onMatchBtn, true);
+      document.addEventListener(
+        "keydown",
+        (e) => {
+          if (
+            e.key === "Enter" &&
+            e.target &&
+            e.target.id === "name-box" &&
+            !b6IsMenuHidden()
+          ) {
+            if (b6BpSt.specEntered || k2WsDead()) {
+              m9MbSt.box1Id = "";
+              m9MbSt.box2Id = "";
+              m9MbSt.activeBox = 0;
+              m9MbSt.matchGen++;
+              v4OwnSeen = false;
+              k4FfCancel(false);
+            }
+            b6BpSt.specEntered = false;
+            b6BpSt.wasAlive = true;
+            b6BpSt.lastPlayAt = performance.now();
+            b6ScanStop();
+            b6UpdateRole(performance.now());
+          }
+        },
+        true,
+      );
+    }
 
     window.addEventListener("storage", (e) => {
       if (!e || e.key === "keybinds") b6SyncKb(false);
       if (!e || e.key === "options") m4SyncMbOpt(false);
+      if (e && e.key === "gota_macro_overlay_v2" && e.newValue) {
+        try {
+          b6ApplyPeerCfg(JSON.parse(e.newValue));
+        } catch (_) {}
+      }
     });
   }
 
@@ -4911,7 +6577,9 @@
         c.id === "macro-bg-canvas" ||
         c.id === "macro-plexus-canvas" ||
         c.id === "macro-grid-canvas" ||
-        c.id === "macro-curline-canvas"
+        c.id === "macro-curline-canvas" ||
+        c.id === "macro-bypass-field" ||
+        c.id === "macro-bypass-radar"
       )
         continue;
       if (r4CvOk(c)) {
@@ -5064,7 +6732,9 @@
   function w3IsUi(tg) {
     const el = tg && tg.nodeType === 1 ? tg : tg && tg.parentElement;
     return Boolean(
-      el && el.closest && el.closest("#macro-window, #macro-toggle-pill"),
+      el &&
+      el.closest &&
+      el.closest("#macro-window, #macro-toggle-pill, #macro-bypass-map"),
     );
   }
 
@@ -5112,7 +6782,9 @@
       cv.id === "macro-bg-canvas" ||
       cv.id === "macro-plexus-canvas" ||
       cv.id === "macro-grid-canvas" ||
-      cv.id === "macro-curline-canvas"
+      cv.id === "macro-curline-canvas" ||
+      cv.id === "macro-bypass-field" ||
+      cv.id === "macro-bypass-radar"
     )
       return;
     const isConn = Boolean(cv.isConnected);
@@ -6429,11 +8101,40 @@
       }
       return;
     }
-    if (!wld.children) return;
+    let cam = wld;
+    const wt = wld.worldTransform;
+    if (
+      wt &&
+      Math.abs(wt.a - 1) < 1e-4 &&
+      Math.abs(wt.d - 1) < 1e-4 &&
+      Math.abs(wt.tx) < 0.5 &&
+      Math.abs(wt.ty) < 0.5 &&
+      wld.children
+    ) {
+      for (let i = 0; i < wld.children.length; i++) {
+        const c = wld.children[i];
+        const cwt = c && c.worldTransform;
+        if (
+          c &&
+          c.children &&
+          c.children.length &&
+          cwt &&
+          cwt.a > 0.002 &&
+          cwt.a < 25 &&
+          (Math.abs(cwt.a - 1) > 1e-4 ||
+            Math.abs(cwt.tx) > 0.5 ||
+            Math.abs(cwt.ty) > 0.5)
+        ) {
+          cam = c;
+          break;
+        }
+      }
+    }
+    if (!cam.children) return;
     let cc = null,
       mx = 0;
-    for (let i = 0; i < wld.children.length; i++) {
-      const c = wld.children[i],
+    for (let i = 0; i < cam.children.length; i++) {
+      const c = cam.children[i],
         n = c.children ? c.children.length : 0;
       if (n > mx) {
         mx = n;
@@ -6462,6 +8163,7 @@
     for (let i = 0; i < cl.length; i++) {
       const c = cl[i];
       if (!c || c.destroyed) continue;
+      if (!c.renderable && !c9LmW2xR.has(c)) continue;
       const b = c.getBounds ? m7Box(c.getBounds()) : null;
       if (!b) continue;
       const out = b.x + b.w < mnX || b.x > mxX || b.y + b.h < mnY || b.y > mxY;
@@ -6470,7 +8172,7 @@
           c.renderable = false;
           c9LmW2xR.add(c);
         }
-      } else if (!c.renderable) {
+      } else if (c9LmW2xR.has(c)) {
         c.renderable = true;
         c9LmW2xR.delete(c);
       }
@@ -6672,10 +8374,11 @@
           if (pct < 100) {
             const rcA = cv.getBoundingClientRect();
             if (
-              rcA.width > 0 &&
-              Math.abs(rcA.width - sw * tr) <= 2 &&
-              Math.abs(sw - sw * tr) > 4 &&
-              (!rcB || Math.abs(rcB.width - sw) <= 4)
+              rnd._mCssFit ||
+              (rcA.width > 0 &&
+                Math.abs(rcA.width - sw * tr) <= 2 &&
+                Math.abs(sw - sw * tr) > 4 &&
+                (!rcB || Math.abs(rcB.width - sw) <= 4))
             ) {
               rnd._mCssFit = true;
               cv.style.width = sw + "px";
@@ -6788,10 +8491,11 @@
             if (pct < 100) {
               const rcA = cv.getBoundingClientRect();
               if (
-                rcA.width > 0 &&
-                Math.abs(rcA.width - w * tr) <= 2 &&
-                Math.abs(w - w * tr) > 4 &&
-                (!rcB || Math.abs(rcB.width - w) <= 4 || this._mCssFit)
+                this._mCssFit ||
+                (rcA.width > 0 &&
+                  Math.abs(rcA.width - w * tr) <= 2 &&
+                  Math.abs(w - w * tr) > 4 &&
+                  (!rcB || Math.abs(rcB.width - w) <= 4))
               ) {
                 this._mCssFit = true;
                 cv.style.width = w + "px";
@@ -7284,7 +8988,9 @@ vec4 _mSoft(vec4 raw) {
       this.id !== "macro-bg-canvas" &&
       this.id !== "macro-plexus-canvas" &&
       this.id !== "macro-grid-canvas" &&
-      this.id !== "macro-curline-canvas"
+      this.id !== "macro-curline-canvas" &&
+      this.id !== "macro-bypass-field" &&
+      this.id !== "macro-bypass-radar"
     ) {
       if (t === "webgl" || t === "webgl2")
         gCtxMap.set(this, { gl: ctx, ctx2d: null });
@@ -7299,11 +9005,12 @@ vec4 _mSoft(vec4 raw) {
     v9QnL4vM = 0;
 
   function z2TvM8sP() {
+    if (b6BpSt.specEntered) return true;
+    const mp = document.getElementById("main-panel");
+    if (mp && window.getComputedStyle(mp).display !== "none") return true;
     const nw = performance.now();
     if (nw - v5QzR9mL < 350) return false;
     v5QzR9mL = nw;
-    const mp = document.getElementById("main-panel");
-    if (mp && window.getComputedStyle(mp).display !== "none") return true;
     const p =
       s8XnL3wP && document.contains(s8XnL3wP)
         ? s8XnL3wP
@@ -8205,6 +9912,7 @@ vec4 _mSoft(vec4 raw) {
   function m4WnL7sT() {
     const nw = performance.now();
     if (v9TxtOn()) w3TickTxt();
+    b6RenderFrame();
     if ((!r8QnS4mT || nw - w2VpL9xK > 40) && !b5TxM1wP) {
       b5TxM1wP = true;
       try {
@@ -9045,7 +10753,7 @@ vec4 _mSoft(vec4 raw) {
         (hasClosest &&
           Boolean(
             tg.closest(
-              "#macro-window, #macro-toggle-pill, #chat-container, #chat-panel, .chat-panel",
+              "#macro-window, #macro-toggle-pill, #macro-bypass-map, #chat-container, #chat-panel, .chat-panel",
             ),
           ));
 
@@ -9171,69 +10879,42 @@ vec4 _mSoft(vec4 raw) {
   }
 
   function hEv2xK9m(st, type) {
-    const cv = t8VwM4xK() || window;
-    const tg = cv !== window ? cv : window;
-    const jq = window.$;
     if (st.kind === "key") {
       let kc = st.keyCode;
       if (!kc && st.code) {
         if (st.code.startsWith("Key")) kc = st.code.charCodeAt(3);
         else if (st.code.startsWith("Digit"))
           kc = 48 + parseInt(st.code.slice(5), 10);
+        else if (st.code === "Space") kc = 32;
       }
       if (!kc) kc = st.key ? st.key.toUpperCase().charCodeAt(0) : 87;
-
-      if (jq) {
-        const jEv = jq.Event(type, {
-          keyCode: kc,
-          which: kc,
-          code: st.code,
-          key: st.key,
-        });
-        jq(tg).trigger(jEv);
-      } else {
-        const ev = new KeyboardEvent(type, {
-          key: st.key,
-          code: st.code,
-          location: st.location || 0,
-          bubbles: true,
-          cancelable: true,
-        });
-        Object.defineProperty(ev, "keyCode", { value: kc, writable: false });
-        Object.defineProperty(ev, "which", { value: kc, writable: false });
-        hSP2xK9m.add(ev);
-        tg.dispatchEvent(ev);
-      }
+      const ev = new KeyboardEvent(type, {
+        key: st.key,
+        code: st.code,
+        location: st.location || 0,
+        bubbles: true,
+        cancelable: true,
+      });
+      Object.defineProperty(ev, "keyCode", { value: kc, writable: false });
+      Object.defineProperty(ev, "which", { value: kc, writable: false });
+      hSP2xK9m.add(ev);
+      document.dispatchEvent(ev);
     } else {
+      const tg = t8VwM4xK() || document;
       const btn = st.button !== undefined ? st.button : 0;
       const wh = btn + 1;
       const btns = type === "mouseup" ? 0 : [1, 4, 2, 8, 16][btn] || 1;
-      const mx = t2QnL9wP,
-        my = b8VmK3xT;
-      if (jq) {
-        const jEv = jq.Event(type, {
-          button: btn,
-          which: wh,
-          buttons: btns,
-          clientX: mx,
-          clientY: my,
-          pageX: mx + window.scrollX,
-          pageY: my + window.scrollY,
-        });
-        jq(tg).trigger(jEv);
-      } else {
-        const mEv = new MouseEvent(type, {
-          button: btn,
-          buttons: btns,
-          clientX: mx,
-          clientY: my,
-          bubbles: true,
-          cancelable: true,
-        });
-        Object.defineProperty(mEv, "which", { value: wh, writable: false });
-        hSP2xK9m.add(mEv);
-        tg.dispatchEvent(mEv);
-      }
+      const mEv = new MouseEvent(type, {
+        button: btn,
+        buttons: btns,
+        clientX: t2QnL9wP,
+        clientY: b8VmK3xT,
+        bubbles: true,
+        cancelable: true,
+      });
+      Object.defineProperty(mEv, "which", { value: wh, writable: false });
+      hSP2xK9m.add(mEv);
+      tg.dispatchEvent(mEv);
     }
   }
 
@@ -9320,6 +11001,13 @@ vec4 _mSoft(vec4 raw) {
       (tg && tg.isContentEditable)
     )
       hCl2xK9m();
+  });
+
+  window.addEventListener("blur", () => {
+    if (m9TvL2sP.holdSpamMode === "release") hCl2xK9m();
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden && m9TvL2sP.holdSpamMode === "release") hCl2xK9m();
   });
 
   window.addEventListener(
@@ -9750,7 +11438,7 @@ vec4 _mSoft(vec4 raw) {
       if (x3CrsKey !== nk) {
         x3CrsKey = nk;
         const u = m8XhairUri(xs, sc);
-        x3CrsStEl.textContent = `html.macro-xhair-on #canvas, html.macro-xhair-on canvas:not(#macro-plexus-canvas):not(#autorev-overlay):not(#macro-bg-canvas):not(#macro-grid-canvas):not(#macro-curline-canvas) { cursor: url("${u}") 10 10, crosshair !important; }`;
+        x3CrsStEl.textContent = `html.macro-xhair-on #canvas, html.macro-xhair-on canvas:not(#macro-plexus-canvas):not(#autorev-overlay):not(#macro-bg-canvas):not(#macro-grid-canvas):not(#macro-curline-canvas):not(#macro-bypass-field):not(#macro-bypass-radar) { cursor: url("${u}") 10 10, crosshair !important; }`;
       }
     }
     if (k9CurFn) k9CurFn();
@@ -9805,6 +11493,19 @@ vec4 _mSoft(vec4 raw) {
       mBtn.textContent = k3Tr("menuBind") + ": " + p7TvM3wL(m9TvL2sP.keyMenu);
     const hBtn = document.getElementById("macro-btn-keyHoldSpam");
     if (hBtn) hBtn.textContent = p7TvM3wL(m9TvL2sP.keyHoldSpam);
+    const hmKey = m9TvL2sP.holdSpamMode === "release" ? "hmDrop" : "hmHold";
+    const cHm = document.getElementById("macro-holdmode-cur");
+    const pHm = document.getElementById("macro-holdmode-pop");
+    if (cHm) cHm.textContent = k3Tr(hmKey);
+    if (pHm) {
+      pHm.querySelectorAll(".macro-pos-opt").forEach((o) => {
+        o.classList.toggle(
+          "active",
+          o.getAttribute("data-holdmode") ===
+            (m9TvL2sP.holdSpamMode === "release" ? "release" : "hold"),
+        );
+      });
+    }
 
     [y4WpS9vT, w9QnL2xM, k5TxM8wL].forEach((arr) => {
       arr.forEach((r) => {
@@ -9940,6 +11641,47 @@ vec4 _mSoft(vec4 raw) {
         o.classList.toggle("active", o.getAttribute("data-grid") === grKey);
       });
     }
+    const tBp = document.getElementById("macro-toggle-bypass");
+    if (tBp) tBp.checked = Boolean(m9TvL2sP.bypassEnabled);
+    const bpM = b6ModeList.includes(m9TvL2sP.bypassMethod)
+      ? m9TvL2sP.bypassMethod
+      : "smart";
+    const cBm = document.getElementById("macro-bpmtd-cur");
+    const pBm = document.getElementById("macro-bpmtd-pop");
+    if (cBm) cBm.textContent = b6ModeLabel(bpM);
+    if (pBm) {
+      pBm.querySelectorAll(".macro-pos-opt").forEach((o) => {
+        o.classList.toggle("active", o.getAttribute("data-bpmtd") === bpM);
+      });
+    }
+    const bpTtl = Math.max(
+      1500,
+      Math.min(25000, Math.round(Number(m9TvL2sP.bypassTtl) || 8500)),
+    );
+    const bpTrk = document.getElementById("macro-track-bpttl");
+    const bpInp = document.getElementById("macro-num-bpttl");
+    if (bpTrk) {
+      const f = bpTrk.querySelector(".macro-slider-fill");
+      if (f) f.style.width = ((bpTtl - 1500) / 23500) * 100 + "%";
+    }
+    if (bpInp && document.activeElement !== bpInp) q2SetVal(bpInp, bpTtl, true);
+    const tBpPh = document.getElementById("macro-toggle-bpphantoms");
+    if (tBpPh) tBpPh.checked = Boolean(m9TvL2sP.bypassPhantoms);
+    const tBpRd = document.getElementById("macro-toggle-bpradar");
+    if (tBpRd) tBpRd.checked = Boolean(m9TvL2sP.bypassRadar);
+    const cBr = document.getElementById("macro-bpradar-cur");
+    const pBr = document.getElementById("macro-bpradar-pop");
+    const brKey = m9TvL2sP.bypassRadarMode === "fixed" ? "fixed" : "real";
+    if (cBr)
+      cBr.textContent = k3Tr(brKey === "fixed" ? "bpRadFixed" : "bpRadReal");
+    if (pBr) {
+      pBr.querySelectorAll(".macro-pos-opt").forEach((o) => {
+        o.classList.toggle("active", o.getAttribute("data-bprad") === brKey);
+      });
+    }
+    const tBpLk = document.getElementById("macro-toggle-bpradarlock");
+    if (tBpLk) tBpLk.checked = Boolean(m9TvL2sP.bypassRadarLock);
+    if (b6SyncRadarLock) b6SyncRadarLock();
     k9SyncXhair();
     if (k9CurFn) k9CurFn();
     if (b7DrawFn) b7DrawFn();
@@ -10400,10 +12142,9 @@ vec4 _mSoft(vec4 raw) {
       .macro-switch input:checked + .macro-switch-slider:before{transform:translate(1.5em,-50%);background-color:var(--macro-sw-on-knob,#f4f4f6)}
       .macro-textarea{width:100%;box-sizing:border-box;background:var(--macro-btn-bg-sub,#151515);border:1px solid var(--macro-btn-border,#303030);border-radius:0.5em;color:var(--macro-btn-text,#ccc);font-family:inherit;font-size:0.9em;padding:0.67em;resize:vertical;min-height:4.8em;outline:none;margin:0.4em 0;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;transition:color 0.28s ease}
       .macro-textarea::-webkit-scrollbar{display:none;width:0;height:0}
-      #macro-row-margin>span,#macro-row-rscale>span{white-space:nowrap;flex-shrink:0}
-      #macro-row-margin .macro-controls-group,#macro-row-rscale .macro-controls-group{min-width:0;flex:1;justify-content:flex-end;gap:0.5em}
-      #macro-row-margin .macro-slider-track{width:7.5em;max-width:7.5em;min-width:3.6em;flex:0 1 7.5em}
-      #macro-row-rscale .macro-slider-track{width:7.5em;max-width:7.5em;min-width:2.4em;flex:0 1 7.5em}
+      #macro-row-margin>span,#macro-row-rscale>span,#macro-row-bpttl>span{flex:1 1 auto;min-width:0;line-height:1.2}
+      #macro-row-margin .macro-controls-group,#macro-row-rscale .macro-controls-group{min-width:0;flex:0 0 auto;justify-content:flex-end;gap:0.45em}
+      #macro-row-margin .macro-slider-track,#macro-row-rscale .macro-slider-track{width:5.4em;max-width:5.4em;min-width:3em;flex:0 1 5.4em}
       #macro-row-margin .macro-num-wrap,#macro-row-margin .macro-switch,#macro-row-rscale .macro-num-wrap,#macro-row-rscale .macro-switch{flex-shrink:0}
       #macro-row-margin .macro-num-input,#macro-row-rscale .macro-num-input{width:2.6em}
       #macro-plexus-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;transition:opacity 0.22s ease}
@@ -10507,14 +12248,38 @@ vec4 _mSoft(vec4 raw) {
       #macro-window *:not(input):not(textarea)::selection{background:transparent}
       #macro-window input,#macro-window textarea{user-select:text !important;-webkit-user-select:text !important;cursor:text}
       #macro-window input::selection,#macro-window textarea::selection{background:var(--macro-sel-bg,rgba(56,152,236,0.48));color:var(--macro-sel-fg,#ffffff)}
-      body.macro-txt-sel-on *:not(#macro-window):not(#macro-window *):not(#macro-toggle-pill):not(#autorev-overlay):not(#macro-bg-canvas):not(#macro-grid-canvas):not(#macro-curline-canvas):not(canvas):not(input[type="range"]):not(input[type="checkbox"]):not(input[type="radio"]):not(input[type="color"]):not(.macro-txt-layer){user-select:text !important;-webkit-user-select:text !important}
-      body.macro-txt-sel-on *:not(#macro-window):not(#macro-window *):not(#macro-toggle-pill):not(#autorev-overlay):not(#macro-bg-canvas):not(#macro-grid-canvas):not(#macro-curline-canvas):not(canvas):not(button):not(a):not(select):not(input):not(textarea):not(.macro-txt-layer){cursor:auto}
+      body.macro-txt-sel-on *:not(#macro-window):not(#macro-window *):not(#macro-toggle-pill):not(#macro-bypass-map):not(#macro-bypass-map *):not(#autorev-overlay):not(#macro-bg-canvas):not(#macro-grid-canvas):not(#macro-curline-canvas):not(canvas):not(input[type="range"]):not(input[type="checkbox"]):not(input[type="radio"]):not(input[type="color"]):not(.macro-txt-layer){user-select:text !important;-webkit-user-select:text !important}
+      body.macro-txt-sel-on *:not(#macro-window):not(#macro-window *):not(#macro-toggle-pill):not(#macro-bypass-map):not(#macro-bypass-map *):not(#autorev-overlay):not(#macro-bg-canvas):not(#macro-grid-canvas):not(#macro-curline-canvas):not(canvas):not(button):not(a):not(select):not(input):not(textarea):not(.macro-txt-layer){cursor:auto}
 
       body.macro-txt-sel-on .macro-pe-txt{pointer-events:auto !important;cursor:text !important}
       .macro-txt-layer{position:fixed;left:0;top:0;width:0;height:0;pointer-events:none !important;overflow:hidden;margin:0;padding:0;border:0;user-select:none !important;-webkit-user-select:none !important}
       .macro-cvs-txt{position:absolute;left:0;top:0;margin:0;padding:0;border:0;white-space:pre;display:block;width:max-content;transform-origin:0 0;color:transparent !important;background:transparent !important;font-family:'Ubuntu',sans-serif,Arial;font-size:20px;font-weight:700;line-height:20px;height:20px;user-select:text !important;-webkit-user-select:text !important;pointer-events:auto !important;cursor:text !important;box-sizing:border-box}
       .macro-cvs-txt::selection{background:rgba(51,153,255,0.45) !important;color:transparent !important}
       body.macro-txt-bypass .macro-cvs-txt,body.macro-txt-bypass .macro-pe-txt{pointer-events:none !important}
+      #macro-row-bpttl .macro-controls-group{min-width:0;flex:0 0 auto;justify-content:flex-end;gap:0.45em}
+      #macro-row-bpttl .macro-slider-track{width:5.5em;max-width:5.5em;min-width:3em;flex:0 1 5.5em}
+      #macro-row-bpttl .macro-num-wrap{flex-shrink:0}
+      #macro-row-bpttl .macro-num-input{width:3.5em}
+      #macro-bpmtd-btn{width:auto;min-width:6.2em;max-width:10.5em}
+      #macro-bpradar-btn{width:auto;min-width:6.2em;max-width:9.2em}
+      #macro-bpmtd-pop,#macro-bpradar-pop,#macro-holdmode-pop{width:max-content;min-width:6.2em;max-width:13.5em}
+      #macro-row-holdspam>span{flex:1 1 auto;min-width:4.8em;line-height:1.2}
+      #macro-row-holdspam .macro-controls-group{flex:0 1 auto;min-width:0;flex-wrap:wrap;justify-content:flex-end;gap:0.4em}
+      #macro-row-holdspam .macro-bind-btn{min-width:4em;padding:0.4em 0.6em}
+      #macro-holdmode-btn{width:auto;min-width:5.4em;max-width:9.8em}
+      #macro-bypass-map{position:fixed;right:12px;bottom:225px;width:220px;height:220px;box-sizing:border-box;background:rgba(14,15,19,0.88);border:1px solid #323540;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,0.65);z-index:999994;overflow:hidden;cursor:grab;display:none;touch-action:none;user-select:none}
+      #macro-bypass-map:active{cursor:grabbing}
+      #macro-bypass-map canvas{display:block;width:100%;height:100%;pointer-events:none}
+      #macro-bypass-map.macro-bp-locked,#macro-bypass-map.macro-bp-locked *{pointer-events:none !important}
+      .macro-bp-rsz{position:absolute;background:transparent;z-index:2;touch-action:none}
+      .macro-bp-rsz-n{top:0;left:10px;right:10px;height:6px;cursor:ns-resize}
+      .macro-bp-rsz-s{bottom:0;left:10px;right:10px;height:6px;cursor:ns-resize}
+      .macro-bp-rsz-w{left:0;top:10px;bottom:10px;width:6px;cursor:ew-resize}
+      .macro-bp-rsz-e{right:0;top:10px;bottom:10px;width:6px;cursor:ew-resize}
+      .macro-bp-rsz-nw{top:0;left:0;width:10px;height:10px;cursor:nwse-resize}
+      .macro-bp-rsz-ne{top:0;right:0;width:10px;height:10px;cursor:nesw-resize}
+      .macro-bp-rsz-sw{bottom:0;left:0;width:10px;height:10px;cursor:nesw-resize}
+      .macro-bp-rsz-se{bottom:0;right:0;width:10px;height:10px;cursor:nwse-resize}
     `;
     document.head.appendChild(st);
 
@@ -10766,12 +12531,90 @@ vec4 _mSoft(vec4 raw) {
           </div>
         </div>
         <div class="macro-sep"></div>
-        <div class="macro-section-header"><span data-i18n="secMisc">${k3Tr("secMisc")}</span></div>
+        <div class="macro-section-header">
+          <span data-i18n="secBypass">${k3Tr("secBypass")}</span>
+          <div class="macro-info-wrap"><span class="macro-info-icon"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.6a1 1 0 0 1 1 1v5.1a1 1 0 1 1-2 0V3.6a1 1 0 0 1 1-1Zm0 8.55a1.15 1.15 0 1 1 0 2.3 1.15 1.15 0 0 1 0-2.3Z"/></svg></span><div class="macro-info-tooltip" data-i18n="tipBypass">${k3Tr("tipBypass")}</div></div>
+        </div>
         <div class="macro-row">
+          <span data-i18n="bpEnable">${k3Tr("bpEnable")}</span>
+          <label class="macro-switch">
+            <input type="checkbox" id="macro-toggle-bypass">
+            <span class="macro-switch-slider"></span>
+          </label>
+        </div>
+        <div class="macro-row" id="macro-row-bpmethod">
+          <span data-i18n="bpMethod">${k3Tr("bpMethod")}</span>
+          <button type="button" class="macro-pos-btn" id="macro-bpmtd-btn">
+            <span class="macro-lang-cur" id="macro-bpmtd-cur">${b6ModeLabel(m9TvL2sP.bypassMethod)}</span>
+            <svg class="macro-lang-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+        </div>
+        <div class="macro-row" id="macro-row-bpttl">
+          <span data-i18n="bpTtl">${k3Tr("bpTtl")}</span>
+          <div class="macro-controls-group">
+            <div class="macro-slider-track" id="macro-track-bpttl" data-key="bypassTtl"><div class="macro-slider-fill"></div></div>
+            <div class="macro-num-wrap">
+              <button type="button" class="macro-step-btn" id="macro-dec-bpttl"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+              <input type="text" inputmode="numeric" class="macro-num-input" id="macro-num-bpttl" data-min="1500" data-max="25000" data-step="250" value="${m9TvL2sP.bypassTtl}" spellcheck="false">
+              <button type="button" class="macro-step-btn" id="macro-inc-bpttl"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+            </div>
+          </div>
+        </div>
+        <div class="macro-row">
+          <span data-i18n="bpPhantoms">${k3Tr("bpPhantoms")}</span>
+          <label class="macro-switch">
+            <input type="checkbox" id="macro-toggle-bpphantoms">
+            <span class="macro-switch-slider"></span>
+          </label>
+        </div>
+        <div class="macro-row" id="macro-row-bpradar">
+          <span data-i18n="bpRadar">${k3Tr("bpRadar")}</span>
+          <div class="macro-controls-group">
+            <button type="button" class="macro-pos-btn" id="macro-bpradar-btn">
+              <span class="macro-lang-cur" id="macro-bpradar-cur">${k3Tr(m9TvL2sP.bypassRadarMode === "fixed" ? "bpRadFixed" : "bpRadReal")}</span>
+              <svg class="macro-lang-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <label class="macro-switch">
+              <input type="checkbox" id="macro-toggle-bpradar">
+              <span class="macro-switch-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="macro-row">
+          <span data-i18n="bpLockRadar">${k3Tr("bpLockRadar")}</span>
+          <label class="macro-switch">
+            <input type="checkbox" id="macro-toggle-bpradarlock">
+            <span class="macro-switch-slider"></span>
+          </label>
+        </div>
+        <div class="macro-pos-pop" id="macro-bpmtd-pop">
+          <div class="macro-lang-list">
+            <button type="button" class="macro-pos-opt${m9TvL2sP.bypassMethod === "smart" ? " active" : ""}" data-bpmtd="smart"><span class="macro-lang-bar"></span><span class="macro-lang-name">Smart</span></button>
+            <button type="button" class="macro-pos-opt${m9TvL2sP.bypassMethod === "nearme" ? " active" : ""}" data-bpmtd="nearme"><span class="macro-lang-bar"></span><span class="macro-lang-name">Near Me</span></button>
+            <button type="button" class="macro-pos-opt${m9TvL2sP.bypassMethod === "cursor" ? " active" : ""}" data-bpmtd="cursor"><span class="macro-lang-bar"></span><span class="macro-lang-name">Cursor</span></button>
+            <button type="button" class="macro-pos-opt${m9TvL2sP.bypassMethod === "biggest" ? " active" : ""}" data-bpmtd="biggest"><span class="macro-lang-bar"></span><span class="macro-lang-name">Biggest</span></button>
+            <button type="button" class="macro-pos-opt${m9TvL2sP.bypassMethod === "lb" ? " active" : ""}" data-bpmtd="lb"><span class="macro-lang-bar"></span><span class="macro-lang-name">Leaderboard</span></button>
+          </div>
+        </div>
+        <div class="macro-pos-pop" id="macro-bpradar-pop">
+          <div class="macro-lang-list">
+            <button type="button" class="macro-pos-opt${m9TvL2sP.bypassRadarMode !== "fixed" ? " active" : ""}" data-bprad="real"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="bpRadReal">${k3Tr("bpRadReal")}</span></button>
+            <button type="button" class="macro-pos-opt${m9TvL2sP.bypassRadarMode === "fixed" ? " active" : ""}" data-bprad="fixed"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="bpRadFixed">${k3Tr("bpRadFixed")}</span></button>
+          </div>
+        </div>
+        <div class="macro-sep"></div>
+        <div class="macro-section-header"><span data-i18n="secMisc">${k3Tr("secMisc")}</span></div>
+        <div class="macro-row" id="macro-row-holdspam">
           <span data-i18n="fixFeed">${k3Tr("fixFeed")}</span>
-          <div class="macro-btn-group">
-            <button class="macro-bind-btn" id="macro-btn-keyHoldSpam" data-id="keyHoldSpam">${p7TvM3wL(m9TvL2sP.keyHoldSpam)}</button>
-            <button class="macro-rst-btn" data-reset="keyHoldSpam" data-i18n="rst">${k3Tr("rst")}</button>
+          <div class="macro-controls-group">
+            <button type="button" class="macro-pos-btn" id="macro-holdmode-btn">
+              <span class="macro-lang-cur" id="macro-holdmode-cur">${k3Tr(m9TvL2sP.holdSpamMode === "release" ? "hmDrop" : "hmHold")}</span>
+              <svg class="macro-lang-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="macro-btn-group">
+              <button class="macro-bind-btn" id="macro-btn-keyHoldSpam" data-id="keyHoldSpam">${p7TvM3wL(m9TvL2sP.keyHoldSpam)}</button>
+              <button class="macro-rst-btn" data-reset="keyHoldSpam" data-i18n="rst">${k3Tr("rst")}</button>
+            </div>
           </div>
         </div>
         <div class="macro-row">
@@ -10863,6 +12706,12 @@ vec4 _mSoft(vec4 raw) {
             <button type="button" class="macro-pos-opt${m9TvL2sP.revMethod === "pixi" ? " active" : ""}" data-revmtd="pixi"><span class="macro-lang-bar"></span><span class="macro-lang-name">Pixi</span></button>
           </div>
         </div>
+        <div class="macro-pos-pop" id="macro-holdmode-pop">
+          <div class="macro-lang-list">
+            <button type="button" class="macro-pos-opt${m9TvL2sP.holdSpamMode !== "release" ? " active" : ""}" data-holdmode="hold"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="hmHold">${k3Tr("hmHold")}</span></button>
+            <button type="button" class="macro-pos-opt${m9TvL2sP.holdSpamMode === "release" ? " active" : ""}" data-holdmode="release"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="hmDrop">${k3Tr("hmDrop")}</span></button>
+          </div>
+        </div>
           </div>
         </div>
         <div class="macro-pane-settings">
@@ -10947,6 +12796,7 @@ vec4 _mSoft(vec4 raw) {
     c1XnL4vP.id = "macro-plexus-canvas";
     g9QmV3xR.insertBefore(c1XnL4vP, g9QmV3xR.firstChild);
     document.body.appendChild(win);
+    b6BpWinEl = win;
     const rnToast = document.createElement("div");
     rnToast.id = "macro-revnot-toast";
     if (m9TvL2sP.revNotifyPos === "bottom") rnToast.classList.add("pos-bottom");
@@ -10954,13 +12804,14 @@ vec4 _mSoft(vec4 raw) {
       <div class="macro-revnot-box">
         <span class="macro-revnot-tag">Auto-Rev</span>
         <span class="macro-revnot-sep"></span>
-        <span class="macro-revnot-lbl">Splits</span>
+        <span class="macro-revnot-lbl" id="macro-revnot-lbl">${k3Tr("splitsLbl")}</span>
         <span class="macro-revnot-val" id="macro-revnot-val">2x</span>
         <span class="macro-revnot-mult" id="macro-revnot-mult">(4c)</span>
         <div class="macro-revnot-bar" id="macro-revnot-bar"></div>
       </div>
     `;
     document.body.appendChild(rnToast);
+    const rnLblEl = document.getElementById("macro-revnot-lbl");
     const rnValEl = document.getElementById("macro-revnot-val");
     const rnMultEl = document.getElementById("macro-revnot-mult");
     const rnBarEl = document.getElementById("macro-revnot-bar");
@@ -10989,6 +12840,7 @@ vec4 _mSoft(vec4 raw) {
         "pos-bottom",
         m9TvL2sP.revNotifyPos === "bottom",
       );
+      if (rnLblEl) rnLblEl.textContent = k3Tr("splitsLbl");
       if (rnValEl) rnValEl.textContent = pw + "x";
       if (rnMultEl) rnMultEl.textContent = "(" + val + "c)";
       r9CenterToast();
@@ -11001,6 +12853,238 @@ vec4 _mSoft(vec4 raw) {
       clearTimeout(rnHideTm);
       rnHideTm = setTimeout(() => rnToast.classList.remove("open"), 1600);
     };
+
+    const mapWin = document.createElement("div");
+    mapWin.id = "macro-bypass-map";
+    const rdCvEl = document.createElement("canvas");
+    rdCvEl.id = "macro-bypass-radar";
+    mapWin.appendChild(rdCvEl);
+    ["n", "s", "w", "e", "nw", "ne", "sw", "se"].forEach((dir) => {
+      const h = document.createElement("div");
+      h.className = "macro-bp-rsz macro-bp-rsz-" + dir;
+      h.setAttribute("data-bp-dir", dir);
+      mapWin.appendChild(h);
+    });
+    document.body.appendChild(mapWin);
+    b6BpMapWin = mapWin;
+    b6BpRdCv = rdCvEl;
+    b6BpRdCtx = rdCvEl.getContext("2d");
+
+    b6FitMapWin = () => {
+      const vpW = document.documentElement.clientWidth || window.innerWidth;
+      const vpH = document.documentElement.clientHeight || window.innerHeight;
+      const maxS = Math.max(140, Math.min(440, vpW, vpH));
+      const sz = Math.max(
+        140,
+        Math.min(maxS, Math.round(Number(m9TvL2sP.bypassMapSize) || 220)),
+      );
+      mapWin.style.width = sz + "px";
+      mapWin.style.height = sz + "px";
+      if (m9TvL2sP.bypassMapX !== null && m9TvL2sP.bypassMapY !== null) {
+        const mxL = Math.max(0, vpW - sz);
+        const mxT = Math.max(0, vpH - sz);
+        const nx = Math.round(Math.max(0, Math.min(mxL, m9TvL2sP.bypassMapX)));
+        const ny = Math.round(Math.max(0, Math.min(mxT, m9TvL2sP.bypassMapY)));
+        mapWin.style.left = nx + "px";
+        mapWin.style.top = ny + "px";
+        mapWin.style.right = "auto";
+        mapWin.style.bottom = "auto";
+      } else {
+        mapWin.style.left = "auto";
+        mapWin.style.top = "auto";
+        mapWin.style.right = "12px";
+        mapWin.style.bottom = "225px";
+      }
+    };
+
+    let bpMapDrag = null;
+    let bpMapRsz = null;
+    let bpMapSyncAt = 0;
+
+    b6SyncRadarLock = () => {
+      const lk = Boolean(m9TvL2sP.bypassRadarLock);
+      mapWin.classList.toggle("macro-bp-locked", lk);
+      if (lk) {
+        bpMapDrag = null;
+        bpMapRsz = null;
+      }
+    };
+
+    b6FitMapWin();
+    b6SyncRadarLock();
+    window.addEventListener("resize", b6FitMapWin, { passive: true });
+
+    mapWin.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    [
+      "pointerdown",
+      "pointermove",
+      "pointerup",
+      "mousedown",
+      "mousemove",
+      "mouseup",
+      "click",
+      "wheel",
+      "keydown",
+      "keyup",
+    ].forEach((ev) => {
+      mapWin.addEventListener(ev, (e) => {
+        if (e.isTrusted && !m9TvL2sP.bypassRadarLock) e.stopPropagation();
+      });
+    });
+
+    mapWin.addEventListener("pointerdown", (e) => {
+      if (
+        !e.isTrusted ||
+        e.button !== 0 ||
+        m9TvL2sP.bypassRadarLock ||
+        (e.target && e.target.closest && e.target.closest(".macro-bp-rsz"))
+      ) {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      const rc = mapWin.getBoundingClientRect();
+      mapWin.style.left = rc.left + "px";
+      mapWin.style.top = rc.top + "px";
+      mapWin.style.right = "auto";
+      mapWin.style.bottom = "auto";
+      bpMapDrag = {
+        id: e.pointerId,
+        ox: e.clientX - rc.left,
+        oy: e.clientY - rc.top,
+      };
+      try {
+        mapWin.setPointerCapture(e.pointerId);
+      } catch (_) {}
+    });
+
+    mapWin.addEventListener("pointermove", (e) => {
+      if (!bpMapDrag || e.pointerId !== bpMapDrag.id) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const vpW = document.documentElement.clientWidth || window.innerWidth;
+      const vpH = document.documentElement.clientHeight || window.innerHeight;
+      const sz = mapWin.clientWidth || m9TvL2sP.bypassMapSize;
+      const nx = Math.max(0, Math.min(vpW - sz, e.clientX - bpMapDrag.ox));
+      const ny = Math.max(0, Math.min(vpH - sz, e.clientY - bpMapDrag.oy));
+      mapWin.style.left = Math.round(nx) + "px";
+      mapWin.style.top = Math.round(ny) + "px";
+      m9TvL2sP.bypassMapX = Math.round(nx);
+      m9TvL2sP.bypassMapY = Math.round(ny);
+      if (b6BcSyncFn && performance.now() - bpMapSyncAt > 45) {
+        bpMapSyncAt = performance.now();
+        b6BcSyncFn();
+      }
+    });
+
+    const endMapDrag = (e) => {
+      if (
+        !bpMapDrag ||
+        (e && e.pointerId !== undefined && e.pointerId !== bpMapDrag.id)
+      ) {
+        return;
+      }
+      try {
+        mapWin.releasePointerCapture(bpMapDrag.id);
+      } catch (_) {}
+      bpMapDrag = null;
+      x3QnK8wR();
+    };
+    mapWin.addEventListener("pointerup", endMapDrag);
+    mapWin.addEventListener("pointercancel", endMapDrag);
+
+    mapWin.querySelectorAll(".macro-bp-rsz").forEach((hb) => {
+      hb.addEventListener("pointerdown", (e) => {
+        if (!e.isTrusted || e.button !== 0 || m9TvL2sP.bypassRadarLock) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const rc = mapWin.getBoundingClientRect();
+        const s0 = rc.width || m9TvL2sP.bypassMapSize;
+        mapWin.style.left = rc.left + "px";
+        mapWin.style.top = rc.top + "px";
+        mapWin.style.right = "auto";
+        mapWin.style.bottom = "auto";
+        bpMapRsz = {
+          id: e.pointerId,
+          dir: hb.getAttribute("data-bp-dir") || "se",
+          sx: e.clientX,
+          sy: e.clientY,
+          s0,
+          l0: rc.left,
+          t0: rc.top,
+          r0: rc.left + s0,
+          b0: rc.top + s0,
+        };
+        try {
+          hb.setPointerCapture(e.pointerId);
+        } catch (_) {}
+      });
+
+      hb.addEventListener("pointermove", (e) => {
+        if (!bpMapRsz || e.pointerId !== bpMapRsz.id) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const vpW = document.documentElement.clientWidth || window.innerWidth;
+        const vpH = document.documentElement.clientHeight || window.innerHeight;
+        const dx = e.clientX - bpMapRsz.sx;
+        const dy = e.clientY - bpMapRsz.sy;
+        const dir = bpMapRsz.dir;
+        let ds = 0;
+        if (dir === "e") ds = dx;
+        else if (dir === "w") ds = -dx;
+        else if (dir === "s") ds = dy;
+        else if (dir === "n") ds = -dy;
+        else if (dir === "se") ds = (dx + dy) * 0.5;
+        else if (dir === "nw") ds = (-dx - dy) * 0.5;
+        else if (dir === "ne") ds = (dx - dy) * 0.5;
+        else if (dir === "sw") ds = (-dx + dy) * 0.5;
+        const maxW = dir.includes("w") ? bpMapRsz.r0 : vpW - bpMapRsz.l0;
+        const maxH = dir.includes("n") ? bpMapRsz.b0 : vpH - bpMapRsz.t0;
+        const maxS = Math.max(140, Math.min(440, maxW, maxH));
+        const ns = Math.max(140, Math.min(maxS, Math.round(bpMapRsz.s0 + ds)));
+        const nl = Math.max(
+          0,
+          dir.includes("w") ? bpMapRsz.r0 - ns : bpMapRsz.l0,
+        );
+        const nt = Math.max(
+          0,
+          dir.includes("n") ? bpMapRsz.b0 - ns : bpMapRsz.t0,
+        );
+        m9TvL2sP.bypassMapSize = ns;
+        m9TvL2sP.bypassMapX = Math.round(nl);
+        m9TvL2sP.bypassMapY = Math.round(nt);
+        mapWin.style.left = m9TvL2sP.bypassMapX + "px";
+        mapWin.style.top = m9TvL2sP.bypassMapY + "px";
+        mapWin.style.right = "auto";
+        mapWin.style.bottom = "auto";
+        mapWin.style.width = ns + "px";
+        mapWin.style.height = ns + "px";
+        if (b6BcSyncFn && performance.now() - bpMapSyncAt > 45) {
+          bpMapSyncAt = performance.now();
+          b6BcSyncFn();
+        }
+      });
+
+      const endRsz = (e) => {
+        if (
+          !bpMapRsz ||
+          (e && e.pointerId !== undefined && e.pointerId !== bpMapRsz.id)
+        ) {
+          return;
+        }
+        try {
+          hb.releasePointerCapture(bpMapRsz.id);
+        } catch (_) {}
+        bpMapRsz = null;
+        x3QnK8wR();
+      };
+      hb.addEventListener("pointerup", endRsz);
+      hb.addEventListener("pointercancel", endRsz);
+    });
+
     f4KzP9wL(win);
     const c6InitJson = win.querySelector("#macro-cfg-json");
     if (c6InitJson) c6InitJson.value = e7BuildCfgJson();
@@ -11097,12 +13181,14 @@ vec4 _mSoft(vec4 raw) {
           /\.(mp4|webm|ogg|mov|m4v)$/i.test(fl.name);
         pUrl =
           URL.createObjectURL(fl) + (isVid ? "#type=video" : "#type=image");
-        m9TvL2sP[kSrc] = "idb:" + dbKey;
+        const idbTag = "idb:" + dbKey + ":" + Date.now();
+        m9TvL2sP[kSrc] = idbTag;
         m9TvL2sP[kToggle] = true;
-        x3QnK8wR();
-        k2DbPut(dbKey, fl, isVid);
         if (typeof sFn === "function") sFn(pUrl);
         r8QnM4tL();
+        k2DbPut(dbKey, fl, isVid).then(() => {
+          if (m9TvL2sP[kSrc] === idbTag) x3QnK8wR();
+        });
         f4RefocusGame();
       });
       if (bU) {
@@ -11658,6 +13744,74 @@ vec4 _mSoft(vec4 raw) {
         e.target.blur();
       });
     }
+    k4BindRange(
+      document.getElementById("macro-track-bpttl"),
+      document.getElementById("macro-num-bpttl"),
+      document.getElementById("macro-dec-bpttl"),
+      document.getElementById("macro-inc-bpttl"),
+      (v) => {
+        m9TvL2sP.bypassTtl = v;
+      },
+      1500,
+      25000,
+      250,
+      8500,
+      null,
+    );
+    const tBp = document.getElementById("macro-toggle-bypass");
+    if (tBp) {
+      tBp.addEventListener("change", (e) => {
+        m9TvL2sP.bypassEnabled = e.target.checked;
+        if (m9TvL2sP.bypassEnabled) {
+          if (!h4HasPeerTab()) {
+            const pop = window.open(
+              location.href,
+              "_blank",
+              "popup=yes,width=560,height=440",
+            );
+            b6BpSt.enableGraceUntil = performance.now() + (pop ? 12000 : 1200);
+          } else {
+            b6BpSt.enableGraceUntil = performance.now() + 1500;
+          }
+        } else {
+          b6BpSt.enableGraceUntil = 0;
+          b6ScanStop();
+          if (!m9TvL2sP.bypassPhantoms && !m9TvL2sP.bypassRadar)
+            b6ResetWorld(false);
+        }
+        x3QnK8wR();
+        e.target.blur();
+        f4RefocusGame();
+      });
+    }
+    const tBpPh = document.getElementById("macro-toggle-bpphantoms");
+    if (tBpPh) {
+      tBpPh.addEventListener("change", (e) => {
+        m9TvL2sP.bypassPhantoms = e.target.checked;
+        x3QnK8wR();
+        e.target.blur();
+        f4RefocusGame();
+      });
+    }
+    const tBpRd = document.getElementById("macro-toggle-bpradar");
+    if (tBpRd) {
+      tBpRd.addEventListener("change", (e) => {
+        m9TvL2sP.bypassRadar = e.target.checked;
+        x3QnK8wR();
+        e.target.blur();
+        f4RefocusGame();
+      });
+    }
+    const tBpLk = document.getElementById("macro-toggle-bpradarlock");
+    if (tBpLk) {
+      tBpLk.addEventListener("change", (e) => {
+        m9TvL2sP.bypassRadarLock = e.target.checked;
+        x3QnK8wR();
+        if (b6SyncRadarLock) b6SyncRadarLock();
+        e.target.blur();
+        f4RefocusGame();
+      });
+    }
 
     win.querySelectorAll(".macro-split-chip").forEach((ch) => {
       ch.addEventListener("click", (e) => {
@@ -12035,6 +14189,7 @@ vec4 _mSoft(vec4 raw) {
     }
 
     k8QmN3vR();
+    b6RebuildFfFn = k8QmN3vR;
 
     function q3XmR7kB(hex) {
       if (typeof hex !== "string" || !/^#[0-9a-f]{6}$/i.test(hex)) return null;
@@ -12348,6 +14503,11 @@ vec4 _mSoft(vec4 raw) {
     }
 
     const v8PalHist = { menu: {}, buttons: {}, plexus: {} };
+    b6ClearPalHistFn = () => {
+      v8PalHist.menu = {};
+      v8PalHist.buttons = {};
+      v8PalHist.plexus = {};
+    };
 
     function y2SwapPalEd(tgt) {
       const sl = v8PalHist[tgt] || (v8PalHist[tgt] = {});
@@ -12765,6 +14925,30 @@ vec4 _mSoft(vec4 raw) {
         t: 0,
         fixW: false,
       },
+      {
+        id: "bpmtd",
+        row: document.getElementById("macro-row-bpmethod"),
+        btn: document.getElementById("macro-bpmtd-btn"),
+        pop: document.getElementById("macro-bpmtd-pop"),
+        t: 0,
+        fixW: false,
+      },
+      {
+        id: "bpradar",
+        row: document.getElementById("macro-row-bpradar"),
+        btn: document.getElementById("macro-bpradar-btn"),
+        pop: document.getElementById("macro-bpradar-pop"),
+        t: 0,
+        fixW: false,
+      },
+      {
+        id: "holdmode",
+        row: document.getElementById("macro-row-holdspam"),
+        btn: document.getElementById("macro-holdmode-btn"),
+        pop: document.getElementById("macro-holdmode-pop"),
+        t: 0,
+        fixW: false,
+      },
     ];
 
     function j4PosMainPop(it) {
@@ -12960,6 +15144,44 @@ vec4 _mSoft(vec4 raw) {
       f4RefocusGame();
     });
 
+    b4BindMainPop("bpmtd", (opt) => {
+      const val = opt.getAttribute("data-bpmtd");
+      m9TvL2sP.bypassMethod = b6ModeList.includes(val) ? val : "smart";
+      b6BpSt.cvsMiss = 0;
+      b6BpSt.holdUntil = 0;
+      b6BpSt.needPeek = false;
+      b6BpSt.wasPeek = false;
+      b6BpSt.nextIsPeek = false;
+      b6BpSt.returnToBest = false;
+      x3QnK8wR();
+      r8QnM4tL();
+
+      f4RefocusGame();
+    });
+
+    b4BindMainPop("bpradar", (opt) => {
+      m9TvL2sP.bypassRadarMode =
+        opt.getAttribute("data-bprad") === "fixed" ? "fixed" : "real";
+      x3QnK8wR();
+      r8QnM4tL();
+
+      f4RefocusGame();
+    });
+
+    b4BindMainPop("holdmode", (opt) => {
+      m9TvL2sP.holdSpamMode =
+        opt.getAttribute("data-holdmode") === "release" ? "release" : "hold";
+      if (
+        m9TvL2sP.holdSpamMode === "release" &&
+        (!document.hasFocus() || document.hidden)
+      ) {
+        hCl2xK9m();
+      }
+      x3QnK8wR();
+      r8QnM4tL();
+      f4RefocusGame();
+    });
+
     if (window.ResizeObserver && b7NmQ2xL) {
       new ResizeObserver(() => {
         m4MainPops.forEach((it) => {
@@ -12985,7 +15207,7 @@ vec4 _mSoft(vec4 raw) {
           t &&
           t.closest &&
           t.closest(
-            "#macro-revnot-pop, #macro-revnot-btn, #macro-xhair-pop, #macro-xhair-btn, #macro-grid-pop, #macro-grid-btn, #macro-revmtd-pop, #macro-revmtd-btn, #macro-ffmtd-pop, #macro-ffmtd-btn, .macro-custom-scroll-track, #macro-toggle-pill",
+            "#macro-revnot-pop, #macro-revnot-btn, #macro-xhair-pop, #macro-xhair-btn, #macro-grid-pop, #macro-grid-btn, #macro-revmtd-pop, #macro-revmtd-btn, #macro-ffmtd-pop, #macro-ffmtd-btn, #macro-bpmtd-pop, #macro-bpmtd-btn, #macro-bpradar-pop, #macro-bpradar-btn, #macro-holdmode-pop, #macro-holdmode-btn, .macro-custom-scroll-track, #macro-toggle-pill",
           )
         )
           return;
@@ -13074,11 +15296,13 @@ vec4 _mSoft(vec4 raw) {
           );
         });
       }
+      if (rnLblEl) rnLblEl.textContent = k3Tr("splitsLbl");
       r8QnM4tL();
       if (typeof r5UpdBanner === "function") r5UpdBanner();
       u4PwM8xQ();
       u4PwS8mQ();
     }
+    b6ApplyLangFn = q4ApplyLang;
 
     if (lBtn && lPop) {
       lBtn.addEventListener("click", (e) => {
@@ -13314,6 +15538,7 @@ vec4 _mSoft(vec4 raw) {
       cfg.crosshairStyle = cfg.crosshairStyle === "cross" ? "cross" : "plus";
       cfg.revNotifyPos = cfg.revNotifyPos === "bottom" ? "bottom" : "top";
       cfg.revMethod = cfg.revMethod === "pixi" ? "pixi" : "ws";
+      cfg.holdSpamMode = cfg.holdSpamMode === "release" ? "release" : "hold";
       cfg.ffMethod = cfg.ffMethod === "auto" ? "auto" : "manual";
       ["menuColor", "buttonsColor", "plexusColor"].forEach((k) => {
         cfg[k] =
@@ -13321,10 +15546,35 @@ vec4 _mSoft(vec4 raw) {
             ? cfg[k].toLowerCase()
             : null;
       });
+      cfg.bypassEnabled = Boolean(cfg.bypassEnabled);
+      cfg.bypassMethod = b6ModeList.includes(cfg.bypassMethod)
+        ? cfg.bypassMethod
+        : "smart";
+      const bpT = Number(cfg.bypassTtl);
+      cfg.bypassTtl = Number.isFinite(bpT)
+        ? Math.max(1500, Math.min(25000, Math.round(bpT)))
+        : 8500;
+      cfg.bypassPhantoms = Boolean(cfg.bypassPhantoms);
+      cfg.bypassRadar = Boolean(cfg.bypassRadar);
+      cfg.bypassRadarMode = cfg.bypassRadarMode === "fixed" ? "fixed" : "real";
+      cfg.bypassRadarLock = Boolean(cfg.bypassRadarLock);
+      cfg.bypassMapX =
+        typeof cfg.bypassMapX === "number" && Number.isFinite(cfg.bypassMapX)
+          ? cfg.bypassMapX
+          : null;
+      cfg.bypassMapY =
+        typeof cfg.bypassMapY === "number" && Number.isFinite(cfg.bypassMapY)
+          ? cfg.bypassMapY
+          : null;
+      const bpS = Number(cfg.bypassMapSize);
+      cfg.bypassMapSize = Number.isFinite(bpS)
+        ? Math.max(140, Math.min(440, Math.round(bpS)))
+        : 220;
       cfg.lang =
         typeof cfg.lang === "string" && t3LangDict[cfg.lang] ? cfg.lang : "en";
       return cfg;
     }
+    b6NormCfgFn = n6NormCfg;
 
     if (cfgCopyBtn) {
       cfgCopyBtn.addEventListener("click", (e) => {
@@ -13438,6 +15688,13 @@ vec4 _mSoft(vec4 raw) {
         q4ApplyLang();
         if (s2NpK7wL) s2NpK7wL();
         if (p9RndRef) p9ApplyRes(p9RndRef);
+        if (!m9TvL2sP.bypassEnabled) {
+          b6ScanStop();
+          b6ResetWorld(false);
+        }
+        if (b6FitMapWin) b6FitMapWin();
+        if (b6SyncRadarLock) b6SyncRadarLock();
+
         e7CfgBoxSync(true);
         clearTimeout(cfgApplyTm);
         cfgApplyBtn.classList.remove("macro-cfg-err");
@@ -13455,6 +15712,14 @@ vec4 _mSoft(vec4 raw) {
         hCl2xK9m();
         q2WnS7xM(false);
         k4FfCancel(false);
+        b6ScanStop();
+        b6ResetWorld(false);
+        b6BpSt.cvsMiss = 0;
+        b6BpSt.holdUntil = 0;
+        b6BpSt.needPeek = false;
+        b6BpSt.wasPeek = false;
+        b6BpSt.nextIsPeek = false;
+        b6BpSt.returnToBest = false;
         window.setMapBackground(null);
         window.setFixedBackground(null);
         k2DbClr();
@@ -13488,6 +15753,9 @@ vec4 _mSoft(vec4 raw) {
         f4KzP9wL(win);
         x3QnK8wR();
         q4ApplyLang();
+        if (b6FitMapWin) b6FitMapWin();
+        if (b6SyncRadarLock) b6SyncRadarLock();
+
         if (s2NpK7wL) s2NpK7wL();
         if (p9RndRef) p9ApplyRes(p9RndRef);
         e7CfgBoxSync(true);
