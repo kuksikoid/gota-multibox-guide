@@ -641,6 +641,10 @@
     tY = 0,
     kAct = false,
     p9GlMs = 0;
+  let p9ProjW = 0,
+    p9ProjH = 0,
+    p9CurCam = null;
+  const p9CamCands = [];
   let b7DrawFn = null;
 
   function a9VnK(src) {
@@ -1649,9 +1653,9 @@
       v4SelfOids.add(id);
       return id;
     }
-    if (v4ActOid > 0) {
-      v4SelfOids.add(v4ActOid);
-      return v4ActOid;
+    if (v4MyOid > 0) {
+      v4SelfOids.add(v4MyOid);
+      return v4MyOid;
     }
     return 0;
   }
@@ -2343,7 +2347,6 @@
           }
           r4WsRtt.lastActOid = actOid;
           v4ActOid = actOid;
-          v4SelfOids.add(actOid);
         } else if (act === 0) {
           r4WsRtt.lastActOid = 0;
           v4ActOid = 0;
@@ -2354,6 +2357,9 @@
       r4ResetRtt(true);
       v4WsCam.init = false;
       v4WsCam.at = 0;
+      p9CurCam = null;
+      p9CamCands.length = 0;
+      kAct = false;
       v4MyOid = vw.getUint16(1, true);
       v4ActOid = 0;
       v4SelfOids.clear();
@@ -2981,6 +2987,157 @@
     }
   }
 
+  function p9SelfCtr() {
+    q9ReadSelfOid();
+    let sx = 0,
+      sy = 0,
+      sw = 0;
+    for (const c of v4WsCells.values()) {
+      if (c.tag !== 2 || !v4SelfOids.has(c.oid)) continue;
+      const wx = c.dx !== undefined ? c.dx : c.x;
+      const wy = c.dy !== undefined ? c.dy : c.y;
+      const wr = c.dr !== undefined ? c.dr : c.r;
+      const w = wr * wr;
+      sx += wx * w;
+      sy += wy * w;
+      sw += w;
+    }
+    return sw > 0 ? { x: sx / sw, y: sy / sw } : null;
+  }
+
+  function p9PushCamCand(src, ma, mb, mc, md, me, mf, cv) {
+    if (
+      !cv ||
+      !Number.isFinite(ma) ||
+      !Number.isFinite(md) ||
+      !Number.isFinite(me) ||
+      !Number.isFinite(mf)
+    )
+      return;
+    if (Math.abs(mb) > 1e-4 || Math.abs(mc) > 1e-4) return;
+    if (
+      src === "gl" &&
+      ma > 0 &&
+      ma < 0.02 &&
+      md < 0 &&
+      Math.abs(me + 1) < 0.02 &&
+      Math.abs(mf - 1) < 0.02
+    ) {
+      p9ProjW = 2 / ma;
+      p9ProjH = -2 / md;
+      return;
+    }
+    if (ma <= 0.003 || ma >= 15 || Math.abs(ma - md) > ma * 0.03) return;
+    const rc = cv.getBoundingClientRect();
+    if (!rc || rc.width <= 0 || rc.height <= 0) return;
+    if (p9CamCands.length >= 48) p9CamCands.shift();
+    const sx =
+      src === "c2d"
+        ? rc.width / cv.width
+        : p9ProjW > 100
+          ? rc.width / p9ProjW
+          : 1;
+    const sy =
+      src === "c2d"
+        ? rc.height / cv.height
+        : p9ProjH > 100
+          ? rc.height / p9ProjH
+          : 1;
+    p9CamCands.push({
+      src,
+      a: ma * sx,
+      d: md * sy,
+      lx: me * sx,
+      ly: mf * sy,
+      rawA: ma,
+      rawTx: me,
+      rawTy: mf,
+    });
+    if (
+      (src === "c2d" || (src === "gl" && p9ProjW <= 100)) &&
+      Math.abs(sx - 1) > 0.02
+    ) {
+      p9CamCands.push({
+        src,
+        a: ma,
+        d: md,
+        lx: me,
+        ly: mf,
+        rawA: ma,
+        rawTx: me,
+        rawTy: mf,
+      });
+    }
+  }
+
+  function p9PickCamCand(cv, rc, nw) {
+    if (p9CamCands.length > 0) {
+      const midX = rc.left + rc.width * 0.5;
+      const midY = rc.top + rc.height * 0.5;
+      const sf = !b6BpSt.specEntered ? p9SelfCtr() : null;
+      let best = null,
+        bestScore = -Infinity;
+      for (let i = 0; i < p9CamCands.length; i++) {
+        const m = p9CamCands[i];
+        const isMinimap =
+          Math.abs(m.rawA - 1) < 0.01 &&
+          m.rawTx > rc.width * 0.55 &&
+          m.rawTy > rc.height * 0.45;
+        let sc = isMinimap ? -1e9 : 0;
+        if (sf) {
+          sc -= Math.hypot(
+            m.a * sf.x + rc.left + m.lx - midX,
+            m.d * sf.y + rc.top + m.ly - midY,
+          );
+        } else {
+          const cx = (rc.width * 0.5 - m.lx) / m.a;
+          const cy = (rc.height * 0.5 - m.ly) / m.d;
+          if (Math.abs(cx) > 15000 || Math.abs(cy) > 15000) sc -= 1e6;
+          let vis = 0;
+          for (const c of v4WsCells.values()) {
+            if (c.tag !== 2) continue;
+            const px = m.lx + m.a * (c.dx !== undefined ? c.dx : c.x);
+            const py = m.ly + m.d * (c.dy !== undefined ? c.dy : c.y);
+            if (px >= 0 && px <= rc.width && py >= 0 && py <= rc.height) vis++;
+          }
+          sc += vis * 100;
+        }
+        if (sc > bestScore) {
+          bestScore = sc;
+          best = m;
+        }
+      }
+      p9CamCands.length = 0;
+      if (best) {
+        p9CurCam = { cv, a: best.a, d: best.d, lx: best.lx, ly: best.ly };
+        zM = best.a;
+        tX = best.lx;
+        tY = best.ly;
+        kAct = true;
+        p9GlMs = nw;
+      }
+    }
+    if (
+      p9CurCam &&
+      p9CurCam.cv === cv &&
+      nw - p9GlMs <= 300 &&
+      p9CurCam.a > 0.002
+    ) {
+      return {
+        cv,
+        rc,
+        a: p9CurCam.a,
+        b: 0,
+        c: 0,
+        d: p9CurCam.d,
+        tx: rc.left + p9CurCam.lx,
+        ty: rc.top + p9CurCam.ly,
+        scale: (p9CurCam.a + p9CurCam.d) * 0.5,
+      };
+    }
+    return null;
+  }
+
   function v4GetCam() {
     const cv = p9CvRef || p9C2Cv || b6GameCanvas();
     if (!cv) return null;
@@ -2998,43 +3155,17 @@
       const ty = rc.top + p9WtTy * sy;
       const det = a * d - b * c;
       if (Math.abs(det) > 1e-8) {
-        let ok = true;
-        if (v4WsCam.init && nw - v4WsCam.at <= 1200) {
-          const mx = rc.left + rc.width * 0.5;
-          const my = rc.top + rc.height * 0.5;
-          const wx = (d * (mx - tx) - c * (my - ty)) / det;
-          const wy = (-b * (mx - tx) + a * (my - ty)) / det;
-          if (Math.hypot(wx - v4WsCam.x, wy - v4WsCam.y) > 2200) ok = false;
+        const mx = rc.left + rc.width * 0.5;
+        const my = rc.top + rc.height * 0.5;
+        const wx = (d * (mx - tx) - c * (my - ty)) / det;
+        const wy = (-b * (mx - tx) + a * (my - ty)) / det;
+        if (Math.abs(wx) < 25000 && Math.abs(wy) < 25000) {
+          return { cv, rc, a, b, c, d, tx, ty, scale: Math.hypot(a, b) };
         }
-        if (ok) return { cv, rc, a, b, c, d, tx, ty, scale: Math.hypot(a, b) };
       }
     }
-    if (kAct && nw - p9GlMs <= 500 && zM > 0.002) {
-      const tx = rc.left + tX;
-      const ty = rc.top + tY;
-      let ok = true;
-      if (v4WsCam.init && nw - v4WsCam.at <= 1200) {
-        const wx = (rc.left + rc.width * 0.5 - tx) / zM;
-        const wy = (rc.top + rc.height * 0.5 - ty) / zM;
-        if (Math.hypot(wx - v4WsCam.x, wy - v4WsCam.y) > 2200) ok = false;
-      }
-      if (ok) return { cv, rc, a: zM, b: 0, c: 0, d: zM, tx, ty, scale: zM };
-    }
-    if (p9C2On && p9C2Cv === cv && cv.width > 0 && cv.height > 0) {
-      const sx = rc.width / cv.width;
-      const sy = rc.height / cv.height;
-      const a = p9C2A * sx;
-      const d = p9C2D * sy;
-      const tx = rc.left + p9C2Tx * sx;
-      const ty = rc.top + p9C2Ty * sy;
-      let ok = true;
-      if (v4WsCam.init && nw - v4WsCam.at <= 1200 && a > 1e-5 && d > 1e-5) {
-        const wx = (rc.left + rc.width * 0.5 - tx) / a;
-        const wy = (rc.top + rc.height * 0.5 - ty) / d;
-        if (Math.hypot(wx - v4WsCam.x, wy - v4WsCam.y) > 2200) ok = false;
-      }
-      if (ok) return { cv, rc, a, b: 0, c: 0, d, tx, ty, scale: (a + d) * 0.5 };
-    }
+    const picked = p9PickCamCand(cv, rc, nw);
+    if (picked) return picked;
     if (v4WsCam.init || b6BpSt.camAt > 0) {
       const cx = v4WsCam.init ? v4WsCam.dx : b6BpSt.camX;
       const cy = v4WsCam.init ? v4WsCam.dy : b6BpSt.camY;
@@ -5389,10 +5520,10 @@
   }
 
   function w4GetCurSelfOid() {
-    if (v4ActOid > 0) return v4ActOid;
     const id = parseInt(g5ReadPid(), 10);
     if (Number.isSafeInteger(id) && id > 0) return id;
-    return v4MyOid;
+    if (v4MyOid > 0) return v4MyOid;
+    return v4ActOid;
   }
 
   function w4ReadFfLocked() {
@@ -9035,26 +9166,16 @@
         const cv = cachedGameCanvas || t8VwM4xK();
         if (cv && cv.width > 0 && this.canvas === cv) {
           f4NzQ8vR++;
-          const z = dt[0];
-          const uk = lc ? uLocMap.get(lc) || 0 : 0;
-          if (
-            !tr &&
-            uk !== 2 &&
-            z > 0.003 &&
-            z < 15.0 &&
-            dt[4] > 0.003 &&
-            Math.abs(z - dt[4]) < Math.max(z, dt[4]) * 0.01 &&
-            Math.abs(dt[1]) < 1e-4 &&
-            Math.abs(dt[3]) < 1e-4 &&
-            (Math.abs(z - 1.0) > 0.01 || (kAct && Math.abs(zM - 1.0) < 0.1)) &&
-            (Math.abs(dt[6]) > 5 || Math.abs(dt[7]) > 5)
-          ) {
-            zM = z;
-            tX = dt[6];
-            tY = dt[7];
-            kAct = true;
-            p9GlMs = performance.now();
-          }
+          p9PushCamCand(
+            "gl",
+            dt[0],
+            tr ? dt[3] : dt[1],
+            tr ? dt[1] : dt[3],
+            dt[4],
+            tr ? dt[2] : dt[6],
+            tr ? dt[5] : dt[7],
+            cv,
+          );
           const m0 = Math.abs(dt[0]),
             m4 = Math.abs(dt[4]);
           if (
@@ -9292,58 +9413,38 @@ vec4 _mSoft(vec4 raw) {
   }
 
   const w7PxM3tL = CanvasRenderingContext2D.prototype.setTransform;
-  CanvasRenderingContext2D.prototype.setTransform = function (
-    a,
-    b,
-    c,
-    d,
-    e,
-    f,
-  ) {
-    if (typeof a === "number") {
-      const s = Math.hypot(a, b);
-      if (s > 0.005 && s < 50.0) {
-        const cv = this.canvas;
-        if (
-          cv &&
-          (cv.id === "canvas" || cv === (cachedGameCanvas || t8VwM4xK()))
-        ) {
-          f4NzQ8vR++;
-          const z0 =
-            Math.abs(a - 1) < 1e-4 &&
-            Math.abs(b) < 1e-4 &&
-            Math.abs(e || 0) < 1 &&
-            Math.abs(f || 0) < 1;
-          if (!z0) {
-            k6XpL1vQ = s;
-            if (r3WnS8mT === null) r3WnS8mT = s;
-          }
-          if (
-            (!p9PixiOn || performance.now() - p9LastPixiMs > 500) &&
-            typeof d === "number" &&
-            typeof e === "number" &&
-            typeof f === "number"
-          ) {
-            if (
-              Math.abs(b) < 1e-4 &&
-              Math.abs(c) < 1e-4 &&
-              Math.abs(a - d) < 1e-3 &&
-              Math.abs(a - 1) > 1e-3 &&
-              (Math.abs(e) > 1 || Math.abs(f) > 1)
-            ) {
-              p9C2A = a;
-              p9C2D = d;
-              p9C2Tx = e;
-              p9C2Ty = f;
-              p9C2Cv = cv;
-              p9C2On = true;
+  ["setTransform", "scale", "translate"].forEach((fn) => {
+    const og = CanvasRenderingContext2D.prototype[fn];
+    if (!og) return;
+    CanvasRenderingContext2D.prototype[fn] = function () {
+      const res = og.apply(this, arguments);
+      const cv = this.canvas;
+      if (
+        cv &&
+        (cv.id === "canvas" || cv === (cachedGameCanvas || t8VwM4xK()))
+      ) {
+        const m = this.getTransform();
+        if (fn === "setTransform") {
+          const s = Math.hypot(m.a, m.b);
+          if (s > 0.005 && s < 50.0) {
+            f4NzQ8vR++;
+            const z0 =
+              Math.abs(m.a - 1) < 1e-4 &&
+              Math.abs(m.b) < 1e-4 &&
+              Math.abs(m.e || 0) < 1 &&
+              Math.abs(m.f || 0) < 1;
+            if (!z0) {
+              k6XpL1vQ = s;
+              if (r3WnS8mT === null) r3WnS8mT = s;
             }
           }
         }
+        p9C2Cv = cv;
+        p9PushCamCand("c2d", m.a, m.b, m.c, m.d, m.e, m.f, cv);
       }
-    }
-    return w7PxM3tL.apply(this, arguments);
-  };
+      return res;
+    };
+  });
 
   window.addEventListener(
     "wheel",
@@ -16439,6 +16540,10 @@ vec4 _mSoft(vec4 raw) {
           tx: rL + p9WtTx * sx,
           ty: rT + p9WtTy * sy,
         };
+      }
+      if (p9CamCands.length > 0 && gCv) {
+        const cRc = gCv.getBoundingClientRect();
+        if (cRc && cRc.width > 0) p9PickCamCand(gCv, cRc, nw);
       }
       if (kAct && nw - p9GlMs <= 500) {
         return { a: zM, b: 0, c: 0, d: zM, tx: rL + tX, ty: rT + tY };
