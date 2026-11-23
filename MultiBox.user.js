@@ -533,6 +533,7 @@
 
   const z4XqW8mT = {
     soloDelay: 800,
+    soloFocus: "multibox",
     autoDelay: 800,
     keyMenu: "ShiftRight",
     ffMethod: "manual",
@@ -729,8 +730,7 @@
   m9TvL2sP.revNotifyPos = m9TvL2sP.revNotifyPos === "bottom" ? "bottom" : "top";
   m9TvL2sP.holdSpamMode =
     m9TvL2sP.holdSpamMode === "release" ? "release" : "hold";
-  m9TvL2sP.revMethod = m9TvL2sP.revMethod === "pixi" ? "pixi" : "ws";
-  m9TvL2sP.ffMethod = m9TvL2sP.ffMethod === "auto" ? "auto" : "manual";
+  m9TvL2sP.soloFocus = m9TvL2sP.soloFocus === "window" ? "window" : "multibox";
   m9TvL2sP.mapGridEnabled = Boolean(m9TvL2sP.mapGridEnabled);
   m9TvL2sP.mapGridMode = m9TvL2sP.mapGridMode === "over" ? "over" : "bg";
   m9TvL2sP.crosshairEnabled = Boolean(m9TvL2sP.crosshairEnabled);
@@ -874,6 +874,9 @@
       revMtd: "Method",
       secFf: "FAST-FEED",
       secSolo: "SOLO-TRICK",
+      soloFoc: "Focus",
+      sfMb: "Multibox",
+      sfWin: "Second Window",
       ffLock: "Lock / Unlock",
       ffAct: "Activate",
       ffMan: "Manual",
@@ -966,6 +969,9 @@
       revMtd: "Метод",
       secFf: "FAST-FEED",
       secSolo: "SOLO-TRICK",
+      soloFoc: "Фокус",
+      sfMb: "Мультибокс",
+      sfWin: "Второе окно",
       ffLock: "Лок / Анлок",
       ffAct: "Активация",
       ffMan: "Ручной",
@@ -1019,6 +1025,7 @@
   let b6BpWinEl = null;
   const b6SyncKeys = [
     "soloDelay",
+    "soloFocus",
     "autoDelay",
     "keyMenu",
     "ffMethod",
@@ -6216,7 +6223,11 @@
       });
       n7KwQ2vL(m9TvL2sP.soloDelay, () => {
         function runStep2(tries) {
-          if (m9MbSt.matchGen !== runGen || !m4IsMbOn() || h4HasPeerTab())
+          if (
+            m9MbSt.matchGen !== runGen ||
+            !m4IsMbOn() ||
+            m9TvL2sP.soloFocus !== "multibox"
+          )
             return;
           if (k4MbBusy) {
             if (tries < 16) d2TinyWait(15, () => runStep2(tries + 1));
@@ -10181,8 +10192,9 @@ vec4 _mSoft(vec4 raw) {
     ];
     for (let i = 0; i < tK.length; i++) {
       if (m9TvL2sP[tK[i]] === c) {
-        if (!h4HasPeerTab() && m4IsMbOn()) {
-          k4MbTrick(i + 1);
+        if (m9TvL2sP.soloFocus === "multibox") {
+          if (m4IsMbOn()) k4MbTrick(i + 1);
+          else s7PzR(i + 1);
           return;
         }
         q5RzL9wK.postMessage({
@@ -10191,6 +10203,7 @@ vec4 _mSoft(vec4 raw) {
         });
         s7PzR(i + 1);
         n7KwQ2vL(m9TvL2sP.soloDelay, () => {
+          if (m9TvL2sP.soloFocus !== "window") return;
           q5RzL9wK.postMessage({
             type: "EXECUTE_BACKGROUND_SPLIT_STEP",
             senderId: v8WpM2tL,
@@ -11377,6 +11390,18 @@ vec4 _mSoft(vec4 raw) {
     if (fLBtn) fLBtn.textContent = p7TvM3wL(m9TvL2sP.keyFfLock);
     const fABtn = document.getElementById("macro-btn-keyFfActivate");
     if (fABtn) fABtn.textContent = p7TvM3wL(m9TvL2sP.keyFfActivate);
+    const sfKey = m9TvL2sP.soloFocus === "window" ? "window" : "multibox";
+    const cSf = document.getElementById("macro-solofocus-cur");
+    const pSf = document.getElementById("macro-solofocus-pop");
+    if (cSf) cSf.textContent = k3Tr(sfKey === "window" ? "sfWin" : "sfMb");
+    if (pSf) {
+      pSf.querySelectorAll(".macro-pos-opt").forEach((o) => {
+        o.classList.toggle(
+          "active",
+          o.getAttribute("data-solofocus") === sfKey,
+        );
+      });
+    }
     const aBtn = document.getElementById("macro-btn-keyAuto");
     if (aBtn) aBtn.textContent = p7TvM3wL(m9TvL2sP.keyAuto);
     const mBtn = document.getElementById("macro-btn-keyMenu");
@@ -12104,7 +12129,7 @@ vec4 _mSoft(vec4 raw) {
       .macro-rev-hdr-r{display:inline-flex;align-items:center;gap:0.45em}
       .macro-rev-mtd-lbl{font-size:1em;font-weight:500;color:var(--macro-muted-text,#9aa0a6);text-transform:none;letter-spacing:0;white-space:nowrap;transition:color 0.28s ease}
       .macro-section-header .macro-pos-btn{width:auto;min-width:0;font-size:0.95em;padding:0.26em 0.52em;text-transform:none;letter-spacing:0;white-space:nowrap}
-      #macro-revmtd-pop,#macro-ffmtd-pop{width:max-content;min-width:7.2em;max-width:12em}
+      #macro-revmtd-pop,#macro-ffmtd-pop,#macro-solofocus-pop{width:max-content;min-width:7.2em;max-width:13.5em}
             .macro-win-body.macro-pal-dim .macro-section-header.macro-pal-active{opacity:1;pointer-events:auto;position:relative;z-index:49}
             .macro-win-body.macro-pal-dim .macro-section-header.macro-pal-active>span{color:var(--macro-title-color,#fff);text-shadow:var(--macro-pal-glow,0 0 8px rgba(255,255,255,0.28))}
       .macro-pos-btn{display:inline-flex;align-items:center;justify-content:space-between;gap:0.35em;width:6.2em;box-sizing:border-box;background:var(--macro-btn-bg,#242424);border:1px solid var(--macro-btn-border,#383838);color:var(--macro-btn-text,#eee);border-radius:0.35em;padding:0.36em 0.55em;font-family:inherit;font-size:0.9em;font-weight:600;cursor:pointer;transition:border-color 0.16s,filter 0.14s,color 0.28s ease}
@@ -12287,7 +12312,16 @@ vec4 _mSoft(vec4 raw) {
           </div>
         </div>
         <div class="macro-sep"></div>
-        <div class="macro-section-header"><span data-i18n="secSolo">${k3Tr("secSolo")}</span></div>
+        <div class="macro-section-header" id="macro-hdr-solo">
+          <span data-i18n="secSolo">${k3Tr("secSolo")}</span>
+          <div class="macro-rev-hdr-r">
+            <span class="macro-rev-mtd-lbl" data-i18n="soloFoc">${k3Tr("soloFoc")}</span>
+            <button type="button" class="macro-pos-btn" id="macro-solofocus-btn">
+              <span class="macro-lang-cur" id="macro-solofocus-cur">${k3Tr(m9TvL2sP.soloFocus === "window" ? "sfWin" : "sfMb")}</span>
+              <svg class="macro-lang-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+          </div>
+        </div>
         <div class="macro-row">
           <span data-i18n="soloDel">${k3Tr("soloDel")}</span>
           <div class="macro-controls-group">
@@ -12585,10 +12619,10 @@ vec4 _mSoft(vec4 raw) {
                     <button type="button" class="macro-pos-opt${m9TvL2sP.mapGridMode === "over" ? " active" : ""}" data-grid="over"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="gridOver">${k3Tr("gridOver")}</span></button>
                   </div>
                 </div>
-        <div class="macro-pos-pop" id="macro-ffmtd-pop">
+        <div class="macro-pos-pop" id="macro-solofocus-pop">
           <div class="macro-lang-list">
-            <button type="button" class="macro-pos-opt${m9TvL2sP.ffMethod !== "auto" ? " active" : ""}" data-ffmtd="manual"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="ffMan">${k3Tr("ffMan")}</span></button>
-            <button type="button" class="macro-pos-opt${m9TvL2sP.ffMethod === "auto" ? " active" : ""}" data-ffmtd="auto"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="ffAuto">${k3Tr("ffAuto")}</span></button>
+            <button type="button" class="macro-pos-opt${m9TvL2sP.soloFocus !== "window" ? " active" : ""}" data-solofocus="multibox"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="sfMb">${k3Tr("sfMb")}</span></button>
+            <button type="button" class="macro-pos-opt${m9TvL2sP.soloFocus === "window" ? " active" : ""}" data-solofocus="window"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="sfWin">${k3Tr("sfWin")}</span></button>
           </div>
         </div>
         <div class="macro-pos-pop" id="macro-revmtd-pop">
@@ -14809,6 +14843,14 @@ vec4 _mSoft(vec4 raw) {
         fixW: false,
       },
       {
+        id: "solofocus",
+        row: document.getElementById("macro-hdr-solo"),
+        btn: document.getElementById("macro-solofocus-btn"),
+        pop: document.getElementById("macro-solofocus-pop"),
+        t: 0,
+        fixW: false,
+      },
+      {
         id: "revmtd",
         row: document.getElementById("macro-hdr-rev"),
         btn: document.getElementById("macro-revmtd-btn"),
@@ -15026,6 +15068,14 @@ vec4 _mSoft(vec4 raw) {
       f4RefocusGame();
     });
 
+    b4BindMainPop("solofocus", (opt) => {
+      m9TvL2sP.soloFocus =
+        opt.getAttribute("data-solofocus") === "window" ? "window" : "multibox";
+      x3QnK8wR();
+      r8QnM4tL();
+      f4RefocusGame();
+    });
+
     b4BindMainPop("revmtd", (opt) => {
       const nxt = opt.getAttribute("data-revmtd") === "pixi" ? "pixi" : "ws";
       if (m9TvL2sP.revMethod !== nxt) q2WnS7xM(false);
@@ -15098,7 +15148,7 @@ vec4 _mSoft(vec4 raw) {
           t &&
           t.closest &&
           t.closest(
-            "#macro-revnot-pop, #macro-revnot-btn, #macro-xhair-pop, #macro-xhair-btn, #macro-grid-pop, #macro-grid-btn, #macro-revmtd-pop, #macro-revmtd-btn, #macro-ffmtd-pop, #macro-ffmtd-btn, #macro-bpmtd-pop, #macro-bpmtd-btn, #macro-bpradar-pop, #macro-bpradar-btn, #macro-holdmode-pop, #macro-holdmode-btn, .macro-custom-scroll-track, #macro-toggle-pill",
+            "#macro-revnot-pop, #macro-revnot-btn, #macro-xhair-pop, #macro-xhair-btn, #macro-grid-pop, #macro-grid-btn, #macro-revmtd-pop, #macro-revmtd-btn, #macro-ffmtd-pop, #macro-ffmtd-btn, #macro-solofocus-pop, #macro-solofocus-btn, #macro-bpmtd-pop, #macro-bpmtd-btn, #macro-bpradar-pop, #macro-bpradar-btn, #macro-holdmode-pop, #macro-holdmode-btn, .macro-custom-scroll-track, #macro-toggle-pill",
           )
         )
           return;
@@ -15431,6 +15481,7 @@ vec4 _mSoft(vec4 raw) {
       cfg.revMethod = cfg.revMethod === "pixi" ? "pixi" : "ws";
       cfg.holdSpamMode = cfg.holdSpamMode === "release" ? "release" : "hold";
       cfg.ffMethod = cfg.ffMethod === "auto" ? "auto" : "manual";
+      cfg.soloFocus = cfg.soloFocus === "window" ? "window" : "multibox";
       ["menuColor", "buttonsColor", "plexusColor"].forEach((k) => {
         cfg[k] =
           typeof cfg[k] === "string" && /^#[0-9a-f]{6}$/i.test(cfg[k])
