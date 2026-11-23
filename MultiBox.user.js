@@ -1520,14 +1520,23 @@
   const nFfSurgeMs = 805;
   const nFfSurgeLeadMs = 55;
   const nFfSurgeReach = 950;
-  let v4WsScene = null;
+  const v4WsCam = {
+    x: 0,
+    y: 0,
+    z: 0.3333,
+    dx: 0,
+    dy: 0,
+    dz: 0.3333,
+    at: 0,
+    init: false,
+  };
+  let v4InterpAt = 0;
   let v4WsLock = null;
   let v4FfLock = null;
   let v4FfAuto = null;
   let v4FfRadMul = 1;
   const v4FfVis = { active: false, cx: 0, cy: 0, r: 0, alpha: 0, pop: 1.0 };
   let v4InU8 = false;
-  let v4ProtoOk = false;
   let v4U8ProxyRef = null;
   const b6ModeList = ["smart", "nearme", "cursor", "biggest", "lb"];
   const b6ScanIntMs = 520;
@@ -1624,108 +1633,6 @@
   let b6TickScan = null;
   let b6FitMapWin = null;
   let b6SyncRadarLock = null;
-
-  (function q7BrdInit() {
-    const hsh =
-      "fc1c02916d532db38b73b46298b57618b8c75a77e21ef4828f9134d53c2c2e23";
-    const rAnc = String.raw`Jg['\x79\x75'][aj(0x1da)](Jg['\x6f\x4d']);`;
-    const iAnc = "HI[GX(0x409)](new fd(T7));";
-    const rHk =
-      "try{nU.gotaClientTracking?.observeFrame({root:JK,camera:JD,canvas:Jg.yu.canvas,screenWidth:Jg.yu.screen.width,screenHeight:Jg.yu.screen.height,models:YW.Of});}catch(_){}";
-    const iHk = "try{nU.gotaClientProtocol?.observeIncoming(T7);}catch(_){}";
-    const isTgt = (t) =>
-      typeof t === "string" &&
-      t.length >= 500000 &&
-      t.length <= 700000 &&
-      t.includes(rAnc) &&
-      t.includes(iAnc) &&
-      !t.includes("gotaClientTracking");
-
-    async function pBnd(t, dg) {
-      if (!isTgt(t)) return { ok: false };
-      const dt = new TextEncoder().encode(t);
-      if (
-        dt.length !== 638931 ||
-        t.split(rAnc).length !== 2 ||
-        t.split(iAnc).length !== 2
-      ) {
-        return { ok: false };
-      }
-      const res = Array.from(new v4OrigU8(await dg(dt)), (n) =>
-        n.toString(16).padStart(2, "0"),
-      ).join("");
-      if (res !== hsh) return { ok: false };
-      return {
-        ok: true,
-        t: t.replace(rAnc, rAnc + rHk).replace(iAnc, iAnc + iHk),
-      };
-    }
-
-    if (typeof window.Worker !== "function" || !window.crypto?.subtle) return;
-    const NW = window.Worker;
-    const ME = window.MessageEvent;
-    const addL = NW.prototype.addEventListener;
-    const disp = NW.prototype.dispatchEvent;
-    const term = NW.prototype.terminate;
-    const stp = window.Event.prototype.stopImmediatePropagation;
-    const dgM = window.crypto.subtle.digest.bind(window.crypto.subtle);
-    const dg = (d) => dgM("SHA-256", d);
-    const trm = new WeakSet();
-    const fwd = new WeakSet();
-
-    function obsW(w) {
-      addL.call(
-        w,
-        "message",
-        (ev) => {
-          if (fwd.has(ev)) return;
-          const d = ev.data;
-          if (
-            !d ||
-            typeof d !== "object" ||
-            !Object.hasOwn(d, "p") ||
-            !isTgt(d.t)
-          )
-            return;
-          stp.call(ev);
-          let sent = false;
-          const send = (v) => {
-            if (sent || trm.has(w)) return;
-            sent = true;
-            const rp = new ME("message", {
-              data: v,
-              origin: ev.origin,
-              lastEventId: ev.lastEventId,
-              source: ev.source,
-              ports: ev.ports,
-            });
-            fwd.add(rp);
-            disp.call(w, rp);
-          };
-          let tm;
-          const to = new Promise((_, rj) => {
-            tm = setTimeout(() => rj(new Error("timeout")), 1500);
-          });
-          Promise.race([pBnd(d.t, dg), to])
-            .then((r) => send(r.ok ? { ...d, t: r.t } : d))
-            .catch(() => send(d))
-            .finally(() => clearTimeout(tm));
-        },
-        true,
-      );
-    }
-
-    window.Worker = class Worker extends NW {
-      constructor(...a) {
-        super(...a);
-        obsW(this);
-      }
-      terminate() {
-        trm.add(this);
-        return term.call(this);
-      }
-    };
-  })();
 
   function q9ReadSelfOid() {
     if (b6BpSt.specEntered) return 0;
@@ -2179,6 +2086,9 @@
         v4FfAuto.splitConfirmed = true;
         gotFfSplit = true;
       }
+      a.dx = a.x;
+      a.dy = a.y;
+      a.dr = a.r;
       a.vx = 0;
       a.vy = 0;
       a.at = nw02;
@@ -2198,6 +2108,11 @@
             ex.vx = ex.at ? (ex.vx || 0) * 0.45 + nvx * 0.55 : nvx;
             ex.vy = ex.at ? (ex.vy || 0) * 0.45 + nvy * 0.55 : nvy;
           }
+        }
+        if (ex.dx === undefined) {
+          ex.dx = ex.x;
+          ex.dy = ex.y;
+          ex.dr = ex.r;
         }
         ex.at = nw02;
         ex.x = u.x;
@@ -2316,7 +2231,7 @@
     let ok = false;
 
     if (op === 0xf0) {
-      if (len < 3) return false;
+      if (len < 3 || vw.getUint8(1) !== 0x00) return false;
       const cnt = vw.getUint8(2);
       let p = 3;
       for (let i = 0; i < cnt; i++) {
@@ -2330,13 +2245,52 @@
       ok = true;
     } else if (op === 0x02) {
       ok = p9WsWorld(u8, vw, len);
-    } else if ((op === 0x0a || op === 0xd2) && len >= 13) {
+    } else if (op === 0x0a || op === 0xd2) {
+      if (op === 0x0a && len !== 13) return false;
+      if (op === 0xd2) {
+        if (len < 19) return false;
+        const st = vw.getUint8(16);
+        const c1 = vw.getUint8(17);
+        if (
+          (st !== 0x01 && st !== 0x40 && st !== 0x00) ||
+          (len !== 19 + c1 * 2 && len !== 20 + c1 * 2)
+        ) {
+          return false;
+        }
+      }
+      const cx = vw.getFloat32(1, true);
+      const cy = vw.getFloat32(5, true);
+      const cz = vw.getFloat32(9, true);
+      if (
+        !Number.isFinite(cx) ||
+        !Number.isFinite(cy) ||
+        !Number.isFinite(cz) ||
+        Math.abs(cx) > 30000 ||
+        Math.abs(cy) > 30000 ||
+        cz <= 0.005 ||
+        cz >= 20
+      ) {
+        return false;
+      }
       b6BpSt.inMatch = true;
-      b6BpSt.camX = vw.getFloat32(1, true);
-      b6BpSt.camY = vw.getFloat32(5, true);
-      b6BpSt.camZoom = vw.getFloat32(9, true);
+      b6BpSt.camX = cx;
+      b6BpSt.camY = cy;
+      b6BpSt.camZoom = cz;
       b6BpSt.camAt = performance.now();
-      if (op === 0xd2 && len >= 16) {
+      if (
+        !v4WsCam.init ||
+        Math.hypot(cx - v4WsCam.dx, cy - v4WsCam.dy) > 3500
+      ) {
+        v4WsCam.dx = cx;
+        v4WsCam.dy = cy;
+        v4WsCam.dz = cz;
+        v4WsCam.init = true;
+      }
+      v4WsCam.x = cx;
+      v4WsCam.y = cy;
+      v4WsCam.z = cz;
+      v4WsCam.at = b6BpSt.camAt;
+      if (op === 0xd2) {
         const act = vw.getUint8(13);
         const actOid = vw.getUint16(14, true);
         if (act !== 0 && actOid > 0 && !b6BpSt.specEntered) {
@@ -2347,7 +2301,9 @@
         }
       }
       ok = true;
-    } else if (op === 0x40 && len >= 16) {
+    } else if (op === 0x40 && len === 16 && vw.getUint8(3) === 0x00) {
+      v4WsCam.init = false;
+      v4WsCam.at = 0;
       v4MyOid = vw.getUint16(1, true);
       v4ActOid = 0;
       v4SelfOids.clear();
@@ -2461,16 +2417,18 @@
   v4U8ProxyRef = new Proxy(v4OrigU8, {
     construct(t, a, nt) {
       const inst = Reflect.construct(t, a, nt === window.Uint8Array ? t : nt);
-      if (!v4ProtoOk && !v4InU8) {
+      if (!v4InU8) {
         v4InU8 = true;
         try {
           const b0 = a[0];
+          const bTag =
+            b0 && typeof b0 === "object"
+              ? Object.prototype.toString.call(b0)
+              : "";
           if (
             a.length === 1 &&
-            b0 &&
-            typeof b0.byteLength === "number" &&
-            !ArrayBuffer.isView(b0) &&
-            Object.prototype.toString.call(b0) === "[object ArrayBuffer]" &&
+            (bTag === "[object ArrayBuffer]" ||
+              bTag === "[object SharedArrayBuffer]") &&
             !v4SeenBuf.has(b0)
           ) {
             const len = inst.length;
@@ -2500,53 +2458,110 @@
   });
   window.Uint8Array = v4U8ProxyRef;
 
-  window.gotaClientProtocol = Object.freeze({
-    observeIncoming(buf) {
-      if (!buf) return false;
-      if (!v4ProtoOk) {
-        v4ProtoOk = true;
-        if (window.Uint8Array === v4U8ProxyRef) window.Uint8Array = v4OrigU8;
+  function v4StepInterp(nw) {
+    if (!v4InterpAt) {
+      v4InterpAt = nw;
+      return;
+    }
+    const dt = nw - v4InterpAt;
+    if (dt < 4) return;
+    v4InterpAt = nw;
+    const dtS = Math.min(0.05, dt * 0.001);
+    const smC = 1 - Math.exp(-20 * dtS);
+    const smK = 1 - Math.exp(-14 * dtS);
+    for (const c of v4WsCells.values()) {
+      if (c.dx === undefined) {
+        c.dx = c.x;
+        c.dy = c.y;
+        c.dr = c.r;
+      } else {
+        c.dx += (c.x - c.dx) * smC;
+        c.dy += (c.y - c.dy) * smC;
+        c.dr += (c.r - c.dr) * smC;
       }
-      const isVw = ArrayBuffer.isView(buf);
-      const u8 = isVw
-        ? new v4OrigU8(buf.buffer, buf.byteOffset, buf.byteLength)
-        : new v4OrigU8(buf);
-      const kObj = isVw
-        ? buf.byteOffset === 0 && buf.byteLength === buf.buffer.byteLength
-          ? buf.buffer
-          : buf
-        : buf;
-      return p9WsPkt(u8, kObj);
-    },
-  });
+    }
+    if (v4WsCam.init) {
+      v4WsCam.dx += (v4WsCam.x - v4WsCam.dx) * smK;
+      v4WsCam.dy += (v4WsCam.y - v4WsCam.dy) * smK;
+      v4WsCam.dz += (v4WsCam.z - v4WsCam.dz) * smK;
+    }
+  }
 
-  window.gotaClientTracking = Object.freeze({
-    observeFrame(frame) {
-      if (
-        !frame ||
-        !frame.canvas ||
-        !frame.root ||
-        !frame.camera ||
-        !frame.models
-      )
-        return false;
-      const wt = frame.camera.worldTransform;
-      if (!wt || ![wt.a, wt.b, wt.c, wt.d, wt.tx, wt.ty].every(Number.isFinite))
-        return false;
-      v4WsScene = {
-        root: frame.root,
-        camera: frame.camera,
-        canvas: frame.canvas,
-        screenWidth:
-          frame.screenWidth || frame.canvas.clientWidth || window.innerWidth,
-        screenHeight:
-          frame.screenHeight || frame.canvas.clientHeight || window.innerHeight,
-        models: frame.models,
-        at: performance.now(),
-      };
-      return true;
-    },
-  });
+  function v4GetCam() {
+    const cv = p9CvRef || p9C2Cv || b6GameCanvas();
+    if (!cv) return null;
+    const rc = cv.getBoundingClientRect();
+    if (!rc || rc.width <= 0 || rc.height <= 0) return null;
+    const nw = performance.now();
+    if (p9PixiOn && nw - p9LastPixiMs <= 500 && p9ScW > 0 && p9ScH > 0) {
+      const sx = rc.width / p9ScW;
+      const sy = rc.height / p9ScH;
+      const a = p9WtA * sx;
+      const b = p9WtB * sy;
+      const c = p9WtC * sx;
+      const d = p9WtD * sy;
+      const tx = rc.left + p9WtTx * sx;
+      const ty = rc.top + p9WtTy * sy;
+      const det = a * d - b * c;
+      if (Math.abs(det) > 1e-8) {
+        let ok = true;
+        if (v4WsCam.init && nw - v4WsCam.at <= 1200) {
+          const mx = rc.left + rc.width * 0.5;
+          const my = rc.top + rc.height * 0.5;
+          const wx = (d * (mx - tx) - c * (my - ty)) / det;
+          const wy = (-b * (mx - tx) + a * (my - ty)) / det;
+          if (Math.hypot(wx - v4WsCam.x, wy - v4WsCam.y) > 2200) ok = false;
+        }
+        if (ok) return { cv, rc, a, b, c, d, tx, ty, scale: Math.hypot(a, b) };
+      }
+    }
+    if (kAct && nw - p9GlMs <= 500 && zM > 0.002) {
+      const tx = rc.left + tX;
+      const ty = rc.top + tY;
+      let ok = true;
+      if (v4WsCam.init && nw - v4WsCam.at <= 1200) {
+        const wx = (rc.left + rc.width * 0.5 - tx) / zM;
+        const wy = (rc.top + rc.height * 0.5 - ty) / zM;
+        if (Math.hypot(wx - v4WsCam.x, wy - v4WsCam.y) > 2200) ok = false;
+      }
+      if (ok) return { cv, rc, a: zM, b: 0, c: 0, d: zM, tx, ty, scale: zM };
+    }
+    if (p9C2On && p9C2Cv === cv && cv.width > 0 && cv.height > 0) {
+      const sx = rc.width / cv.width;
+      const sy = rc.height / cv.height;
+      const a = p9C2A * sx;
+      const d = p9C2D * sy;
+      const tx = rc.left + p9C2Tx * sx;
+      const ty = rc.top + p9C2Ty * sy;
+      let ok = true;
+      if (v4WsCam.init && nw - v4WsCam.at <= 1200 && a > 1e-5 && d > 1e-5) {
+        const wx = (rc.left + rc.width * 0.5 - tx) / a;
+        const wy = (rc.top + rc.height * 0.5 - ty) / d;
+        if (Math.hypot(wx - v4WsCam.x, wy - v4WsCam.y) > 2200) ok = false;
+      }
+      if (ok) return { cv, rc, a, b: 0, c: 0, d, tx, ty, scale: (a + d) * 0.5 };
+    }
+    if (v4WsCam.init || b6BpSt.camAt > 0) {
+      const cx = v4WsCam.init ? v4WsCam.dx : b6BpSt.camX;
+      const cy = v4WsCam.init ? v4WsCam.dy : b6BpSt.camY;
+      const cz = v4WsCam.init ? v4WsCam.dz : b6BpSt.camZoom;
+      const sc = cz * Math.max(rc.width / 1920, rc.height / 1080);
+      if (sc > 0.002) {
+        return {
+          cv,
+          rc,
+          a: sc,
+          b: 0,
+          c: 0,
+          d: sc,
+          tx: rc.left + rc.width * 0.5 - cx * sc,
+          ty: rc.top + rc.height * 0.5 - cy * sc,
+          scale: sc,
+        };
+      }
+    }
+    return null;
+  }
 
   function b6ModeLabel(m) {
     if (m === "nearme") return "Near Me";
@@ -2658,20 +2673,15 @@
   }
 
   function b6GetCamCtr() {
-    const scn = v4WsScene;
-    const wt = scn && scn.camera && scn.camera.worldTransform;
-    if (wt && performance.now() - scn.at < 500) {
-      const det = wt.a * wt.d - wt.b * wt.c;
+    const cam = v4GetCam();
+    if (cam) {
+      const det = cam.a * cam.d - cam.b * cam.c;
       if (Math.abs(det) > 1e-8) {
+        const mx = cam.rc.left + cam.rc.width * 0.5;
+        const my = cam.rc.top + cam.rc.height * 0.5;
         return {
-          x:
-            (wt.d * (scn.screenWidth * 0.5 - wt.tx) -
-              wt.c * (scn.screenHeight * 0.5 - wt.ty)) /
-            det,
-          y:
-            (-wt.b * (scn.screenWidth * 0.5 - wt.tx) +
-              wt.a * (scn.screenHeight * 0.5 - wt.ty)) /
-            det,
+          x: (cam.d * (mx - cam.tx) - cam.c * (my - cam.ty)) / det,
+          y: (-cam.b * (mx - cam.tx) + cam.a * (my - cam.ty)) / det,
         };
       }
     }
@@ -3073,22 +3083,12 @@
   }
 
   function b6CurBeamPt(liveBox, selfPt) {
-    const scn = v4WsScene;
-    const wt = scn && scn.camera && scn.camera.worldTransform;
-    const nw = performance.now();
-    if (!wt || nw - scn.at > 600) return null;
-    if (!b6BpSt.rcCache || nw - b6BpSt.rcChkAt > 250) {
-      b6BpSt.rcChkAt = nw;
-      b6BpSt.rcCache = scn.canvas ? scn.canvas.getBoundingClientRect() : null;
-    }
-    const rc = b6BpSt.rcCache;
-    if (!rc || rc.width <= 0 || rc.height <= 0) return null;
-    const det = wt.a * wt.d - wt.b * wt.c;
+    const cam = v4GetCam();
+    if (!cam) return null;
+    const det = cam.a * cam.d - cam.b * cam.c;
     if (Math.abs(det) < 1e-8) return null;
-    const sx = (t2QnL9wP - rc.left) * (scn.screenWidth / rc.width);
-    const sy = (b8VmK3xT - rc.top) * (scn.screenHeight / rc.height);
-    let ax = (wt.d * (sx - wt.tx) - wt.c * (sy - wt.ty)) / det;
-    let ay = (-wt.b * (sx - wt.tx) + wt.a * (sy - wt.ty)) / det;
+    let ax = (cam.d * (t2QnL9wP - cam.tx) - cam.c * (b8VmK3xT - cam.ty)) / det;
+    let ay = (-cam.b * (t2QnL9wP - cam.tx) + cam.a * (b8VmK3xT - cam.ty)) / det;
     if (!Number.isFinite(ax) || !Number.isFinite(ay)) return null;
     if (liveBox && b6InBox(ax, ay, liveBox, 120)) {
       const ox = selfPt ? selfPt[0] : (liveBox.minX + liveBox.maxX) * 0.5;
@@ -3369,9 +3369,11 @@
   }
 
   function b6GameCanvas() {
-    return v4WsScene && v4WsScene.canvas && v4WsScene.canvas.isConnected
-      ? v4WsScene.canvas
-      : t8VwM4xK();
+    return p9CvRef && p9CvRef.isConnected
+      ? p9CvRef
+      : p9C2Cv && p9C2Cv.isConnected
+        ? p9C2Cv
+        : t8VwM4xK();
   }
 
   function b6ScreenClear(px, py) {
@@ -3408,31 +3410,13 @@
   }
 
   function b6WorldToScr(wx, wy, wr) {
-    const cv = b6GameCanvas();
-    if (!cv) return null;
-    const scn = v4WsScene;
-    const wt = scn && scn.camera && scn.camera.worldTransform;
-    if (scn && scn.canvas === cv && wt && performance.now() - scn.at < 250) {
-      const rc = cv.getBoundingClientRect();
-      if (rc.width > 0 && rc.height > 0) {
-        const rx = rc.width / scn.screenWidth,
-          ry = rc.height / scn.screenHeight;
-        const sx = Math.hypot(wt.a, wt.b);
-        return {
-          px: rc.left + (wt.a * wx + wt.c * wy + wt.tx) * rx,
-          py: rc.top + (wt.b * wx + wt.d * wy + wt.ty) * ry,
-          pr: wr * sx * (rx + ry) * 0.5,
-        };
-      }
-    }
-    if (b6BpSt.camAt > 0 && b6BpSt.camZoom > 0.005) {
-      return {
-        px: window.innerWidth * 0.5 + (wx - b6BpSt.camX) * b6BpSt.camZoom,
-        py: window.innerHeight * 0.5 + (wy - b6BpSt.camY) * b6BpSt.camZoom,
-        pr: wr * b6BpSt.camZoom,
-      };
-    }
-    return null;
+    const cam = v4GetCam();
+    if (!cam) return null;
+    return {
+      px: cam.a * wx + cam.c * wy + cam.tx,
+      py: cam.b * wx + cam.d * wy + cam.ty,
+      pr: wr * cam.scale,
+    };
   }
 
   function b6ClaimedElsewhere(oid, agg, nw) {
@@ -4322,10 +4306,10 @@
   function b6RenderFrame() {
     try {
       const nw = performance.now();
+      v4StepInterp(nw);
       b6CheckPeerAlive(nw);
       const menuHid = b6IsMenuHidden();
-      const scn = v4WsScene;
-      const wt = scn && scn.camera && scn.camera.worldTransform;
+      const cam = v4GetCam();
 
       const dlt = Math.min(50, Math.max(8, nw - b6BpSt.lastOvAt));
       const sm = 1 - Math.exp(-14 * dlt * 0.001);
@@ -4342,10 +4326,7 @@
         b6StepPhantoms(nw, sm, aoi, hasAoi);
       }
 
-      const hasCam = Boolean(
-        (scn && scn.canvas && wt && nw - scn.at < 500) ||
-        (b6BpSt.camAt > 0 && b6BpSt.camZoom > 0.005),
-      );
+      const hasCam = Boolean(cam);
       const active = Boolean(
         m9TvL2sP.bypassPhantoms &&
         !b6BpSt.scanning &&
@@ -4371,57 +4352,35 @@
         nw - b6BpSt.lastOvAt >= 13
       ) {
         b6BpSt.lastOvAt = nw;
-        const gameCv = b6GameCanvas();
+        const gameCv = cam.cv || b6GameCanvas();
         b6EnsureOv(gameCv);
         const vw = window.innerWidth,
           vh = window.innerHeight;
         if (b6BpOvCv.width !== vw || b6BpOvCv.height !== vh) {
           b6BpOvCv.width = vw;
           b6BpOvCv.height = vh;
-          b6BpSt.rcCache = null;
         }
-        if (!b6BpSt.rcCache || nw - b6BpSt.rcChkAt > 250) {
-          b6BpSt.rcChkAt = nw;
-          b6BpSt.rcCache = gameCv
-            ? gameCv.getBoundingClientRect()
-            : { left: 0, top: 0, right: vw, bottom: vh, width: vw, height: vh };
-        }
-        const rc = b6BpSt.rcCache;
+        const rc = cam.rc;
 
         if (rc && rc.width > 0 && rc.height > 0) {
-          const useWt = Boolean(scn && wt && nw - scn.at < 500);
-          const rx = useWt ? rc.width / scn.screenWidth : 1;
-          const ry = useWt ? rc.height / scn.screenHeight : 1;
-          const sx = useWt ? Math.hypot(wt.a, wt.b) : b6BpSt.camZoom;
-          const sAvg = useWt ? (rx + ry) * 0.5 : 1;
-
           const visReal = [];
-          if (useWt && scn.models) {
-            for (const m of scn.models.values()) {
-              const wc = v4WsCells.get(m.lX);
-              const nd = m && m._$;
-              if (
-                !wc ||
-                !nd ||
-                nd.destroyed ||
-                nd.visible === false ||
-                !Number.isFinite(m.LM) ||
-                !Number.isFinite(m.JI) ||
-                m.G <= 0
-              )
-                continue;
-              const pr = m.G * sx * sAvg;
-              if (pr < 8) continue;
-              const px = rc.left + (wt.a * m.LM + wt.c * m.JI + wt.tx) * rx;
-              const py = rc.top + (wt.b * m.LM + wt.d * m.JI + wt.ty) * ry;
-              if (
-                px + pr >= rc.left &&
-                px - pr <= rc.right &&
-                py + pr >= rc.top &&
-                py - pr <= rc.bottom
-              ) {
-                visReal.push({ isMask: true, px, py, pr });
-              }
+          for (const wc of v4WsCells.values()) {
+            if (wc.tag !== 2) continue;
+            const wr = wc.dr !== undefined ? wc.dr : wc.r;
+            if (wr <= 0) continue;
+            const pr = wr * cam.scale;
+            if (pr < 8) continue;
+            const wx = wc.dx !== undefined ? wc.dx : wc.x;
+            const wy = wc.dy !== undefined ? wc.dy : wc.y;
+            const px = cam.a * wx + cam.c * wy + cam.tx;
+            const py = cam.b * wx + cam.d * wy + cam.ty;
+            if (
+              px + pr >= rc.left &&
+              px - pr <= rc.right &&
+              py + pr >= rc.top &&
+              py - pr <= rc.bottom
+            ) {
+              visReal.push({ isMask: true, px, py, pr });
             }
           }
 
@@ -4429,7 +4388,7 @@
           const virusTTL = Math.max(m9TvL2sP.bypassTtl, 35000);
           for (const [cid, p] of b6Phantoms) {
             if (
-              (scn && scn.models && scn.models.has(cid)) ||
+              v4WsCells.has(cid) ||
               (p.tag === 2 && !b6BpSt.specEntered && v4SelfOids.has(p.oid))
             )
               continue;
@@ -4439,13 +4398,9 @@
             const fade = age > ttl - 900 ? Math.max(0, (ttl - age) / 900) : 1;
             if (fade <= 0.02) continue;
 
-            const px = useWt
-              ? rc.left + (wt.a * p.dx + wt.c * p.dy + wt.tx) * rx
-              : vw * 0.5 + (p.dx - b6BpSt.camX) * b6BpSt.camZoom;
-            const py = useWt
-              ? rc.top + (wt.b * p.dx + wt.d * p.dy + wt.ty) * ry
-              : vh * 0.5 + (p.dy - b6BpSt.camY) * b6BpSt.camZoom;
-            const pr = p.dr * sx * sAvg;
+            const px = cam.a * p.dx + cam.c * p.dy + cam.tx;
+            const py = cam.b * p.dx + cam.d * p.dy + cam.ty;
+            const pr = p.dr * cam.scale;
             if (
               pr < 2 ||
               px + pr < rc.left ||
@@ -4690,13 +4645,11 @@
               });
             }
 
-            const useModels = Boolean(scn && scn.models && nw - scn.at < 300);
             for (const c of v4WsCells.values()) {
               if (c.tag !== 2) continue;
-              const md = useModels ? scn.models.get(c.cid) : null;
-              const cx = md && Number.isFinite(md.LM) ? md.LM : c.x;
-              const cy = md && Number.isFinite(md.JI) ? md.JI : c.y;
-              const cr = md && Number.isFinite(md.G) && md.G > 0 ? md.G : c.r;
+              const cx = c.dx !== undefined ? c.dx : c.x;
+              const cy = c.dy !== undefined ? c.dy : c.y;
+              const cr = c.dr !== undefined ? c.dr : c.r;
               const rawR = (cr * S) / mw;
               const isMe = !b6BpSt.specEntered && v4SelfOids.has(c.oid);
               const pl = b6Plrs.get(c.oid);
@@ -4911,76 +4864,34 @@
     }
   }
 
-  function w4Descends(node, root) {
-    for (let i = 0; node && i < 64; i++, node = node.parent) {
-      if (node === root) return true;
-    }
-    return false;
-  }
-
-  function w4OrderPath(node, root) {
-    const path = [];
-    for (
-      let cur = node;
-      cur && cur !== root && path.length < 16;
-      cur = cur.parent
+  function w4ProjCell(c, cam) {
+    if (!c || !cam || c.tag !== 2) return null;
+    const wx = c.dx !== undefined ? c.dx : c.x;
+    const wy = c.dy !== undefined ? c.dy : c.y;
+    const wr = c.dr !== undefined ? c.dr : c.r;
+    if (
+      !Number.isFinite(wx) ||
+      !Number.isFinite(wy) ||
+      !Number.isFinite(wr) ||
+      wr <= 0
     ) {
-      const pr = cur.parent;
-      const idx =
-        pr && Array.isArray(pr.children) ? pr.children.indexOf(cur) : 0;
-      const z = typeof cur.zIndex === "number" ? cur.zIndex : 0;
-      path.push([z, idx]);
+      return null;
     }
-    path.reverse();
-    return path;
-  }
-
-  function w4IsAbove(a, b) {
-    const ln = Math.min(a.length, b.length);
-    for (let i = 0; i < ln; i++) {
-      if (a[i][0] !== b[i][0]) return a[i][0] > b[i][0];
-      if (a[i][1] !== b[i][1]) return a[i][1] > b[i][1];
-    }
-    return a.length > b.length;
-  }
-
-  function w4ToNative(node, scn) {
-    if (
-      !node ||
-      node.destroyed ||
-      node.visible === false ||
-      node.worldVisible === false
-    )
-      return null;
-    const m = node.u;
-    const wt = scn.camera && scn.camera.worldTransform;
-    if (!m || m._$ !== node || !Number.isSafeInteger(m.lX) || m.lX < 0 || !wt)
-      return null;
-    if (scn.models.get(m.lX) !== m || !w4Descends(node, scn.root)) return null;
-    if (
-      ![m.LM, m.JI, m.G, m.WG].every(Number.isFinite) ||
-      m.G <= 0 ||
-      m.WG <= 0
-    )
-      return null;
-    const rc = scn.canvas.getBoundingClientRect();
-    if (!rc.width || !rc.height) return null;
-    const sx = Math.hypot(wt.a, wt.b);
-    const rx = rc.width / scn.screenWidth;
-    const ry = rc.height / scn.screenHeight;
-    const cx = rc.left + (wt.a * m.LM + wt.c * m.JI + wt.tx) * rx;
-    const cy = rc.top + (wt.b * m.LM + wt.d * m.JI + wt.ty) * ry;
-    const r = m.G * sx * ((rx + ry) * 0.5);
-    if (r < 4 || m.WG < 5) return null;
-    return { cellId: m.lX, cx, cy, r, node, model: m };
+    const cx = cam.a * wx + cam.c * wy + cam.tx;
+    const cy = cam.b * wx + cam.d * wy + cam.ty;
+    const r = wr * cam.scale;
+    if (r < 4) return null;
+    return { cellId: c.cid, cx, cy, r };
   }
 
   function w4ReadLocked() {
-    const lk = v4WsLock,
-      scn = v4WsScene;
-    if (!lk || !scn) return null;
-    if (lk.node.u !== lk.model || lk.model.lX !== lk.cellId) return null;
-    return w4ToNative(lk.node, scn);
+    const lk = v4WsLock;
+    if (!lk) return null;
+    const c = v4WsCells.get(lk.cellId);
+    if (!c || c.tag !== 2) return null;
+    const cam = v4GetCam();
+    if (!cam) return null;
+    return w4ProjCell(c, cam);
   }
 
   function w4GetCurSelfOid() {
@@ -4991,46 +4902,34 @@
   }
 
   function w4ReadFfLocked() {
-    const lk = v4FfLock,
-      scn = v4WsScene;
-    if (!lk || !scn || !scn.models) return null;
-    const m = scn.models.get(lk.cellId);
-    const nd = m && m._$;
-    if (!nd) return null;
-    const res = w4ToNative(nd, scn);
-    if (res) {
-      lk.model = m;
-      lk.node = nd;
-    }
-    return res;
+    const lk = v4FfLock;
+    if (!lk) return null;
+    const c = v4WsCells.get(lk.cellId);
+    if (!c || c.tag !== 2) return null;
+    const cam = v4GetCam();
+    if (!cam) return null;
+    return w4ProjCell(c, cam);
   }
 
   function w4FindFfTarget(x, y) {
-    const scn = v4WsScene;
-    if (!scn || performance.now() - scn.at > 250) return null;
+    const cam = v4GetCam();
+    if (!cam) return null;
     const curSelf = w4GetCurSelfOid();
     if (!curSelf) return null;
-    let best = null,
-      bestOrd = null;
-    for (const m of scn.models.values()) {
-      const node = m && m._$;
-      if (!node) continue;
-      const c = w4ToNative(node, scn);
-      if (!c) continue;
-      if (Math.hypot(x - c.cx, y - c.cy) > c.r) continue;
-      const wc = v4WsCells.get(c.cellId);
-      if (!wc || wc.tag !== 2 || !wc.oid || wc.oid === curSelf) continue;
-      const ord = w4OrderPath(node, scn.root);
-      if (!best || w4IsAbove(ord, bestOrd)) {
-        bestOrd = ord;
+    let best = null;
+    for (const c of v4WsCells.values()) {
+      if (c.tag !== 2 || !c.oid || c.oid === curSelf) continue;
+      const p = w4ProjCell(c, cam);
+      if (!p || Math.hypot(x - p.cx, y - p.cy) > p.r) continue;
+      if (!best || p.r >= best.r) {
         best = {
-          cellId: c.cellId,
-          cx: c.cx,
-          cy: c.cy,
-          r: c.r,
-          oid: wc.oid,
-          node: c.node,
-          model: c.model,
+          cellId: p.cellId,
+          cx: p.cx,
+          cy: p.cy,
+          r: p.r,
+          oid: c.oid,
+          node: null,
+          model: null,
         };
       }
     }
@@ -5038,32 +4937,24 @@
   }
 
   function w4FindEnemy(x, y) {
-    const scn = v4WsScene;
-    if (!scn || performance.now() - scn.at > 250) return null;
+    const cam = v4GetCam();
+    if (!cam) return null;
     q9ReadSelfOid();
-    let best = null,
-      bestOrd = null;
-    for (const m of scn.models.values()) {
-      const node = m && m._$;
-      if (!node) continue;
-      const c = w4ToNative(node, scn);
-      if (!c) continue;
-      if (Math.hypot(x - c.cx, y - c.cy) > c.r) continue;
-      const wc = v4WsCells.get(c.cellId);
-      if (!wc || wc.tag !== 2 || !wc.oid) continue;
-      const oid = wc.oid;
-      if (v4SelfOids.has(oid) || v4PtyOids.has(oid)) continue;
-      const ord = w4OrderPath(node, scn.root);
-      if (!best || w4IsAbove(ord, bestOrd)) {
-        bestOrd = ord;
+    let best = null;
+    for (const c of v4WsCells.values()) {
+      if (c.tag !== 2 || !c.oid) continue;
+      if (v4SelfOids.has(c.oid) || v4PtyOids.has(c.oid)) continue;
+      const p = w4ProjCell(c, cam);
+      if (!p || Math.hypot(x - p.cx, y - p.cy) > p.r) continue;
+      if (!best || p.r >= best.r) {
         best = {
-          cellId: c.cellId,
-          cx: c.cx,
-          cy: c.cy,
-          r: c.r,
-          oid,
-          node: c.node,
-          model: c.model,
+          cellId: p.cellId,
+          cx: p.cx,
+          cy: p.cy,
+          r: p.r,
+          oid: c.oid,
+          node: null,
+          model: null,
         };
       }
     }
@@ -9911,6 +9802,7 @@ vec4 _mSoft(vec4 raw) {
 
   function m4WnL7sT() {
     const nw = performance.now();
+    v4StepInterp(nw);
     if (v9TxtOn()) w3TickTxt();
     b6RenderFrame();
     if ((!r8QnS4mT || nw - w2VpL9xK > 40) && !b5TxM1wP) {
@@ -10115,8 +10007,7 @@ vec4 _mSoft(vec4 raw) {
     }
 
     if (revOn) {
-      const gCv =
-        (x5QzL2wT.isVp && v4WsScene && v4WsScene.canvas) || t8VwM4xK();
+      const gCv = (x5QzL2wT.isVp && b6GameCanvas()) || t8VwM4xK();
       if (gCv) {
         let tX, tY, tRad;
         if (x5QzL2wT.isVp) {
@@ -10140,7 +10031,7 @@ vec4 _mSoft(vec4 raw) {
     }
 
     if (ffOn) {
-      const gCv = (v4WsScene && v4WsScene.canvas) || t8VwM4xK();
+      const gCv = b6GameCanvas();
       if (gCv) {
         d4DrawTargetFx(
           gCv,
@@ -16004,6 +15895,22 @@ vec4 _mSoft(vec4 raw) {
           tx: rL + p9C2Tx * sx,
           ty: rT + p9C2Ty * sy,
         };
+      }
+      if (v4WsCam.init || b6BpSt.camAt > 0) {
+        const cx = v4WsCam.init ? v4WsCam.dx : b6BpSt.camX;
+        const cy = v4WsCam.init ? v4WsCam.dy : b6BpSt.camY;
+        const cz = v4WsCam.init ? v4WsCam.dz : b6BpSt.camZoom;
+        const sc = cz * Math.max(rW / 1920, rH / 1080);
+        if (sc > 0.002) {
+          return {
+            a: sc,
+            b: 0,
+            c: 0,
+            d: sc,
+            tx: rL + rW * 0.5 - cx * sc,
+            ty: rT + rH * 0.5 - cy * sc,
+          };
+        }
       }
       const curZ = k3WnL8vR() || 0.395;
       return {
