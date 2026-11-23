@@ -1918,6 +1918,10 @@
     if (len - p !== 2 || (vw.getUint8(p) | vw.getUint8(p + 1)) !== 0)
       return false;
 
+    const nw02 = performance.now();
+    r4OnTick02(nw02);
+    r4CheckSplit02(adds, nw02);
+
     if (v4WsLock && !v4WsLock.ownerId) {
       const c = v4WsCells.get(v4WsLock.cellId);
       if (c && c.tag === 2 && c.oid) v4WsLock.ownerId = c.oid;
@@ -2014,7 +2018,6 @@
       }
     }
 
-    const nw02 = performance.now();
     const nowWall = Date.now();
     for (let i = 0; i < newPlrs.length; i++) {
       const pl = newPlrs[i];
@@ -2195,9 +2198,14 @@
 
     if (v4FfAuto && gotFfSplit) {
       if (v4FfAuto.cancelFire) v4FfAuto.cancelFire();
-      const hudPing = g5ReadPingMs();
-      const rttEst = performance.now() - v4FfAuto.t0;
-      const pingEst = hudPing > 0 ? hudPing : Math.max(30, rttEst - 20);
+      const wsPing =
+        r4WsRtt.rtt > 0
+          ? r4WsRtt.rtt +
+            (r4WsRtt.curTickJitAt === nw02 ? r4WsRtt.curTickJit : 0)
+          : g5ReadDomPingMs();
+      const rttEst = nw02 - v4FfAuto.t0;
+      const tHalf = r4WsRtt.tickCount >= 2 ? r4WsRtt.tickMs * 0.5 : 20;
+      const pingEst = wsPing > 0 ? wsPing : Math.max(20, rttEst - tHalf);
       const delayFromAdd1 = Math.max(
         360,
         nFfSurgeMs - pingEst - nFfSurgeLeadMs + v4FfAuto.radBoost,
@@ -2241,13 +2249,30 @@
       if (len < 3 || vw.getUint8(1) !== 0x00) return false;
       const cnt = vw.getUint8(2);
       let p = 3;
+      const subs = [];
+      let has02 = false;
       for (let i = 0; i < cnt; i++) {
         if (p + 4 > len) return false;
         const sLen = vw.getUint32(p, true);
         p += 4;
         if (sLen === 0 || p + sLen > len) return false;
-        p9WsPkt(u8.subarray(p, p + sLen), {});
+        const sub = u8.subarray(p, p + sLen);
+        if (sub[0] === 0x02) has02 = true;
+        if (sub[0] === 0x44) p9WsPkt(sub, {});
+        else subs.push(sub);
         p += sLen;
+      }
+      const prevF0 = r4WsRtt.inF0Batch;
+      const prevH02 = r4WsRtt.f0Has02;
+      r4WsRtt.inF0Batch = true;
+      r4WsRtt.f0Has02 = has02;
+      try {
+        for (let i = 0; i < subs.length; i++) {
+          p9WsPkt(subs[i], {});
+        }
+      } finally {
+        r4WsRtt.inF0Batch = prevF0;
+        r4WsRtt.f0Has02 = prevH02;
       }
       ok = true;
     } else if (op === 0x02) {
@@ -2300,15 +2325,33 @@
       if (op === 0xd2) {
         const act = vw.getUint8(13);
         const actOid = vw.getUint16(14, true);
+        const nwD2 = b6BpSt.camAt;
+        if (r4WsRtt.lastD2At > 0) {
+          const dtD2 = nwD2 - r4WsRtt.lastD2At;
+          if (dtD2 >= 12 && dtD2 <= 95) r4WsRtt.d2TickCount++;
+          else if (dtD2 > 180) r4WsRtt.d2TickCount = 0;
+        }
+        r4WsRtt.lastD2At = nwD2;
+        const prevActOid = r4WsRtt.lastActOid;
         if (act !== 0 && actOid > 0 && !b6BpSt.specEntered) {
+          if (prevActOid > 0 && actOid !== prevActOid) {
+            const isTickSynced =
+              r4WsRtt.d2TickCount >= 2 ||
+              (r4WsRtt.inF0Batch && r4WsRtt.f0Has02) ||
+              Math.abs(nwD2 - r4WsRtt.last02At) <= 3;
+            r4MatchSwitch(nwD2, prevActOid, isTickSynced);
+          }
+          r4WsRtt.lastActOid = actOid;
           v4ActOid = actOid;
           v4SelfOids.add(actOid);
         } else if (act === 0) {
+          r4WsRtt.lastActOid = 0;
           v4ActOid = 0;
         }
       }
       ok = true;
     } else if (op === 0x40 && len === 16 && vw.getUint8(3) === 0x00) {
+      r4ResetRtt(true);
       v4WsCam.init = false;
       v4WsCam.at = 0;
       v4MyOid = vw.getUint16(1, true);
@@ -2416,6 +2459,16 @@
         }
       }
       ok = true;
+    } else if (op === 0x44 && len === 10) {
+      const srvMs = vw.getFloat64(2, true);
+      if (
+        Number.isFinite(srvMs) &&
+        srvMs > 1500000000000 &&
+        srvMs < 4000000000000
+      ) {
+        r4OnPkt44(srvMs, performance.now());
+        ok = true;
+      }
     }
     if (ok && k && typeof k === "object") v4SeenBuf.add(k);
     return ok;
@@ -2449,7 +2502,8 @@
                 op === 0x0a ||
                 op === 0xd2 ||
                 op === 0x31 ||
-                op === 0x46
+                op === 0x46 ||
+                op === 0x44
               ) {
                 p9WsPkt(inst, b0);
               }
@@ -2464,6 +2518,439 @@
     },
   });
   window.Uint8Array = v4U8ProxyRef;
+
+  const r4WsRtt = {
+    rtt: 0,
+    tickMs: 33.33,
+    tickCount: 0,
+    last02At: 0,
+    phase02: 0,
+    downJit: 0,
+    curTickJit: 0,
+    curTickJitAt: 0,
+    srv44Base: 0,
+    loc44Base: 0,
+    prev44Srv: 0,
+    prev44Loc: 0,
+    min44Off: 0,
+    last44At: 0,
+    has44: false,
+    lastD2At: 0,
+    d2TickCount: 0,
+    lastActOid: 0,
+    swArmedAt: 0,
+    lastSwitchAt: 0,
+    hiStreak: 0,
+    inF0Batch: false,
+    f0Has02: false,
+    splits: [],
+    switches: [],
+    samples: [],
+  };
+
+  function r4ResetRtt(clrRtt) {
+    if (clrRtt) r4WsRtt.rtt = 0;
+    r4WsRtt.tickMs = 33.33;
+    r4WsRtt.tickCount = 0;
+    r4WsRtt.last02At = 0;
+    r4WsRtt.phase02 = 0;
+    r4WsRtt.downJit = 0;
+    r4WsRtt.curTickJit = 0;
+    r4WsRtt.curTickJitAt = 0;
+    r4WsRtt.srv44Base = 0;
+    r4WsRtt.loc44Base = 0;
+    r4WsRtt.prev44Srv = 0;
+    r4WsRtt.prev44Loc = 0;
+    r4WsRtt.min44Off = 0;
+    r4WsRtt.last44At = 0;
+    r4WsRtt.has44 = false;
+    r4WsRtt.lastD2At = 0;
+    r4WsRtt.d2TickCount = 0;
+    r4WsRtt.lastActOid = 0;
+    r4WsRtt.swArmedAt = 0;
+    r4WsRtt.lastSwitchAt = 0;
+    r4WsRtt.hiStreak = 0;
+    r4WsRtt.splits.length = 0;
+    r4WsRtt.switches.length = 0;
+    r4WsRtt.samples.length = 0;
+  }
+
+  function r4OnPkt44(srvMs, nw) {
+    if (r4WsRtt.has44 && r4WsRtt.prev44Srv - srvMs > 5000) {
+      r4WsRtt.has44 = false;
+    }
+    if (!r4WsRtt.has44) {
+      r4WsRtt.has44 = true;
+      r4WsRtt.srv44Base = srvMs;
+      r4WsRtt.loc44Base = nw;
+      r4WsRtt.prev44Srv = srvMs;
+      r4WsRtt.prev44Loc = nw;
+      r4WsRtt.min44Off = 0;
+      r4WsRtt.downJit = 0;
+      r4WsRtt.last44At = nw;
+      return;
+    }
+    if (srvMs <= r4WsRtt.prev44Srv) return;
+    const dSrv = srvMs - r4WsRtt.prev44Srv;
+    const dLoc = nw - r4WsRtt.prev44Loc;
+    r4WsRtt.prev44Srv = srvMs;
+    r4WsRtt.prev44Loc = nw;
+    if (dLoc <= 0) return;
+    const off = nw - r4WsRtt.loc44Base - (srvMs - r4WsRtt.srv44Base);
+    const driftAllow = Math.min(2.0, dSrv * 0.00025);
+    r4WsRtt.min44Off += driftAllow;
+    if (off < r4WsRtt.min44Off) {
+      r4WsRtt.min44Off = off;
+    } else if (off - r4WsRtt.min44Off > 400) {
+      r4WsRtt.srv44Base = srvMs;
+      r4WsRtt.loc44Base = nw;
+      r4WsRtt.min44Off = 0;
+      r4WsRtt.downJit = 0;
+      r4WsRtt.last44At = nw;
+      return;
+    }
+    const jit = Math.max(0, Math.min(80, off - r4WsRtt.min44Off));
+    r4WsRtt.downJit = r4WsRtt.downJit * 0.25 + jit * 0.75;
+    r4WsRtt.last44At = nw;
+  }
+
+  function r4OnTick02(nw) {
+    if (r4WsRtt.last02At > 0) {
+      const dt = nw - r4WsRtt.last02At;
+      if (dt >= 12 && dt <= 95) {
+        if (r4WsRtt.tickCount === 0) {
+          r4WsRtt.tickMs = dt;
+          r4WsRtt.phase02 = nw;
+        } else {
+          const a = r4WsRtt.tickCount < 8 ? 0.28 : 0.12;
+          r4WsRtt.tickMs = Math.max(
+            16,
+            Math.min(65, r4WsRtt.tickMs * (1 - a) + dt * a),
+          );
+        }
+        r4WsRtt.tickCount++;
+      }
+    }
+    let jit = 0;
+    if (r4WsRtt.phase02 > 0 && r4WsRtt.tickMs > 0) {
+      const k = Math.max(
+        1,
+        Math.round((nw - r4WsRtt.phase02) / r4WsRtt.tickMs),
+      );
+      const pred = r4WsRtt.phase02 + k * r4WsRtt.tickMs;
+      const err = nw - pred;
+      if (Math.abs(err) < r4WsRtt.tickMs * 1.5) {
+        r4WsRtt.phase02 = pred + err * (err < 0 ? 0.45 : 0.14);
+        if (err > 2) jit = Math.min(45, err - 2);
+      } else {
+        r4WsRtt.phase02 = nw;
+      }
+    } else {
+      r4WsRtt.phase02 = nw;
+    }
+    if (nw - (r4WsRtt.last44At || 0) <= 2) {
+      jit = Math.min(45, r4WsRtt.downJit);
+    }
+    r4WsRtt.curTickJit = jit;
+    r4WsRtt.curTickJitAt = nw;
+    r4WsRtt.last02At = nw;
+  }
+
+  function r4CanSelfSplit(nw) {
+    if (k2WsDead()) return false;
+    const recentSw =
+      r4WsRtt.lastSwitchAt > 0 && nw - r4WsRtt.lastSwitchAt < 1200;
+    const curOid = w4GetCurSelfOid();
+    const byOid = new Map();
+    for (const c of v4WsCells.values()) {
+      if (c.tag !== 2 || !c.oid) continue;
+      if (c.oid === curOid || (recentSw && v4SelfOids.has(c.oid))) {
+        let rec = byOid.get(c.oid);
+        if (!rec) {
+          rec = { cnt: 0, maxR: 0 };
+          byOid.set(c.oid, rec);
+        }
+        rec.cnt++;
+        if (c.r > rec.maxR) rec.maxR = c.r;
+      }
+    }
+    for (const rec of byOid.values()) {
+      if (rec.cnt > 0 && rec.cnt < 256 && rec.maxR >= 14) return true;
+    }
+    return false;
+  }
+
+  function r4ArmSwitch(nw) {
+    if (k2WsDead()) return;
+    r4WsRtt.swArmedAt = nw;
+    r4WsRtt.lastSwitchAt = nw;
+    const curAct = v4ActOid || w4GetCurSelfOid();
+    const swQ = r4WsRtt.switches;
+    if (swQ.length > 0 && nw - swQ[swQ.length - 1].ts <= 20) return;
+    swQ.push({ ts: nw, fromOid: curAct, ws: false });
+    if (swQ.length > 6) swQ.shift();
+  }
+
+  function r4OnWsSend(u8, nw) {
+    const op = u8[0];
+    if (op === 0xf0 && u8.length >= 2 && u8[1] === 0x05) {
+      r4ResetRtt(true);
+      return;
+    }
+    if (op === 0xcb && u8.length === 10) {
+      if (!r4CanSelfSplit(nw)) return;
+      const oid = w4GetCurSelfOid();
+      const spQ = r4WsRtt.splits;
+      if (spQ.length > 0) {
+        const last = spQ[spQ.length - 1];
+        if (last.oid === oid && nw - last.lastTs <= 18) {
+          last.lastTs = nw;
+          return;
+        }
+      }
+      spQ.push({ ts: nw, lastTs: nw, oid });
+      if (spQ.length > 8) spQ.shift();
+      return;
+    }
+    const isArm = nw - r4WsRtt.swArmedAt <= 25;
+    const isNonSw =
+      op === 0x10 ||
+      op === 0x12 ||
+      op === 0xcb ||
+      op === 0xd7 ||
+      op === 0xd8 ||
+      op === 0x47 ||
+      op === 0x48 ||
+      op === 0x00 ||
+      op === 0x01;
+    if (op === 0xd3 || (isArm && !isNonSw)) {
+      if (k2WsDead()) return;
+      r4WsRtt.lastSwitchAt = nw;
+      const swQ = r4WsRtt.switches;
+      const curAct = v4ActOid || w4GetCurSelfOid();
+      if (
+        swQ.length > 0 &&
+        !swQ[swQ.length - 1].ws &&
+        nw - swQ[swQ.length - 1].ts <= 25
+      ) {
+        swQ[swQ.length - 1].ts = nw;
+        swQ[swQ.length - 1].ws = true;
+      } else if (swQ.length === 0 || nw - swQ[swQ.length - 1].ts > 20) {
+        swQ.push({ ts: nw, fromOid: curAct, ws: true });
+        if (swQ.length > 6) swQ.shift();
+      }
+    }
+  }
+
+  function r4AddSample(raw, isTick, nw) {
+    if (!Number.isFinite(raw) || raw < 1 || raw > 1500) return;
+    const jitAge = nw - (r4WsRtt.last44At || 0);
+    const actJit =
+      jitAge <= 1500
+        ? r4WsRtt.downJit
+        : isTick && r4WsRtt.curTickJitAt === nw
+          ? r4WsRtt.curTickJit
+          : 0;
+    const deJit = Math.max(1, raw - Math.min(raw * 0.45, actJit));
+    const T = r4WsRtt.tickCount >= 2 ? r4WsRtt.tickMs : 33.33;
+    const smps = r4WsRtt.samples;
+    for (let i = smps.length - 1; i >= 0; i--) {
+      if (nw - smps[i].t > 18000) smps.splice(i, 1);
+    }
+    let stepUp = false;
+    if (smps.length > 0) {
+      let curLo = Infinity;
+      for (let i = 0; i < smps.length; i++) {
+        if (smps[i].v < curLo) curLo = smps[i].v;
+      }
+      if (deJit < curLo - 14) {
+        smps.length = 0;
+        r4WsRtt.hiStreak = 0;
+      } else if (r4WsRtt.rtt > 0 && deJit > r4WsRtt.rtt + T + 18) {
+        r4WsRtt.hiStreak++;
+        if (r4WsRtt.hiStreak >= 2) {
+          const last = smps[smps.length - 1];
+          smps.length = 0;
+          if (last && nw - last.t < 6000) smps.push(last);
+          r4WsRtt.hiStreak = 0;
+          stepUp = true;
+        }
+      } else {
+        r4WsRtt.hiStreak = 0;
+      }
+    }
+    smps.push({ v: deJit, tick: Boolean(isTick), t: nw });
+    if (smps.length > 10) smps.shift();
+    let tCnt = 0,
+      tLo = Infinity,
+      dSum = 0,
+      dCnt = 0;
+    for (let i = 0; i < smps.length; i++) {
+      const s = smps[i];
+      if (s.tick) {
+        tCnt++;
+        if (s.v < tLo) tLo = s.v;
+      } else {
+        dSum += s.v;
+        dCnt++;
+      }
+    }
+    let est = 0;
+    if (tCnt > 0) {
+      let tHi = tLo;
+      for (let i = 0; i < smps.length; i++) {
+        const s = smps[i];
+        if (s.tick && s.v <= tLo + T + 10 && s.v > tHi) tHi = s.v;
+      }
+      tHi = Math.min(tHi, tLo + T);
+      const mle =
+        tCnt === 1
+          ? Math.max(1, Math.max(tLo * 0.4, tLo - T * 0.5))
+          : Math.max(1, Math.min(tLo, (tLo + tHi - T) * 0.5));
+      est = dCnt > 0 ? (mle * tCnt + dSum) / (tCnt + dCnt) : mle;
+    } else if (dCnt > 0) {
+      est = dSum / dCnt;
+    }
+    if (est <= 0) return;
+    if (r4WsRtt.rtt <= 0 || stepUp) {
+      r4WsRtt.rtt = est;
+    } else if (tCnt > 0 && est > tLo) {
+      r4WsRtt.rtt = Math.min(tLo, est);
+    } else {
+      const a = est < r4WsRtt.rtt ? 0.55 : 0.45;
+      r4WsRtt.rtt = r4WsRtt.rtt * (1 - a) + est * a;
+    }
+    if (tCnt > 0) r4WsRtt.rtt = Math.min(r4WsRtt.rtt, tLo);
+  }
+
+  function r4MatchSplit(nw, oid) {
+    const spQ = r4WsRtt.splits;
+    while (spQ.length > 0 && nw - spQ[0].ts > 1500) spQ.shift();
+    if (!spQ.length) return;
+    const recentSw =
+      r4WsRtt.lastSwitchAt > 0 && nw - r4WsRtt.lastSwitchAt < 1200;
+    const T = r4WsRtt.tickCount >= 2 ? r4WsRtt.tickMs : 33.33;
+    const maxAged =
+      r4WsRtt.rtt > 0 ? Math.max(180, r4WsRtt.rtt * 2.2 + T + 60) : 450;
+    let pick = -1;
+    for (let i = 0; i < spQ.length; i++) {
+      const e = spQ[i];
+      const dt = nw - e.ts;
+      if (dt < 2) continue;
+      if (e.oid === oid || e.oid === 0 || (recentSw && v4SelfOids.has(e.oid))) {
+        if (pick < 0) pick = i;
+        else if (nw - spQ[pick].ts > maxAged && dt <= maxAged) pick = i;
+      }
+    }
+    if (pick < 0) return;
+    const m = spQ[pick];
+    spQ.splice(0, pick + 1);
+    r4AddSample(nw - m.ts, true, nw);
+  }
+
+  function r4MatchSwitch(nw, prevActOid, isTick) {
+    const swQ = r4WsRtt.switches;
+    while (swQ.length > 0 && nw - swQ[0].ts > 1500) swQ.shift();
+    if (!swQ.length) return;
+    const T = r4WsRtt.tickCount >= 2 ? r4WsRtt.tickMs : 33.33;
+    const maxAged =
+      r4WsRtt.rtt > 0 ? Math.max(180, r4WsRtt.rtt * 2.2 + T + 60) : 450;
+    let pick = -1;
+    for (let i = 0; i < swQ.length; i++) {
+      const e = swQ[i];
+      const dt = nw - e.ts;
+      if (dt < 2) continue;
+      if (e.fromOid === prevActOid || e.fromOid === 0) {
+        if (pick < 0) pick = i;
+        else if (nw - swQ[pick].ts > maxAged && dt <= maxAged) pick = i;
+      }
+    }
+    if (pick < 0) return;
+    const m = swQ[pick];
+    swQ.splice(0, pick + 1);
+    r4AddSample(nw - m.ts, isTick, nw);
+  }
+
+  function r4CheckSplit02(adds, nw) {
+    if (b6BpSt.specEntered || !r4WsRtt.splits.length || !adds.length) return;
+    const splitOids = new Set();
+    for (let i = 0; i < adds.length; i++) {
+      const a = adds[i];
+      if (
+        a.tag === 2 &&
+        a.oid &&
+        !v4WsCells.has(a.cid) &&
+        (v4SelfOids.has(a.oid) || a.oid === v4ActOid || a.oid === v4MyOid)
+      ) {
+        splitOids.add(a.oid);
+      }
+    }
+    if (!splitOids.size) return;
+    for (const oid of splitOids) {
+      let preCnt = 0;
+      for (const c of v4WsCells.values()) {
+        if (c.tag === 2 && c.oid === oid) {
+          preCnt = 1;
+          break;
+        }
+      }
+      if (preCnt > 0) r4MatchSplit(nw, oid);
+    }
+  }
+
+  const v4OrigWsSend =
+    window.WebSocket &&
+    window.WebSocket.prototype &&
+    window.WebSocket.prototype.send;
+  const v4WsHooked = new WeakSet();
+  if (v4OrigWsSend) {
+    WebSocket.prototype.send = function (data) {
+      const isAb =
+        data instanceof ArrayBuffer ||
+        Object.prototype.toString.call(data) === "[object ArrayBuffer]";
+      const isVw = !isAb && ArrayBuffer.isView(data);
+      if (!v4WsHooked.has(this) && (isAb || isVw)) {
+        v4WsHooked.add(this);
+        this.addEventListener("message", (ev) => {
+          if (
+            ev &&
+            (ev.data instanceof ArrayBuffer ||
+              Object.prototype.toString.call(ev.data) ===
+                "[object ArrayBuffer]") &&
+            !v4SeenBuf.has(ev.data)
+          ) {
+            const u = new v4OrigU8(ev.data);
+            if (u.length > 0 && u.length < 524288) {
+              const o = u[0];
+              if (
+                o === 0x02 ||
+                o === 0x40 ||
+                o === 0xf0 ||
+                o === 0x29 ||
+                o === 0x0a ||
+                o === 0xd2 ||
+                o === 0x31 ||
+                o === 0x46 ||
+                o === 0x44
+              ) {
+                p9WsPkt(u, ev.data);
+              }
+            }
+          }
+        });
+      }
+      const res = v4OrigWsSend.apply(this, arguments);
+      if (isAb && data.byteLength > 0) {
+        r4OnWsSend(new v4OrigU8(data), performance.now());
+      } else if (isVw && data.byteLength > 0) {
+        r4OnWsSend(
+          new v4OrigU8(data.buffer, data.byteOffset, data.byteLength),
+          performance.now(),
+        );
+      }
+      return res;
+    };
+  }
 
   function v4StepInterp(nw) {
     if (!v4InterpAt) {
@@ -4902,9 +5389,9 @@
   }
 
   function w4GetCurSelfOid() {
+    if (v4ActOid > 0) return v4ActOid;
     const id = parseInt(g5ReadPid(), 10);
     if (Number.isSafeInteger(id) && id > 0) return id;
-    if (v4ActOid > 0) return v4ActOid;
     return v4MyOid;
   }
 
@@ -5372,6 +5859,7 @@
 
   function w5PzR8tM(key, times) {
     const kc = Number(key) || 32;
+    if (g2BindTbl.sw > 0 && kc === g2BindTbl.sw) r4ArmSwitch(performance.now());
     const mt = g4KcMeta(kc);
     const cv = t8VwM4xK();
     if (mt.isMouse) {
@@ -5754,7 +6242,10 @@
       )
         return;
       const kc = e.keyCode || e.which || 0;
-      if (!e.repeat && g2BindTbl.sw > 5 && kc === g2BindTbl.sw) m9MbSt.swSeq++;
+      if (!e.repeat && g2BindTbl.sw > 5 && kc === g2BindTbl.sw) {
+        m9MbSt.swSeq++;
+        r4ArmSwitch(performance.now());
+      }
       if (g2BindTbl.ej > 5 && kc === g2BindTbl.ej) {
         m4EjPhys.down = true;
         m4EjPhys.kc = kc;
@@ -5790,8 +6281,10 @@
         g2BindTbl.sw >= 1 &&
         g2BindTbl.sw <= 5 &&
         e.button === g4KcMeta(g2BindTbl.sw).btn
-      )
+      ) {
         m9MbSt.swSeq++;
+        r4ArmSwitch(performance.now());
+      }
       if (
         g2BindTbl.ej >= 1 &&
         g2BindTbl.ej <= 5 &&
@@ -5938,7 +6431,7 @@
     return Boolean(el && el.checked);
   }
 
-  function g5ReadPingMs() {
+  function g5ReadDomPingMs() {
     const el = g4PidEl();
     const box =
       el && el.parentElement && el.parentElement.parentElement
@@ -5947,6 +6440,11 @@
     if (!box) return 0;
     const m = (box.textContent || "").match(/Ping\s*:\s*(\d+)/i);
     return m ? parseInt(m[1], 10) || 0 : 0;
+  }
+
+  function g5ReadPingMs() {
+    if (r4WsRtt.rtt > 0) return Math.max(1, Math.round(r4WsRtt.rtt));
+    return g5ReadDomPingMs();
   }
 
   function k4ExecSecondSplit(startId, startSw, runGen, onDone) {
@@ -6304,6 +6802,10 @@
         switchKey: g2BindTbl.sw,
         ejectKey: g2BindTbl.ej,
         revPlan: g2BindTbl.rev,
+        pingMs: g5ReadPingMs(),
+        wsRtt: r4WsRtt.rtt > 0 ? Math.round(r4WsRtt.rtt * 10) / 10 : 0,
+        wsTickMs:
+          r4WsRtt.tickCount >= 2 ? Math.round(r4WsRtt.tickMs * 10) / 10 : 0,
       });
     };
 
@@ -12619,6 +13121,12 @@ vec4 _mSoft(vec4 raw) {
                     <button type="button" class="macro-pos-opt${m9TvL2sP.mapGridMode === "over" ? " active" : ""}" data-grid="over"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="gridOver">${k3Tr("gridOver")}</span></button>
                   </div>
                 </div>
+                <div class="macro-pos-pop" id="macro-ffmtd-pop">
+                          <div class="macro-lang-list">
+                            <button type="button" class="macro-pos-opt${m9TvL2sP.ffMethod !== "auto" ? " active" : ""}" data-ffmtd="manual"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="ffMan">${k3Tr("ffMan")}</span></button>
+                            <button type="button" class="macro-pos-opt${m9TvL2sP.ffMethod === "auto" ? " active" : ""}" data-ffmtd="auto"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="ffAuto">${k3Tr("ffAuto")}</span></button>
+                          </div>
+                        </div>
         <div class="macro-pos-pop" id="macro-solofocus-pop">
           <div class="macro-lang-list">
             <button type="button" class="macro-pos-opt${m9TvL2sP.soloFocus !== "window" ? " active" : ""}" data-solofocus="multibox"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="sfMb">${k3Tr("sfMb")}</span></button>
