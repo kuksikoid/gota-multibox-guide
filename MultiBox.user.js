@@ -507,23 +507,29 @@
     return k9LwP2xM(function (tP4) {
       const vY8 = f4NzQ8vR;
       const rN2 = xW3.call(this, tP4);
-      if (f4NzQ8vR !== vY8 && tP4 !== y7MwB3tL) {
-        y7MwB3tL = tP4;
-        r8QnS4mT = true;
-        w2VpL9xK = performance.now();
+      if (f4NzQ8vR !== vY8) {
+        const nw = performance.now();
+        w2VpL9xK = nw;
         if (
           b7DrawFn &&
-          (kAct || p9C2On) &&
-          (!p9PixiOn || w2VpL9xK - p9LastPixiMs > 45)
+          nw - p9BgDrawAt > 4 &&
+          (kAct ||
+            m9TvL2sP.mapBgEnabled ||
+            m9TvL2sP.mapGridEnabled ||
+            m9TvL2sP.fixedBackgroundEnabled)
         )
           b7DrawFn();
-        if (!b5TxM1wP) {
-          b5TxM1wP = true;
-          try {
-            h3KvR9yQ++;
-            p3WnK7vT();
-          } finally {
-            b5TxM1wP = false;
+        if (tP4 !== y7MwB3tL) {
+          y7MwB3tL = tP4;
+          r8QnS4mT = true;
+          if (!b5TxM1wP) {
+            b5TxM1wP = true;
+            try {
+              h3KvR9yQ++;
+              p3WnK7vT();
+            } finally {
+              b5TxM1wP = false;
+            }
           }
         }
       }
@@ -627,15 +633,11 @@
   let p9MapX = -9000,
     p9MapY = -9000,
     p9MapW = 18000,
-    p9MapH = 18000;
+    p9MapH = 18000,
+    p9MapWsSet = false;
   let p9BgCol = "#111111";
   let k9CurFn = null;
-  let p9C2A = 0.395,
-    p9C2D = 0.395,
-    p9C2Tx = 0,
-    p9C2Ty = 0,
-    p9C2On = false,
-    p9C2Cv = null;
+  let p9C2Cv = null;
   let zM = 0.395,
     tX = 0,
     tY = 0,
@@ -645,6 +647,11 @@
     p9ProjH = 0,
     p9CurCam = null;
   const p9CamCands = [];
+  let p9BgDrawAt = 0,
+    p9RcCv = null,
+    p9RcObj = null,
+    p9RcAt = 0;
+  const glScreenFbo = new WeakMap();
   let b7DrawFn = null;
 
   function a9VnK(src) {
@@ -832,7 +839,6 @@
       marg: "Cull Margin",
       rScale: "Render Scale (%)",
       secBg: "MAP & BACKGROUND",
-
       mapBg: "Map Background",
       fixBg: "Fixed Background",
       fFile: "File",
@@ -927,7 +933,6 @@
       marg: "Отступ отсечения",
       rScale: "Масштаб рендера (%)",
       secBg: "КАРТА И ФОН",
-
       mapBg: "Фон карты",
       fixBg: "Статичный фон",
       fFile: "Файл",
@@ -1327,7 +1332,7 @@
       if (c7TnW1xP.state === "suspended") c7TnW1xP.resume().catch(() => {});
     } catch (e) {}
   }
-  ["keydown", "pointerdown", "mousedown", "touchstart", "focus"].forEach((ev) =>
+  ["keydown", "keyup", "pointerdown", "mousedown", "touchstart", "focus"].forEach((ev) =>
     window.addEventListener(ev, p2LxQ8vM, { passive: true, capture: true }),
   );
   document.addEventListener(
@@ -1393,7 +1398,7 @@
         let m=Infinity;
         q.forEach((e,i)=>{
           const r=e-n;
-          if(r<=2.5){ q.delete(i); self.postMessage(i); }
+          if(r<=1.8){ q.delete(i); self.postMessage(i); }
           else if(r<m) m=r;
         });
         if(q.size) t=setTimeout(p,Math.max(1,Math.ceil(m)));
@@ -1508,25 +1513,81 @@
   }
 
   function n7KwQ2vL(ms, cb) {
-    k7RunDelay(Math.max(50, Number(ms) || 800), cb, 50);
+    return k7RunDelay(Math.max(50, Number(ms) || 800), cb, 50);
   }
 
   function z7PxM4wK(ms, cb) {
-    k7RunDelay(Math.max(50, Number(ms) || 800), cb, 50);
+    return k7RunDelay(Math.max(50, Number(ms) || 800), cb, 50);
   }
 
   function d2TinyWait(ms, cb) {
-    k7RunDelay(Math.max(1, Number(ms) || 1), cb, 1);
+    return k7RunDelay(Math.max(1, Number(ms) || 1), cb, 1);
   }
 
   const v4OrigU8 = window.Uint8Array;
+  const v4OrigDv = window.DataView;
+  const v4OrigWs = window.WebSocket;
+  const v4OrigWk = window.Worker;
+  const v4OrigFetch = window.fetch ? window.fetch.bind(window) : null;
+  const v4OrigAdd =
+    typeof EventTarget !== "undefined" && EventTarget.prototype.addEventListener
+      ? EventTarget.prototype.addEventListener
+      : null;
   const v4WsCells = new Map();
   const v4PtyOids = new Set();
   const v4SelfOids = new Set();
+  const v4SeenEv = new WeakSet();
   const v4SeenBuf = new WeakSet();
+  const v4WsHooked = new WeakSet();
+  const v4WkHooked = new WeakSet();
+  const s3SrvAddr = new Map();
+  const s3SrvName = new Map();
+  const b6SrvBnd = {
+    beta2: [-10000, -10000, 10000, 10000],
+    beta: [-10000, -10000, 10000, 10000],
+    galaxy: [-7500, -7500, 7500, 7500],
+    cerberus: [-4500, -4500, 4500, 4500],
+    anubis: [0, 0, 7500, 7500],
+    storm: [-9000, -9000, 9000, 9000],
+    sedulous: [-9000, -9000, 9000, 9000],
+    underworld: [-6250, -6250, 6250, 6250],
+    bolt: [-11500, -11500, 11500, 11500],
+    diamond: [-4500, -4500, 4500, 4500],
+    zeus: [0, 0, 7500, 7500],
+    fluffy: [0, 0, 7500, 7500],
+    vendetta: [-5500, -5500, 5500, 5500],
+    avalon: [0, 0, 8500, 8500],
+    juno: [0, 0, 7500, 7500],
+    metro: [-4500, -4500, 4500, 4500],
+    wreck: [-5750, -5750, 5750, 5750],
+    garm: [-9000, -9000, 9000, 9000],
+    aurora: [0, 0, 15000, 15000],
+    valkyrie: [0, 0, 7500, 7500],
+    jet: [0, 0, 7500, 7500],
+    eris: [-10000, -10000, 10000, 10000],
+  };
+  const b6ModeBnd = {
+    "rush split (128x)": [-10000, -10000, 10000, 10000],
+    "ultra split (256x)": [-9000, -9000, 9000, 9000],
+    "ultra split": [-7500, -7500, 7500, 7500],
+    "instant merge 2": [-4500, -4500, 4500, 4500],
+    "instant merge": [-4500, -4500, 4500, 4500],
+    "self feed": [-11500, -11500, 11500, 11500],
+    "extreme split": [0, 0, 15000, 15000],
+    powerups: [0, 0, 7500, 7500],
+    experimental: [0, 0, 7500, 7500],
+  };
+  let v4InHook = false;
+  let s3DomSrv = "";
+  let s3DomMode = "";
+  let s3CurSrvKey = "";
+  let s3Last40At = 0;
+  let v4ActWs = null;
+  let v4WsUrl = "";
   let v4MyOid = 0;
   let v4ActOid = 0;
   let v4OwnSeen = false;
+  let w3FlipCb = null;
   const nFfMinMassPct = 15;
   const nFfSurgeMs = 805;
   const nFfSurgeLeadMs = 55;
@@ -1547,8 +1608,6 @@
   let v4FfAuto = null;
   let v4FfRadMul = 1;
   const v4FfVis = { active: false, cx: 0, cy: 0, r: 0, alpha: 0, pop: 1.0 };
-  let v4InU8 = false;
-  let v4U8ProxyRef = null;
   const b6ModeList = ["smart", "nearme", "cursor", "biggest", "lb"];
   const b6ScanIntMs = 520;
   const b6BpSt = {
@@ -1587,8 +1646,6 @@
     avgSpecHH: 2600,
     menuHid: false,
     menuChkAt: 0,
-    rcCache: null,
-    rcChkAt: 0,
     lastPruneAt: 0,
     lastRxAt: 0,
     bcAt: 0,
@@ -1617,6 +1674,9 @@
     menuHidAt: 0,
     lastPlayAt: 0,
     lastPingAt: 0,
+    specAt: 0,
+    lastD2ActAt: 0,
+    last0AAt: 0,
     enableGraceUntil: m9TvL2sP.bypassEnabled ? performance.now() + 5000 : 0,
   };
 
@@ -1645,8 +1705,221 @@
   let b6FitMapWin = null;
   let b6SyncRadarLock = null;
 
+  function s3NormKey(raw) {
+    return String(raw || "")
+      .trim()
+      .toLowerCase()
+      .replace(/^\[[^\]]+\]\s*/, "")
+      .replace(/\s*\([^)]*\)\s*$/, "")
+      .replace(/\.+$/, "")
+      .trim();
+  }
+
+  function s3ApplyBnd(b, from40) {
+    if (!Array.isArray(b) || b.length < 4) return;
+    const x0 = b[0],
+      y0 = b[1],
+      x1 = b[2],
+      y1 = b[3];
+    if (!(x1 > x0 && y1 > y0)) return;
+    const chg =
+      p9MapX !== x0 ||
+      p9MapY !== y0 ||
+      p9MapW !== x1 - x0 ||
+      p9MapH !== y1 - y0;
+    p9MapX = x0;
+    p9MapY = y0;
+    p9MapW = x1 - x0;
+    p9MapH = y1 - y0;
+    b6BpSt.bounds = [x0, y0, x1, y1];
+    if (from40) {
+      p9MapWsSet = true;
+      s3Last40At = performance.now();
+    }
+    if (chg && b7DrawFn) b7DrawFn();
+  }
+
+  function s3FindSrvBnd(nm, md) {
+    const k = s3NormKey(nm);
+    if (k && b6SrvBnd[k]) return { bnd: b6SrvBnd[k], exact: true, key: k };
+    if (k) {
+      const toks = k.split(/\s+/);
+      for (let i = 0; i < toks.length; i++) {
+        if (b6SrvBnd[toks[i]]) {
+          return { bnd: b6SrvBnd[toks[i]], exact: true, key: toks[i] };
+        }
+      }
+    }
+    const mk = String(md || "")
+      .trim()
+      .toLowerCase();
+    if (mk && b6ModeBnd[mk])
+      return { bnd: b6ModeBnd[mk], exact: false, key: k };
+    return { bnd: null, exact: false, key: k };
+  }
+
+  function s3ApplySrv(nm, md) {
+    const info = s3FindSrvBnd(nm, md);
+    const nw = performance.now();
+    const isNew = Boolean(info.key && info.key !== s3CurSrvKey);
+    if (isNew) s3CurSrvKey = info.key;
+    if (info.bnd) {
+      if ((isNew && nw - s3Last40At > 600) || !p9MapWsSet) {
+        s3ApplyBnd(info.bnd, false);
+        if (info.exact) p9MapWsSet = true;
+      }
+    } else if (isNew && nw - s3Last40At > 600) {
+      p9MapWsSet = false;
+    }
+  }
+
+  function s3LoadJson(d) {
+    if (!Array.isArray(d)) return;
+    for (let i = 0; i < d.length; i++) {
+      const reg = d[i];
+      if (!reg || !Array.isArray(reg.servers)) continue;
+      const rCode = String(reg.region || "").toUpperCase();
+      for (let j = 0; j < reg.servers.length; j++) {
+        const sv = reg.servers[j];
+        if (!sv || !sv.address) continue;
+        const addr = String(sv.address).trim();
+        const name = String(sv.name || "").trim();
+        const obj = {
+          region: rCode,
+          name,
+          gamemode: String(sv.gamemode || "").trim(),
+          address: addr,
+        };
+        s3SrvAddr.set(addr.toLowerCase(), obj);
+        if (name) s3SrvName.set(name.toLowerCase(), obj);
+      }
+    }
+    s3SyncCurSrv();
+  }
+
+  function s3SyncCurSrv() {
+    if (v4WsUrl) {
+      let host = "";
+      let hn = "";
+      try {
+        const u = new URL(v4WsUrl);
+        host = (u.host || "").toLowerCase();
+        hn = (u.hostname || "").toLowerCase();
+      } catch (_) {
+        host = String(v4WsUrl).toLowerCase();
+      }
+      const byA = s3SrvAddr.get(host) || s3SrvAddr.get(hn);
+      if (byA) {
+        s3DomSrv = byA.name || s3DomSrv;
+        s3DomMode = byA.gamemode || s3DomMode;
+        s3ApplySrv(byA.name, byA.gamemode);
+        return;
+      }
+    }
+    if (s3DomSrv) {
+      const byN = s3SrvName.get(s3NormKey(s3DomSrv));
+      if (byN) s3DomMode = byN.gamemode || s3DomMode;
+      s3ApplySrv(s3DomSrv, s3DomMode);
+    }
+    if (typeof v5PingPeers === "function") v5PingPeers(true);
+  }
+
+  function s3ScanDomSrv() {
+    const sel = document.querySelectorAll(
+      "#chat-container, #chat-panel, #chat-body, .chat-panel, [id*='chat']",
+    );
+    let found = "";
+    for (let i = 0; i < sel.length; i++) {
+      const txt = sel[i].textContent || "";
+      const rx = /Connecting to\s+([^\r\n.]+?)\.\.\./gi;
+      let m;
+      while ((m = rx.exec(txt)) !== null) {
+        const nm = m[1].trim();
+        if (nm && !/^chat\s*server$/i.test(nm)) found = nm;
+      }
+    }
+    if (found && found !== s3DomSrv) {
+      s3DomSrv = found;
+      const hit = s3SrvName.get(s3NormKey(found));
+      s3DomMode = hit ? hit.gamemode : "";
+      s3ApplySrv(found, s3DomMode);
+    }
+  }
+
+  function v4IsGameWsUrl(u) {
+    return (
+      typeof u === "string" &&
+      /^wss?:\/\//i.test(u) &&
+      !/accounts\.gota\.io|firebaseio\.com/i.test(u)
+    );
+  }
+
+  function s3IsKnownSrvUrl(u) {
+    if (!u || !s3SrvAddr.size) return false;
+    try {
+      const p = new URL(u);
+      return (
+        s3SrvAddr.has((p.host || "").toLowerCase()) ||
+        s3SrvAddr.has((p.hostname || "").toLowerCase())
+      );
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function s3CanTakeUrl(u) {
+    if (!v4IsGameWsUrl(u)) return false;
+    if (!v4WsUrl) return true;
+    if (s3IsKnownSrvUrl(u)) return true;
+    return !s3IsKnownSrvUrl(v4WsUrl);
+  }
+
+  function s3ScanUrl(val) {
+    if (typeof val === "string") {
+      const m = val.match(/wss?:\/\/[^\s"'`]+/i);
+      if (m && s3CanTakeUrl(m[0]) && m[0] !== v4WsUrl) {
+        v4WsUrl = m[0];
+        s3SyncCurSrv();
+      }
+    } else if (val && typeof val === "object") {
+      const u = val.url || val.address || val.host || val.server;
+      if (typeof u === "string") {
+        if (/^wss?:\/\//i.test(u)) s3ScanUrl(u);
+        else if (
+          !/accounts\.gota\.io|firebaseio\.com/i.test(u) &&
+          (/:\d{2,5}$/.test(u) || s3SrvAddr.has(u.toLowerCase()))
+        ) {
+          const wu = "wss://" + u + "/";
+          if (s3CanTakeUrl(wu) && wu !== v4WsUrl) {
+            v4WsUrl = wu;
+            s3SyncCurSrv();
+          }
+        }
+      }
+    }
+  }
+
+  if (v4OrigFetch) {
+    window.fetch = function (inp) {
+      const u = typeof inp === "string" ? inp : (inp && inp.url) || "";
+      const p = v4OrigFetch.apply(this, arguments);
+      if (u.includes("/api/v2/utilities/servers")) {
+        p.then((r) => (r && r.ok ? r.clone().json() : null))
+          .then((d) => {
+            if (d) s3LoadJson(d);
+          })
+          .catch(() => {});
+      }
+      return p;
+    };
+  }
+
   function q9ReadSelfOid() {
     if (b6BpSt.specEntered) return 0;
+    if (v4ActOid > 0) {
+      v4SelfOids.add(v4ActOid);
+      return v4ActOid;
+    }
     const el = document.getElementById("playerId");
     const id = el ? parseInt((el.textContent || "").trim(), 10) : 0;
     if (Number.isSafeInteger(id) && id > 0) {
@@ -1671,6 +1944,7 @@
 
   function k2WsDead() {
     if (b6BpSt.specEntered) return true;
+    q9ReadSelfOid();
     const mp = document.getElementById("main-panel");
     if (mp && window.getComputedStyle(mp).display !== "none") return true;
     let own = 0;
@@ -1761,7 +2035,7 @@
       p = q9SkU8(vw, p, len);
       if (p < 0 || p + 1 > len) return false;
       const pEx = vw.getUint8(p++);
-      if (pEx === 0x02) {
+      if ((pEx & 2) === 2) {
         if (p + 5 > len) return false;
         p += 5;
       } else if (pEx !== 0x00) {
@@ -1893,6 +2167,13 @@
           p += 2;
           if (cid === 0) break;
           if (p + 4 > len) return false;
+          const px = vw.getInt16(p, true),
+            py = vw.getInt16(p + 2, true);
+          if (px < pMinX) pMinX = px;
+          if (px > pMaxX) pMaxX = px;
+          if (py < pMinY) pMinY = py;
+          if (py > pMaxY) pMaxY = py;
+          upds.push({ cid, tag: 1, x: px, y: py, r: -1 });
           p += 4;
         }
       } else if (uTag === 6) {
@@ -1937,6 +2218,7 @@
 
     const delSet = new Set(dels);
     const remSet = new Set(remPlrs);
+    const prevRevLk = v4WsLock ? v4WsCells.get(v4WsLock.cellId) : null;
     const prevFfLk = v4FfLock ? v4WsCells.get(v4FfLock.cellId) : null;
     let newFfCid = 0;
     if (
@@ -1961,8 +2243,8 @@
         1 - (lkUpd.r * lkUpd.r) / (prevFfLk.r * prevFfLk.r) >= 0.25
       ) {
         const maxD = Math.max(
-          prevFfLk.r * v4FfRadMul * 1.6,
-          prevFfLk.r * v4FfRadMul + 180,
+          prevFfLk.r * v4FfRadMul * 6,
+          prevFfLk.r * v4FfRadMul + 600,
         );
         let bestScore = Infinity;
         for (let i = 0; i < adds.length; i++) {
@@ -2000,7 +2282,7 @@
           let hit = false;
           for (let i = 0; i < upds.length; i++) {
             const u = upds[i];
-            if (u.tag !== 2) continue;
+            if (u.tag !== 2 || u.cid !== v4WsLock.cellId) continue;
             const prev = v4WsCells.get(u.cid);
             if (!prev || prev.tag !== 2 || prev.oid !== v4WsLock.ownerId)
               continue;
@@ -2035,13 +2317,14 @@
       locBox.maxY - locBox.minY > 900,
     );
     const keepLocPh =
-      !b6BpSt.scanning &&
-      !b6BpSt.specEntered &&
+      b6AllowPhantoms(nw02) &&
       (m9TvL2sP.bypassPhantoms || m9TvL2sP.bypassRadar) &&
       hasLocBox &&
       b6IsMenuHidden() &&
-      (adds.length > 0 ||
-        dels.length + remPlrs.length < Math.max(4, v4WsCells.size));
+      !(
+        dels.length + remPlrs.length >= Math.max(8, v4WsCells.size * 0.85) &&
+        adds.length === 0
+      );
     const pushLocPh = (c) => {
       if (
         !keepLocPh ||
@@ -2131,9 +2414,34 @@
         ex.at = nw02;
         ex.x = u.x;
         ex.y = u.y;
-        ex.r = u.r;
+        if (u.r >= 0) ex.r = u.r;
         if (ex.tag === 2 && ex.oid) b6SeenOid.set(ex.oid, nw02);
       }
+    }
+
+    if (
+      !triggered &&
+      m9TvL2sP.revMethod === "ws" &&
+      v4WsLock &&
+      !remSet.has(v4WsLock.ownerId) &&
+      !v4WsCells.has(v4WsLock.cellId) &&
+      prevRevLk
+    ) {
+      let mRevCid = 0;
+      let mRevBestD = Infinity;
+      for (const c of v4WsCells.values()) {
+        if (c.tag !== 2 || c.oid !== v4WsLock.ownerId) continue;
+        const d = Math.hypot(c.x - prevRevLk.x, c.y - prevRevLk.y);
+        if (
+          d <= prevRevLk.r + c.r + 300 &&
+          c.r >= prevRevLk.r * 0.9 &&
+          d < mRevBestD
+        ) {
+          mRevBestD = d;
+          mRevCid = c.cid;
+        }
+      }
+      if (mRevCid) v4WsLock.cellId = mRevCid;
     }
 
     if (newFfCid && v4FfLock) {
@@ -2162,6 +2470,22 @@
       }
     }
 
+    if (b6BpSt.specEntered && nw02 - (b6BpSt.specAt || 0) > 600) {
+      for (const sid of v4SelfOids) {
+        if (q9CntParts(sid) > 0) {
+          b6BpSt.specEntered = false;
+          b6BpSt.wasAlive = true;
+          b6ScanStop();
+          break;
+        }
+      }
+      if (b6BpSt.specEntered && v4MyOid && q9CntParts(v4MyOid) > 0) {
+        v4SelfOids.add(v4MyOid);
+        b6BpSt.specEntered = false;
+        b6BpSt.wasAlive = true;
+        b6ScanStop();
+      }
+    }
     const sOid = q9ReadSelfOid() || v4MyOid;
     if (sOid && q9CntParts(sOid) > 0) {
       v4OwnSeen = true;
@@ -2240,18 +2564,17 @@
     return true;
   }
 
-  function p9WsPkt(u8, keyObj = null) {
+  function p9WsPkt(u8) {
     if (!u8 || u8.length === 0) return false;
-    const k = keyObj || u8.buffer;
-    if (k && typeof k === "object" && v4SeenBuf.has(k)) return true;
     const len = u8.length;
-    const vw = new DataView(u8.buffer, u8.byteOffset, len);
+    const vw = new v4OrigDv(u8.buffer, u8.byteOffset, len);
     const op = vw.getUint8(0);
     let ok = false;
 
     if (op === 0xf0) {
       if (len < 3 || vw.getUint8(1) !== 0x00) return false;
       const cnt = vw.getUint8(2);
+      if (cnt === 0 || cnt > 32) return false;
       let p = 3;
       const subs = [];
       let has02 = false;
@@ -2262,35 +2585,36 @@
         if (sLen === 0 || p + sLen > len) return false;
         const sub = u8.subarray(p, p + sLen);
         if (sub[0] === 0x02) has02 = true;
-        if (sub[0] === 0x44) p9WsPkt(sub, {});
-        else subs.push(sub);
+        subs.push(sub);
         p += sLen;
       }
+      if (p !== len) return false;
+      let subOk = false;
       const prevF0 = r4WsRtt.inF0Batch;
       const prevH02 = r4WsRtt.f0Has02;
       r4WsRtt.inF0Batch = true;
       r4WsRtt.f0Has02 = has02;
       try {
         for (let i = 0; i < subs.length; i++) {
-          p9WsPkt(subs[i], {});
+          if (subs[i][0] === 0x44 && p9WsPkt(subs[i])) subOk = true;
+        }
+        for (let i = 0; i < subs.length; i++) {
+          if (subs[i][0] !== 0x44 && p9WsPkt(subs[i])) subOk = true;
         }
       } finally {
         r4WsRtt.inF0Batch = prevF0;
         r4WsRtt.f0Has02 = prevH02;
       }
-      ok = true;
+      ok = subOk;
     } else if (op === 0x02) {
       ok = p9WsWorld(u8, vw, len);
     } else if (op === 0x0a || op === 0xd2) {
       if (op === 0x0a && len !== 13) return false;
       if (op === 0xd2) {
         if (len < 19) return false;
-        const st = vw.getUint8(16);
         const c1 = vw.getUint8(17);
-        if (
-          (st !== 0x01 && st !== 0x40 && st !== 0x00) ||
-          (len !== 19 + c1 * 2 && len !== 20 + c1 * 2)
-        ) {
+        const c2 = vw.getUint8(18);
+        if (len < 19 + c1 * 2 || len > 19 + c1 * 2 + c2 * 2 + 4) {
           return false;
         }
       }
@@ -2313,6 +2637,7 @@
       b6BpSt.camY = cy;
       b6BpSt.camZoom = cz;
       b6BpSt.camAt = performance.now();
+      if (op === 0x0a) b6BpSt.last0AAt = b6BpSt.camAt;
       if (
         !v4WsCam.init ||
         Math.hypot(cx - v4WsCam.dx, cy - v4WsCam.dy) > 3500
@@ -2337,7 +2662,9 @@
         }
         r4WsRtt.lastD2At = nwD2;
         const prevActOid = r4WsRtt.lastActOid;
+        if (act !== 0 && actOid > 0) b6BpSt.lastD2ActAt = nwD2;
         if (act !== 0 && actOid > 0 && !b6BpSt.specEntered) {
+          v4SelfOids.add(actOid);
           if (prevActOid > 0 && actOid !== prevActOid) {
             const isTickSynced =
               r4WsRtt.d2TickCount >= 2 ||
@@ -2346,7 +2673,12 @@
             r4MatchSwitch(nwD2, prevActOid, isTickSynced);
           }
           r4WsRtt.lastActOid = actOid;
+          const actChanged = v4ActOid !== actOid;
           v4ActOid = actOid;
+          if (actChanged) {
+            u2SyncPidState();
+            if (w3FlipCb) w3FlipCb();
+          }
         } else if (act === 0) {
           r4WsRtt.lastActOid = 0;
           v4ActOid = 0;
@@ -2354,47 +2686,86 @@
       }
       ok = true;
     } else if (op === 0x40 && len === 16 && vw.getUint8(3) === 0x00) {
-      r4ResetRtt(true);
-      v4WsCam.init = false;
-      v4WsCam.at = 0;
-      p9CurCam = null;
-      p9CamCands.length = 0;
-      kAct = false;
-      v4MyOid = vw.getUint16(1, true);
-      v4ActOid = 0;
-      v4SelfOids.clear();
-      if (v4MyOid) v4SelfOids.add(v4MyOid);
-      v4OwnSeen = false;
-      v4WsCells.clear();
-      v4PtyOids.clear();
-      m9MbSt.box1Id = v4MyOid ? String(v4MyOid) : "";
-      m9MbSt.box2Id = "";
-      m9MbSt.activeId = "";
-      m9MbSt.activeBox = 0;
-      m9MbSt.matchGen++;
-      if (m9TvL2sP.revMethod === "ws") q2WnS7xM(false);
-      else v4WsLock = null;
-      k4FfCancel(false);
-      b6ResetWorld(true, [
-        vw.getInt16(4, true),
-        vw.getInt16(6, true),
-        vw.getInt16(8, true),
-        vw.getInt16(10, true),
-      ]);
-      ok = true;
+      const mX0 = vw.getInt16(4, true),
+        mY0 = vw.getInt16(6, true),
+        mX1 = vw.getInt16(8, true),
+        mY1 = vw.getInt16(10, true),
+        mMaxC = vw.getUint16(12, true);
+      if (
+        mX1 <= mX0 ||
+        mY1 <= mY0 ||
+        mX1 - mX0 < 500 ||
+        mY1 - mY0 < 500 ||
+        mMaxC === 0 ||
+        mMaxC > 4096
+      ) {
+        return false;
+      }
+      const nOid = vw.getUint16(1, true);
+      const sameBnd =
+        b6BpSt.bounds[0] === mX0 &&
+        b6BpSt.bounds[1] === mY0 &&
+        b6BpSt.bounds[2] === mX1 &&
+        b6BpSt.bounds[3] === mY1;
+      const keepMb =
+        sameBnd &&
+        v4WsCells.size > 0 &&
+        v4MyOid > 0 &&
+        nOid > 0 &&
+        nOid !== v4MyOid &&
+        m4IsMbOn() &&
+        (b6BpSt.wasAlive || b6HasLiveMassHud());
+      if (keepMb) {
+        v4SelfOids.add(nOid);
+        if (!m9MbSt.box1Id) m9MbSt.box1Id = String(v4MyOid);
+        if (String(nOid) !== m9MbSt.box1Id && !m9MbSt.box2Id) {
+          m9MbSt.box2Id = String(nOid);
+        }
+        s3ApplyBnd([mX0, mY0, mX1, mY1], true);
+        ok = true;
+      } else {
+        r4ResetRtt(true);
+        v4WsCam.init = false;
+        v4WsCam.at = 0;
+        p9CurCam = null;
+        p9CamCands.length = 0;
+        kAct = false;
+        v4MyOid = nOid;
+        v4ActOid = 0;
+        v4SelfOids.clear();
+        if (v4MyOid) v4SelfOids.add(v4MyOid);
+        v4OwnSeen = false;
+        v4WsCells.clear();
+        v4PtyOids.clear();
+        m9MbSt.box1Id = v4MyOid ? String(v4MyOid) : "";
+        m9MbSt.box2Id = "";
+        m9MbSt.activeId = "";
+        m9MbSt.activeBox = 0;
+        m9MbSt.matchGen++;
+        if (m9TvL2sP.revMethod === "ws") q2WnS7xM(false);
+        else v4WsLock = null;
+        k4FfCancel(false);
+        s3ApplyBnd([mX0, mY0, mX1, mY1], true);
+        b6ResetWorld(true, [mX0, mY0, mX1, mY1]);
+        ok = true;
+      }
     } else if (op === 0x29 && len >= 3) {
       const cnt = vw.getUint16(1, true);
+      if (cnt > 128) return false;
       let p = 3;
-      v4PtyOids.clear();
+      const tmp = [];
       for (let i = 0; i < cnt; i++) {
-        if (p + 3 > len) break;
+        if (p + 3 > len) return false;
         p += 1;
         const oid = vw.getUint16(p, true);
         p += 2;
         p = q9SkU16(vw, p, len);
-        if (p < 0) break;
-        v4PtyOids.add(oid);
+        if (p < 0) return false;
+        tmp.push(oid);
       }
+      if (p !== len) return false;
+      v4PtyOids.clear();
+      for (let i = 0; i < tmp.length; i++) v4PtyOids.add(tmp[i]);
       ok = true;
     } else if (op === 0x31 && len >= 5) {
       const cnt = vw.getUint32(1, true);
@@ -2420,23 +2791,25 @@
                 q5RzL9wK.postMessage({
                   type: "BYPASS_WORLD_RESET",
                   senderId: v8WpM2tL,
+                  srv: v4WsUrl,
                 });
               } catch (_) {}
             }
           }
+          ok = true;
         }
       }
-      ok = true;
     } else if (op === 0x46 && len >= 3) {
       const nm = b6RdU16Str(vw, 1, len, true);
-      if (nm && nm.s.startsWith("Spectating: ")) {
+      if (!nm || !nm.s) return false;
+      if (nm.s.startsWith("Spectating: ")) {
         const nick = nm.s.slice(12).trim();
         b6BpSt.curSpecNick = nick;
-        const match = b6BpSt.lb.find((x) => x.nick === nick);
+        const match = b6BpSt.lb.find((x) => x.nick.trim() === nick);
         let oid = match ? match.oid : 0;
         if (!oid) {
           for (const pl of b6Plrs.values()) {
-            if (pl.name === nick) {
+            if (pl.name.trim() === nick) {
               oid = pl.oid;
               break;
             }
@@ -2453,18 +2826,34 @@
             break;
           }
         }
+        const nw46 = performance.now();
         if (
+          !ownLive ||
           !b6BpSt.wasAlive ||
-          (b6IsMenuHidden() && !ownLive && !b6HasLiveMassHud())
+          (b6IsMenuHidden() && nw46 - b6BpSt.lastPlayAt > 1200)
         ) {
           b6BpSt.specEntered = true;
+          b6BpSt.specAt = nw46;
           b6BpSt.wasAlive = false;
+          b6BpSt.lastPlayAt = 0;
           v4ActOid = 0;
           v4SelfOids.clear();
           if (v4MyOid) v4SelfOids.add(v4MyOid);
+          b6UpdateRole(nw46);
+        }
+        ok = true;
+      } else {
+        const cm = nm.s.match(/Connecting to\s+(.+?)\.\.\./i);
+        if (cm && cm[1] && !/^chat\s*server$/i.test(cm[1].trim())) {
+          s3DomSrv = cm[1].trim();
+          const hit = s3SrvName.get(s3NormKey(s3DomSrv));
+          s3DomMode = hit ? hit.gamemode : "";
+          s3ApplySrv(s3DomSrv, s3DomMode);
+          ok = true;
+        } else if (nm.p === len && /^[\x20-\x7e\u0400-\u04ff]+$/.test(nm.s)) {
+          ok = true;
         }
       }
-      ok = true;
     } else if (op === 0x44 && len === 10) {
       const srvMs = vw.getFloat64(2, true);
       if (
@@ -2476,54 +2865,635 @@
         ok = true;
       }
     }
-    if (ok && k && typeof k === "object") v4SeenBuf.add(k);
     return ok;
   }
 
-  v4U8ProxyRef = new Proxy(v4OrigU8, {
+  function v4IsPktOp(op) {
+    return (
+      op === 0x02 ||
+      op === 0x0a ||
+      op === 0x29 ||
+      op === 0x31 ||
+      op === 0x40 ||
+      op === 0x44 ||
+      op === 0x46 ||
+      op === 0xd2 ||
+      op === 0xf0
+    );
+  }
+
+  const c8KmW4vP = new WeakSet();
+  const c8TqN9xL = new WeakMap();
+
+  const x9DwK5vL = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+
+  function x9RmN8pQ(r, g, b) {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    const x = Math.max(r, g, b);
+    const n = Math.min(r, g, b);
+    let h = 0;
+    let s = 0;
+    const l = (x + n) / 2;
+    if (x !== n) {
+      const d = x - n;
+      s = l > 0.5 ? d / (2 - x - n) : d / (x + n);
+      if (x === r) h = (g - b) / d + (g < b ? 6 : 0);
+      else if (x === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h /= 6;
+    }
+    return [h, s, l];
+  }
+
+  function x9HvT2wM(p, q, t) {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  }
+
+  function x9LqP4sK(h, s, l) {
+    if (s === 0) {
+      const v = Math.round(l * 255);
+      return [v, v, v];
+    }
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    return [
+      Math.round(x9HvT2wM(p, q, h + 1 / 3) * 255),
+      Math.round(x9HvT2wM(p, q, h) * 255),
+      Math.round(x9HvT2wM(p, q, h - 1 / 3) * 255),
+    ];
+  }
+
+  function x9ZtM7vR(r, g, b, k = 0) {
+    if (k > 0) {
+      const w = 100 - Math.min(k, 100);
+      return [
+        Math.floor((r * w) / 100),
+        Math.floor((g * w) / 100),
+        Math.floor((b * w) / 100),
+      ];
+    }
+    const m = 0x66;
+    return [
+      Math.floor(r + (((255 - r) * m) >> 8)),
+      Math.floor(g + (((255 - g) * m) >> 8)),
+      Math.floor(b + (((255 - b) * m) >> 8)),
+    ];
+  }
+
+  function x9FnW3qP(r, g, b, a, c, lf) {
+    let [h, s, l] = x9RmN8pQ(r, g, b);
+    l = x9DwK5vL(l + a / 100);
+    if (lf && s > 0.05 && l < 0.56) {
+      l = 0.56;
+    }
+    s = x9DwK5vL(s - c / 100);
+    return x9LqP4sK(h, s, l);
+  }
+
+  function x9KpL6nT(r, g, b) {
+    return x9FnW3qP(r, g, b, 22, 28, true);
+  }
+
+  function x9MvQ8rW(r, g, b) {
+    return x9ZtM7vR(r, g, b, 40);
+  }
+
+  function c8GxP5nR(u, dv, st, en) {
+    const ln = en - st;
+    if (ln < 11) return false;
+    if (u[st] !== 0x02) return false;
+    if (u[en - 2] !== 0x00 || u[en - 1] !== 0x00) return false;
+
+    let p = st + 1;
+
+    if (p + 2 > en) return false;
+    const rc = dv.getUint16(p, true);
+    p += 2;
+    if (p + rc * 2 > en) return false;
+    p += rc * 2;
+
+    if (p + 2 > en) return false;
+    const dc = dv.getUint16(p, true);
+    p += 2;
+    if (p + dc * 2 > en) return false;
+    p += dc * 2;
+
+    const pL = [];
+    while (true) {
+      if (p + 2 > en) return false;
+      const oi = dv.getUint16(p, true);
+      p += 2;
+      if (oi === 0) break;
+
+      if (p + 3 > en) return false;
+      const rp = p;
+      const r = u[p++];
+      const g = u[p++];
+      const b = u[p++];
+
+      let nm = "";
+      while (true) {
+        if (p + 2 > en) return false;
+        const ch = dv.getUint16(p, true);
+        p += 2;
+        if (ch === 0) break;
+        nm += String.fromCharCode(ch);
+      }
+
+      while (true) {
+        if (p >= en) return false;
+        if (u[p++] === 0) break;
+      }
+
+      if (p >= en) return false;
+      const fl = u[p++];
+      if ((fl & 2) === 2) {
+        if (p + 5 > en) return false;
+        p += 5;
+      }
+
+      pL.push({ rp, r, g, b, ib: nm.includes("\uD83E\uDD16") });
+    }
+
+    const wL = [];
+    while (true) {
+      if (p >= en) return false;
+      const tg = u[p++];
+      if (tg === 0) break;
+
+      if (tg === 0x06) {
+        while (true) {
+          if (p + 2 > en) return false;
+          const ci = dv.getUint16(p, true);
+          p += 2;
+          if (ci === 0) break;
+          if (p + 4 > en) return false;
+          p += 4;
+        }
+      } else if (tg === 0x01) {
+        while (true) {
+          if (p + 2 > en) return false;
+          const ci = dv.getUint16(p, true);
+          p += 2;
+          if (ci === 0) break;
+          if (p + 10 > en) return false;
+          wL.push({
+            rp: p + 6,
+            r: u[p + 6],
+            g: u[p + 7],
+            b: u[p + 8],
+          });
+          p += 10;
+        }
+      } else if (tg === 0x03 || tg === 0x04) {
+        while (true) {
+          if (p + 2 > en) return false;
+          const ci = dv.getUint16(p, true);
+          p += 2;
+          if (ci === 0) break;
+          if (p + 6 > en) return false;
+          p += 6;
+        }
+      } else if (tg === 0x02) {
+        while (true) {
+          if (p + 2 > en) return false;
+          const co = dv.getUint16(p, true);
+          p += 2;
+          if (co === 0) break;
+          while (true) {
+            if (p + 2 > en) return false;
+            const ci = dv.getUint16(p, true);
+            p += 2;
+            if (ci === 0) break;
+            if (p + 6 > en) return false;
+            p += 6;
+          }
+        }
+      } else {
+        return false;
+      }
+    }
+
+    while (true) {
+      if (p >= en) return false;
+      const ut = u[p++];
+      if (ut === 0) break;
+
+      if (ut === 0x02 || ut === 0x03 || ut === 0x04) {
+        while (true) {
+          if (p + 2 > en) return false;
+          const ci = dv.getUint16(p, true);
+          p += 2;
+          if (ci === 0) break;
+          if (p + 6 > en) return false;
+          p += 6;
+        }
+      } else if (ut === 0x01 || ut === 0x06) {
+        while (true) {
+          if (p + 2 > en) return false;
+          const ci = dv.getUint16(p, true);
+          p += 2;
+          if (ci === 0) break;
+          if (p + 4 > en) return false;
+          p += 4;
+        }
+      } else {
+        return false;
+      }
+    }
+
+    if (p + 2 !== en) return false;
+    if (dv.getUint16(p, true) !== 0) return false;
+
+    for (let i = 0; i < pL.length; i++) {
+      const q = pL[i];
+      const [nr, ng, nb] = q.ib
+        ? x9MvQ8rW(q.r, q.g, q.b)
+        : x9KpL6nT(q.r, q.g, q.b);
+      u[q.rp] = nr;
+      u[q.rp + 1] = ng;
+      u[q.rp + 2] = nb;
+    }
+
+    for (let i = 0; i < wL.length; i++) {
+      const w = wL[i];
+      const [nr, ng, nb] = x9FnW3qP(w.r, w.g, w.b, 25, 20, false);
+      u[w.rp] = nr;
+      u[w.rp + 1] = ng;
+      u[w.rp + 2] = nb;
+    }
+
+    return true;
+  }
+
+  function c8JwT7kM(u, dv, st, en, dp = 0) {
+    const ln = en - st;
+    if (dp > 2 || ln < 8) return false;
+    if (u[st] !== 0xf0 || u[st + 1] !== 0x00) return false;
+
+    const cnt = u[st + 2];
+    if (cnt === 0) return false;
+
+    let p = st + 3;
+    const sl = [];
+
+    for (let i = 0; i < cnt; i++) {
+      if (p + 4 > en) return false;
+      const sL = dv.getUint32(p, true);
+      p += 4;
+      if (sL === 0 || p + sL > en) return false;
+      sl.push({ s: p, e: p + sL });
+      p += sL;
+    }
+
+    if (p !== en) return false;
+
+    for (let i = 0; i < sl.length; i++) {
+      const sb = sl[i];
+      const op = u[sb.s];
+      if (op === 0x02) {
+        c8GxP5nR(u, dv, sb.s, sb.e);
+      } else if (op === 0xf0) {
+        c8JwT7kM(u, dv, sb.s, sb.e, dp + 1);
+      }
+    }
+
+    return true;
+  }
+
+  function c8HnV2qL(bf, of, ln, fl) {
+    if (!bf || bf.byteLength === 0 || ln < 8) return;
+    if (of < 0 || of + ln > bf.byteLength) return;
+    if (c8KmW4vP.has(bf)) return;
+
+    const sk = fl ? 0 : of * 4294967296 + ln;
+    if (!fl) {
+      const ss = c8TqN9xL.get(bf);
+      if (ss && ss.has(sk)) return;
+    }
+
+    const u = new v4OrigU8(bf, of, ln);
+    const op = u[0];
+    if (op !== 0x02 && op !== 0xf0) return;
+
+    const dv = new v4OrigDv(bf, of, ln);
+    const ok = op === 0x02 ? c8GxP5nR(u, dv, 0, ln) : c8JwT7kM(u, dv, 0, ln, 0);
+
+    if (!ok) return;
+
+    if (fl) {
+      c8KmW4vP.add(bf);
+    } else {
+      let ss = c8TqN9xL.get(bf);
+      if (!ss) {
+        ss = new Set();
+        c8TqN9xL.set(bf, ss);
+      }
+      ss.add(sk);
+    }
+  }
+
+  function c8PrK9sW(o) {
+    return (
+      o instanceof ArrayBuffer ||
+      Object.prototype.toString.call(o) === "[object ArrayBuffer]" ||
+      (typeof SharedArrayBuffer !== "undefined" &&
+        o instanceof SharedArrayBuffer)
+    );
+  }
+
+  function c8QxM4vT(dt, dp = 0) {
+    if (!dt || dp > 2) return;
+
+    if (c8PrK9sW(dt)) {
+      c8HnV2qL(dt, 0, dt.byteLength, true);
+      return;
+    }
+
+    if (ArrayBuffer.isView(dt)) {
+      const fl = dt.byteOffset === 0 && dt.byteLength === dt.buffer.byteLength;
+      c8HnV2qL(dt.buffer, dt.byteOffset, dt.byteLength, fl);
+      return;
+    }
+
+    if (typeof dt === "object") {
+      if (Array.isArray(dt)) {
+        for (let i = 0; i < dt.length; i++) {
+          c8QxM4vT(dt[i], dp + 1);
+        }
+      } else {
+        const ks = Object.keys(dt);
+        for (let i = 0; i < ks.length; i++) {
+          c8QxM4vT(dt[ks[i]], dp + 1);
+        }
+      }
+    }
+  }
+
+  function c8YtL8nK(dt) {
+    if (!m9TvL2sP.softColors || v4InHook) return;
+    v4InHook = true;
+    try {
+      c8QxM4vT(dt, 0);
+    } catch (_) {
+    } finally {
+      v4InHook = false;
+    }
+  }
+
+  function c8ZbW3pM(a0, inst) {
+    if (!m9TvL2sP.softColors || v4InHook) return;
+    v4InHook = true;
+    try {
+      if (ArrayBuffer.isView(a0) && a0.buffer) {
+        const ss = c8TqN9xL.get(a0.buffer);
+        const sk = a0.byteOffset * 4294967296 + a0.byteLength;
+        if (c8KmW4vP.has(a0.buffer) || (ss && ss.has(sk))) {
+          if (
+            inst.byteOffset === 0 &&
+            inst.byteLength === inst.buffer.byteLength
+          ) {
+            c8KmW4vP.add(inst.buffer);
+          }
+          return;
+        }
+      }
+
+      const ln = inst.byteLength;
+      if (ln >= 8) {
+        const bf = inst.buffer;
+        const of = inst.byteOffset;
+        if (bf && of + ln <= bf.byteLength) {
+          const op = new v4OrigU8(bf, of, 1)[0];
+          if (op === 0x02 || op === 0xf0) {
+            c8HnV2qL(bf, of, ln, of === 0 && ln === bf.byteLength);
+          }
+        }
+      }
+    } catch (_) {
+    } finally {
+      v4InHook = false;
+    }
+  }
+
+  const c8VzR2mK = ArrayBuffer.prototype.slice;
+  ArrayBuffer.prototype.slice = function () {
+    const sl = c8VzR2mK.apply(this, arguments);
+    try {
+      if (c8KmW4vP.has(this)) c8KmW4vP.add(sl);
+    } catch (_) {}
+    return sl;
+  };
+
+  const c8LpS6wN = v4OrigU8.prototype.slice;
+  v4OrigU8.prototype.slice = function () {
+    const sl = c8LpS6wN.apply(this, arguments);
+    try {
+      if (this.buffer) {
+        const ss = c8TqN9xL.get(this.buffer);
+        const sk = this.byteOffset * 4294967296 + this.byteLength;
+        if (c8KmW4vP.has(this.buffer) || (ss && ss.has(sk))) {
+          c8KmW4vP.add(sl.buffer);
+        }
+      }
+    } catch (_) {}
+    return sl;
+  };
+
+  const c8BnM3tQ = v4OrigU8.prototype.set;
+  v4OrigU8.prototype.set = function (s, o) {
+    const rs = c8BnM3tQ.apply(this, arguments);
+    try {
+      if (
+        s &&
+        s.buffer &&
+        this.buffer &&
+        (o === undefined || o === 0) &&
+        this.buffer.byteLength === s.byteLength
+      ) {
+        const ss = c8TqN9xL.get(s.buffer);
+        const sk = s.byteOffset * 4294967296 + s.byteLength;
+        if (c8KmW4vP.has(s.buffer) || (ss && ss.has(sk))) {
+          c8KmW4vP.add(this.buffer);
+        }
+      }
+    } catch (_) {}
+    return rs;
+  };
+
+  function v4FeedBuf(buf, off, len, key) {
+    if (!buf || len <= 0 || len >= 524288) return;
+    if (key && v4SeenBuf.has(key)) return;
+    const prevHook = v4InHook;
+    v4InHook = true;
+    try {
+      const vw = new v4OrigDv(buf, off, len);
+      if (!v4IsPktOp(vw.getUint8(0))) return;
+      const u = new v4OrigU8(buf, off, len);
+      if (p9WsPkt(u) && key) v4SeenBuf.add(key);
+    } catch (_) {
+    } finally {
+      v4InHook = prevHook;
+    }
+  }
+
+  function v4AttachWs(ws) {
+    if (!ws || v4WsHooked.has(ws)) return;
+    v4WsHooked.add(ws);
+    if (s3CanTakeUrl(ws.url)) {
+      v4ActWs = ws;
+      if (ws.url !== v4WsUrl) {
+        v4WsUrl = ws.url;
+        s3SyncCurSrv();
+      }
+    }
+    const onOpen = () => {
+      if (v4IsGameWsUrl(ws.url)) {
+        v4ActWs = ws;
+        if (ws.url !== v4WsUrl) {
+          v4WsUrl = ws.url;
+          s3SyncCurSrv();
+        }
+      }
+    };
+    const onMsg = (ev) => {
+      if (!ev || v4SeenEv.has(ev)) return;
+      v4SeenEv.add(ev);
+      if (typeof ws.url === "string" && ws.url && !v4IsGameWsUrl(ws.url))
+        return;
+      if (v4IsGameWsUrl(ws.url) && ws.url !== v4WsUrl) {
+        v4ActWs = ws;
+        v4WsUrl = ws.url;
+        s3SyncCurSrv();
+      }
+      const d = ev.data;
+      c8YtL8nK(d);
+      if (
+        (d instanceof ArrayBuffer ||
+          Object.prototype.toString.call(d) === "[object ArrayBuffer]") &&
+        !v4SeenBuf.has(d)
+      ) {
+        v4FeedBuf(d, 0, d.byteLength, d);
+      } else if (ArrayBuffer.isView(d)) {
+        v4FeedBuf(d.buffer, d.byteOffset, d.byteLength, null);
+      }
+    };
+    if (v4OrigAdd) {
+      v4OrigAdd.call(ws, "open", onOpen);
+      v4OrigAdd.call(ws, "message", onMsg);
+    } else {
+      ws.addEventListener("open", onOpen);
+      ws.addEventListener("message", onMsg);
+    }
+  }
+
+  function v4AttachWk(wk) {
+    if (!wk || v4WkHooked.has(wk) || wk === g6VwN3tK || wk === f2QpL8xN) return;
+    v4WkHooked.add(wk);
+    const onMsg = (ev) => {
+      const d = ev.data;
+      c8YtL8nK(d);
+      if (
+        (d instanceof ArrayBuffer ||
+          Object.prototype.toString.call(d) === "[object ArrayBuffer]") &&
+        !v4SeenBuf.has(d)
+      ) {
+        v4FeedBuf(d, 0, d.byteLength, d);
+      } else if (ArrayBuffer.isView(d)) {
+        v4FeedBuf(d.buffer, d.byteOffset, d.byteLength, null);
+      } else {
+        s3ScanUrl(d);
+        if (d && typeof d === "object") {
+          const p = d.data || d.packet || d.buf;
+          if (
+            (p instanceof ArrayBuffer ||
+              Object.prototype.toString.call(p) === "[object ArrayBuffer]") &&
+            !v4SeenBuf.has(p)
+          ) {
+            v4FeedBuf(p, 0, p.byteLength, p);
+          } else if (ArrayBuffer.isView(p)) {
+            v4FeedBuf(p.buffer, p.byteOffset, p.byteLength, null);
+          }
+        }
+      }
+    };
+    if (v4OrigAdd) v4OrigAdd.call(wk, "message", onMsg);
+    else wk.addEventListener("message", onMsg);
+  }
+
+  window.Uint8Array = new Proxy(v4OrigU8, {
     construct(t, a, nt) {
       const inst = Reflect.construct(t, a, nt === window.Uint8Array ? t : nt);
-      if (!v4InU8) {
-        v4InU8 = true;
-        try {
-          const b0 = a[0];
-          const bTag =
-            b0 && typeof b0 === "object"
-              ? Object.prototype.toString.call(b0)
-              : "";
-          if (
-            a.length === 1 &&
-            (bTag === "[object ArrayBuffer]" ||
-              bTag === "[object SharedArrayBuffer]") &&
-            !v4SeenBuf.has(b0)
-          ) {
-            const len = inst.length;
-            if (len > 0 && len < 524288) {
-              const op = inst[0];
-              if (
-                op === 0x02 ||
-                op === 0x40 ||
-                op === 0xf0 ||
-                op === 0x29 ||
-                op === 0x0a ||
-                op === 0xd2 ||
-                op === 0x31 ||
-                op === 0x46 ||
-                op === 0x44
-              ) {
-                p9WsPkt(inst, b0);
-              }
+      if (!v4InHook && a.length >= 1 && a[0] && typeof a[0] === "object") {
+        c8ZbW3pM(a[0], inst);
+        if (inst.byteLength > 0 && inst.byteLength < 524288) {
+          const op = inst[0];
+          if (v4IsPktOp(op)) {
+            const full = a.length === 1 && a[0].byteLength === inst.byteLength;
+            const key = full ? a[0] : null;
+            if (!key || !v4SeenBuf.has(key)) {
+              v4FeedBuf(inst.buffer, inst.byteOffset, inst.byteLength, key);
             }
           }
-        } catch (_) {
-        } finally {
-          v4InU8 = false;
         }
       }
       return inst;
     },
   });
-  window.Uint8Array = v4U8ProxyRef;
+
+  if (v4OrigDv) {
+    window.DataView = new Proxy(v4OrigDv, {
+      construct(t, a, nt) {
+        const inst = Reflect.construct(t, a, nt === window.DataView ? t : nt);
+        if (!v4InHook && a.length >= 1 && a[0] && typeof a[0] === "object") {
+          c8ZbW3pM(a[0], inst);
+          if (inst.byteLength > 0 && inst.byteLength < 524288) {
+            const full = a.length === 1 && a[0].byteLength === inst.byteLength;
+            const key = full ? a[0] : null;
+            if (!key || !v4SeenBuf.has(key)) {
+              v4InHook = true;
+              try {
+                if (v4IsPktOp(inst.getUint8(0))) {
+                  v4FeedBuf(inst.buffer, inst.byteOffset, inst.byteLength, key);
+                }
+              } catch (_) {
+              } finally {
+                v4InHook = false;
+              }
+            }
+          }
+        }
+        return inst;
+      },
+    });
+  }
+
+  if (v4OrigWs) {
+    window.WebSocket = new Proxy(v4OrigWs, {
+      construct(t, a, nt) {
+        const ws = Reflect.construct(t, a, nt === window.WebSocket ? t : nt);
+        v4AttachWs(ws);
+        return ws;
+      },
+    });
+  }
+
+  if (v4OrigWk) {
+    window.Worker = new Proxy(v4OrigWk, {
+      construct(t, a, nt) {
+        const wk = Reflect.construct(t, a, nt === window.Worker ? t : nt);
+        v4AttachWk(wk);
+        return wk;
+      },
+    });
+  }
 
   const r4WsRtt = {
     rtt: 0,
@@ -2701,6 +3671,35 @@
     const op = u8[0];
     if (op === 0xf0 && u8.length >= 2 && u8[1] === 0x05) {
       r4ResetRtt(true);
+      return;
+    }
+    if (op === 0x01 && u8.length === 1) {
+      p2LxQ8vM();
+      b6BpSt.specEntered = true;
+      b6BpSt.specAt = nw;
+      b6BpSt.wasAlive = false;
+      b6BpSt.lastPlayAt = 0;
+      v4ActOid = 0;
+      v4SelfOids.clear();
+      if (v4MyOid) v4SelfOids.add(v4MyOid);
+      b6UpdateRole(nw);
+      return;
+    }
+    if (op === 0x00 && u8.length >= 3) {
+      if (b6BpSt.specEntered || k2WsDead()) {
+        m9MbSt.box1Id = "";
+        m9MbSt.box2Id = "";
+        m9MbSt.activeBox = 0;
+        m9MbSt.matchGen++;
+        v4OwnSeen = false;
+        k4FfCancel(false);
+      }
+      b6BpSt.specEntered = false;
+      b6BpSt.specAt = 0;
+      b6BpSt.wasAlive = true;
+      b6BpSt.lastPlayAt = nw;
+      b6ScanStop();
+      b6UpdateRole(nw);
       return;
     }
     if (op === 0xcb && u8.length === 10) {
@@ -2905,54 +3904,67 @@
   }
 
   const v4OrigWsSend =
-    window.WebSocket &&
-    window.WebSocket.prototype &&
-    window.WebSocket.prototype.send;
-  const v4WsHooked = new WeakSet();
+    v4OrigWs && v4OrigWs.prototype && v4OrigWs.prototype.send;
   if (v4OrigWsSend) {
-    WebSocket.prototype.send = function (data) {
+    v4OrigWs.prototype.send = function (data) {
       const isAb =
         data instanceof ArrayBuffer ||
         Object.prototype.toString.call(data) === "[object ArrayBuffer]";
       const isVw = !isAb && ArrayBuffer.isView(data);
-      if (!v4WsHooked.has(this) && (isAb || isVw)) {
-        v4WsHooked.add(this);
-        this.addEventListener("message", (ev) => {
-          if (
-            ev &&
-            (ev.data instanceof ArrayBuffer ||
-              Object.prototype.toString.call(ev.data) ===
-                "[object ArrayBuffer]") &&
-            !v4SeenBuf.has(ev.data)
-          ) {
-            const u = new v4OrigU8(ev.data);
-            if (u.length > 0 && u.length < 524288) {
-              const o = u[0];
-              if (
-                o === 0x02 ||
-                o === 0x40 ||
-                o === 0xf0 ||
-                o === 0x29 ||
-                o === 0x0a ||
-                o === 0xd2 ||
-                o === 0x31 ||
-                o === 0x46 ||
-                o === 0x44
-              ) {
-                p9WsPkt(u, ev.data);
-              }
-            }
+      if (isAb || isVw) {
+        if (s3CanTakeUrl(this.url)) {
+          v4ActWs = this;
+          if (this.url !== v4WsUrl) {
+            v4WsUrl = this.url;
+            s3SyncCurSrv();
           }
-        });
+        }
+        v4AttachWs(this);
       }
       const res = v4OrigWsSend.apply(this, arguments);
-      if (isAb && data.byteLength > 0) {
-        r4OnWsSend(new v4OrigU8(data), performance.now());
-      } else if (isVw && data.byteLength > 0) {
-        r4OnWsSend(
-          new v4OrigU8(data.buffer, data.byteOffset, data.byteLength),
-          performance.now(),
-        );
+      if (!this.url || v4IsGameWsUrl(this.url)) {
+        if (isAb && data.byteLength > 0) {
+          r4OnWsSend(new v4OrigU8(data), performance.now());
+        } else if (isVw && data.byteLength > 0) {
+          r4OnWsSend(
+            new v4OrigU8(data.buffer, data.byteOffset, data.byteLength),
+            performance.now(),
+          );
+        }
+      }
+      return res;
+    };
+  }
+
+  const v4OrigWkPm =
+    v4OrigWk && v4OrigWk.prototype && v4OrigWk.prototype.postMessage;
+  if (v4OrigWkPm) {
+    v4OrigWk.prototype.postMessage = function (msg) {
+      if (this !== g6VwN3tK && this !== f2QpL8xN) {
+        v4AttachWk(this);
+        s3ScanUrl(msg);
+      }
+      const res = v4OrigWkPm.apply(this, arguments);
+      if (this !== g6VwN3tK && this !== f2QpL8xN) {
+        const pay =
+          msg &&
+          typeof msg === "object" &&
+          !(msg instanceof ArrayBuffer) &&
+          !ArrayBuffer.isView(msg)
+            ? msg.data || msg.packet || msg.buf || msg
+            : msg;
+        const isAb =
+          pay instanceof ArrayBuffer ||
+          Object.prototype.toString.call(pay) === "[object ArrayBuffer]";
+        const isVw = !isAb && ArrayBuffer.isView(pay);
+        if (isAb && pay.byteLength > 0) {
+          r4OnWsSend(new v4OrigU8(pay), performance.now());
+        } else if (isVw && pay.byteLength > 0) {
+          r4OnWsSend(
+            new v4OrigU8(pay.buffer, pay.byteOffset, pay.byteLength),
+            performance.now(),
+          );
+        }
       }
       return res;
     };
@@ -3028,9 +4040,15 @@
       return;
     }
     if (ma <= 0.003 || ma >= 15 || Math.abs(ma - md) > ma * 0.03) return;
-    const rc = cv.getBoundingClientRect();
+    const nw = performance.now();
+    let rc = p9RcObj;
+    if (!rc || p9RcCv !== cv || nw - p9RcAt > 100) {
+      rc = cv.getBoundingClientRect();
+      p9RcCv = cv;
+      p9RcObj = rc;
+      p9RcAt = nw;
+    }
     if (!rc || rc.width <= 0 || rc.height <= 0) return;
-    if (p9CamCands.length >= 48) p9CamCands.shift();
     const sx =
       src === "c2d"
         ? rc.width / cv.width
@@ -3043,84 +4061,121 @@
         : p9ProjH > 100
           ? rc.height / p9ProjH
           : 1;
+    const lx = me * sx,
+      ly = mf * sy;
+    const last = p9CamCands.length ? p9CamCands[p9CamCands.length - 1] : null;
+    if (
+      last &&
+      last.src === src &&
+      Math.abs(last.rawA - ma) < 1e-5 &&
+      Math.abs(last.rawTx - me) < 1e-3 &&
+      Math.abs(last.rawTy - mf) < 1e-3
+    )
+      return;
+    if (p9CamCands.length >= 512) p9CamCands.splice(0, 256);
     p9CamCands.push({
+      cv,
       src,
       a: ma * sx,
       d: md * sy,
-      lx: me * sx,
-      ly: mf * sy,
+      lx,
+      ly,
       rawA: ma,
       rawTx: me,
       rawTy: mf,
     });
-    if (
-      (src === "c2d" || (src === "gl" && p9ProjW <= 100)) &&
-      Math.abs(sx - 1) > 0.02
-    ) {
-      p9CamCands.push({
-        src,
-        a: ma,
-        d: md,
-        lx: me,
-        ly: mf,
-        rawA: ma,
-        rawTx: me,
-        rawTy: mf,
-      });
-    }
   }
 
-  function p9PickCamCand(cv, rc, nw) {
-    if (p9CamCands.length > 0) {
-      const midX = rc.left + rc.width * 0.5;
-      const midY = rc.top + rc.height * 0.5;
-      const sf = !b6BpSt.specEntered ? p9SelfCtr() : null;
-      let best = null,
-        bestScore = -Infinity;
-      for (let i = 0; i < p9CamCands.length; i++) {
-        const m = p9CamCands[i];
-        const isMinimap =
-          Math.abs(m.rawA - 1) < 0.01 &&
-          m.rawTx > rc.width * 0.55 &&
-          m.rawTy > rc.height * 0.45;
-        let sc = isMinimap ? -1e9 : 0;
-        if (sf) {
-          sc -= Math.hypot(
-            m.a * sf.x + rc.left + m.lx - midX,
-            m.d * sf.y + rc.top + m.ly - midY,
-          );
-        } else {
-          const cx = (rc.width * 0.5 - m.lx) / m.a;
-          const cy = (rc.height * 0.5 - m.ly) / m.d;
-          if (Math.abs(cx) > 15000 || Math.abs(cy) > 15000) sc -= 1e6;
-          let vis = 0;
-          for (const c of v4WsCells.values()) {
-            if (c.tag !== 2) continue;
-            const px = m.lx + m.a * (c.dx !== undefined ? c.dx : c.x);
-            const py = m.ly + m.d * (c.dy !== undefined ? c.dy : c.y);
-            if (px >= 0 && px <= rc.width && py >= 0 && py <= rc.height) vis++;
-          }
-          sc += vis * 100;
-        }
-        if (sc > bestScore) {
-          bestScore = sc;
-          best = m;
-        }
+  function p9PickCamCand(cv, rc, nw, clr) {
+    if (!rc || rc.width <= 0 || rc.height <= 0) return null;
+    if (!p9CamCands.length) {
+      if (
+        p9CurCam &&
+        p9CurCam.cv === cv &&
+        nw - p9GlMs < 300 &&
+        p9CurCam.a > 0.002
+      ) {
+        return {
+          cv,
+          rc,
+          a: p9CurCam.a,
+          b: 0,
+          c: 0,
+          d: p9CurCam.d,
+          tx: rc.left + p9CurCam.lx,
+          ty: rc.top + p9CurCam.ly,
+          scale: (p9CurCam.a + p9CurCam.d) * 0.5,
+        };
       }
-      p9CamCands.length = 0;
-      if (best) {
-        p9CurCam = { cv, a: best.a, d: best.d, lx: best.lx, ly: best.ly };
-        zM = best.a;
-        tX = best.lx;
-        tY = best.ly;
-        kAct = true;
-        p9GlMs = nw;
+      return null;
+    }
+    const sf = !b6BpSt.specEntered ? p9SelfCtr() : null;
+    const minBx = p9MapX - 2000,
+      maxBx = p9MapX + p9MapW + 2000;
+    const minBy = p9MapY - 2000,
+      maxBy = p9MapY + p9MapH + 2000;
+    let best = null,
+      bestScore = -Infinity;
+    for (let i = 0; i < p9CamCands.length; i++) {
+      const m = p9CamCands[i];
+      if (m.cv && m.cv !== cv) continue;
+      let sc =
+        Math.abs(m.rawA - 1) < 0.01 &&
+        m.lx > rc.width * 0.55 &&
+        m.ly > rc.height * 0.45
+          ? -1e9
+          : 0;
+      if (sf) {
+        sc -= Math.hypot(
+          m.a * sf.x + m.lx - rc.width * 0.5,
+          m.d * sf.y + m.ly - rc.height * 0.5,
+        );
+      } else {
+        if (
+          Math.abs(m.a - 1) < 0.01 &&
+          Math.abs(m.lx) < 2 &&
+          Math.abs(m.ly) < 2
+        ) {
+          sc -= 50;
+        }
+        const cx = (rc.width * 0.5 - m.lx) / m.a;
+        const cy = (rc.height * 0.5 - m.ly) / m.d;
+        if (cx < minBx || cx > maxBx || cy < minBy || cy > maxBy) sc -= 1e6;
+        let vis = 0;
+        for (const c of v4WsCells.values()) {
+          if (c.tag !== 2) continue;
+          const wx = c.dx !== undefined ? c.dx : c.x;
+          const wy = c.dy !== undefined ? c.dy : c.y;
+          const px = m.a * wx + m.lx,
+            py = m.d * wy + m.ly;
+          if (px >= 0 && px <= rc.width && py >= 0 && py <= rc.height) vis++;
+        }
+        sc += vis * 100;
       }
+      if (sc > bestScore) {
+        bestScore = sc;
+        best = m;
+      }
+    }
+    if (clr) p9CamCands.length = 0;
+    if (best && bestScore > -1e5) {
+      p9CurCam = {
+        cv,
+        a: best.a,
+        d: best.d,
+        lx: best.lx,
+        ly: best.ly,
+      };
+      zM = best.a;
+      tX = best.lx;
+      tY = best.ly;
+      kAct = true;
+      p9GlMs = nw;
     }
     if (
       p9CurCam &&
       p9CurCam.cv === cv &&
-      nw - p9GlMs <= 300 &&
+      nw - p9GlMs < 300 &&
       p9CurCam.a > 0.002
     ) {
       return {
@@ -3144,6 +4199,8 @@
     const rc = cv.getBoundingClientRect();
     if (!rc || rc.width <= 0 || rc.height <= 0) return null;
     const nw = performance.now();
+    const picked = p9PickCamCand(cv, rc, nw, false);
+    if (picked) return picked;
     if (p9PixiOn && nw - p9LastPixiMs <= 500 && p9ScW > 0 && p9ScH > 0) {
       const sx = rc.width / p9ScW;
       const sy = rc.height / p9ScH;
@@ -3164,12 +4221,16 @@
         }
       }
     }
-    const picked = p9PickCamCand(cv, rc, nw);
-    if (picked) return picked;
     if (v4WsCam.init || b6BpSt.camAt > 0) {
-      const cx = v4WsCam.init ? v4WsCam.dx : b6BpSt.camX;
-      const cy = v4WsCam.init ? v4WsCam.dy : b6BpSt.camY;
-      const cz = v4WsCam.init ? v4WsCam.dz : b6BpSt.camZoom;
+      const liveWs =
+        document.hidden || b6BpSt.scanning || nw - v4InterpAt > 120;
+      const cx = v4WsCam.init ? (liveWs ? v4WsCam.x : v4WsCam.dx) : b6BpSt.camX;
+      const cy = v4WsCam.init ? (liveWs ? v4WsCam.y : v4WsCam.dy) : b6BpSt.camY;
+      const cz = v4WsCam.init
+        ? liveWs
+          ? v4WsCam.z
+          : v4WsCam.dz
+        : b6BpSt.camZoom;
       const sc = cz * Math.max(rc.width / 1920, rc.height / 1080);
       if (sc > 0.002) {
         return {
@@ -3240,11 +4301,53 @@
     return Number.isFinite(val) && val > 0;
   }
 
+  function b6SrvKey(u) {
+    const s = u !== undefined ? u : v4WsUrl;
+    if (!s) return "";
+    try {
+      return new URL(s).host.toLowerCase();
+    } catch (_) {
+      return String(s).toLowerCase();
+    }
+  }
+
+  function b6PeerSpecCount(nw, sameSrv) {
+    const t = nw || performance.now();
+    const mySrv = sameSrv ? b6SrvKey() : "";
+    let cnt = 0;
+    for (const [id, rec] of v5PeerMap) {
+      if (!rec || t - rec.ts > 4500) {
+        v5PeerMap.delete(id);
+        continue;
+      }
+      if (
+        rec.role === "spec" &&
+        (!sameSrv || !mySrv || !rec.srv || rec.srv === mySrv)
+      ) {
+        cnt++;
+      }
+    }
+    return cnt;
+  }
+
+  function b6AllowPhantoms(nw) {
+    const t = nw || performance.now();
+    return Boolean(
+      b6BpSt.curRole !== "spec" &&
+      !b6BpSt.specEntered &&
+      !b6BpSt.scanning &&
+      b6PeerSpecCount(t, true) === 1 &&
+      b6PeerSpecCount(t, false) === 1,
+    );
+  }
+
   function b6UpdateRole(nw) {
     const hid = b6IsMenuHidden();
     let nxt = "menu";
     if (!hid) {
       b6BpSt.menuHidAt = 0;
+      if (nw - b6BpSt.lastPlayAt > 1800) b6BpSt.wasAlive = false;
+      if (nw - (b6BpSt.specAt || 0) > 1000) b6BpSt.specEntered = false;
       nxt = "menu";
     } else {
       if (!b6BpSt.menuHidAt) b6BpSt.menuHidAt = nw;
@@ -3255,47 +4358,49 @@
           break;
         }
       }
-      const hudLive = !b6BpSt.specEntered && b6HasLiveMassHud();
-      if (ownLive || hudLive || nw - b6BpSt.lastPlayAt < 1800) {
+      const actLive =
+        !b6BpSt.specEntered &&
+        v4ActOid > 0 &&
+        nw - (b6BpSt.lastD2ActAt || 0) < 1200;
+      if (
+        ownLive ||
+        actLive ||
+        (!b6BpSt.specEntered && nw - b6BpSt.lastPlayAt < 1800)
+      ) {
         b6BpSt.wasAlive = true;
         b6BpSt.specEntered = false;
         nxt = "play";
       } else if (
         b6BpSt.specEntered ||
-        (!b6BpSt.wasAlive &&
-          nw - b6BpSt.menuHidAt >= 350 &&
-          nw - b6BpSt.lastPlayAt > 2500)
+        (!ownLive &&
+          v4ActOid === 0 &&
+          nw - b6BpSt.menuHidAt >= 250 &&
+          nw - b6BpSt.lastPlayAt > 1800)
       ) {
         if (!b6BpSt.specEntered) {
           b6BpSt.specEntered = true;
+          b6BpSt.specAt = nw;
           v4SelfOids.clear();
           if (v4MyOid) v4SelfOids.add(v4MyOid);
         }
+        b6BpSt.wasAlive = false;
         nxt = "spec";
       } else {
         nxt = b6BpSt.wasAlive ? "play" : "menu";
       }
     }
+    if (nxt !== "spec") {
+      b6BpSt.curSpecNick = "";
+      b6BpSt.curSpecOid = 0;
+    }
     if (b6BpSt.curRole !== nxt) {
       b6BpSt.curRole = nxt;
-      v5PingPeers();
+      v5PingPeers(true);
     }
     return nxt;
   }
 
-  function b6CheckPeerAlive(nw) {
-    if (!m9TvL2sP.bypassEnabled) return;
-    if (nw < b6BpSt.enableGraceUntil) return;
-    if (!h4HasPeerTab()) {
-      m9TvL2sP.bypassEnabled = false;
-      b6BpSt.enableGraceUntil = 0;
-      b6ScanStop();
-      if (!m9TvL2sP.bypassPhantoms && !m9TvL2sP.bypassRadar)
-        b6ResetWorld(false);
-      x3QnK8wR();
-      if (document.getElementById("macro-window")) r8QnM4tL();
-    }
-  }
+  function b6CheckPeerAlive() {}
 
   function b6GetCamCtr() {
     const cam = v4GetCam();
@@ -3572,6 +4677,7 @@
           q5RzL9wK.postMessage({
             type: "BYPASS_WORLD_RESET",
             senderId: v8WpM2tL,
+            srv: v4WsUrl,
           });
         } catch (_) {}
       }
@@ -3643,8 +4749,14 @@
   }
 
   function b6FlushBc(force) {
-    if (!b6BpSt.scanning || !b6BpSt.inMatch) return;
     const nw = performance.now();
+    if (
+      !b6BpSt.inMatch ||
+      !b6BpSt.specEntered ||
+      b6BpSt.curRole !== "spec" ||
+      b6PeerSpecCount(nw, false) > 0
+    )
+      return;
     if (!force && nw - b6BpSt.bcAt < 70) {
       b6BpSt.bcPending = true;
       return;
@@ -3678,6 +4790,7 @@
       q5RzL9wK.postMessage({
         type: "BYPASS_FRAME",
         senderId: v8WpM2tL,
+        srv: v4WsUrl,
         ts: Date.now(),
         bounds: b6BpSt.bounds,
         aoi: a && a.maxX > a.minX ? [a.minX, a.minY, a.maxX, a.maxY] : null,
@@ -3736,9 +4849,10 @@
 
   function b6SendMainAoi(nw) {
     if (
-      !m9TvL2sP.bypassEnabled ||
       b6BpSt.scanning ||
       b6BpSt.specEntered ||
+      b6BpSt.curRole === "spec" ||
+      b6PeerSpecCount(nw, true) !== 1 ||
       !b6BpSt.inMatch ||
       !b6IsMenuHidden() ||
       nw - b6BpSt.mainBcAt < 100
@@ -3753,6 +4867,7 @@
       q5RzL9wK.postMessage({
         type: "BYPASS_MAIN_AOI",
         senderId: v8WpM2tL,
+        srv: v4WsUrl,
         aoi: [a.minX, a.minY, a.maxX, a.maxY],
         self: selfPt,
         cur: b6CurBeamPt(a, selfPt),
@@ -3778,7 +4893,7 @@
     b6BpSt.inMatch = true;
     if (b6BpSt.scanning && b6BpSt.curSpecNick && !b6BpSt.curSpecOid) {
       for (const pl of b6Plrs.values()) {
-        if (pl.name === b6BpSt.curSpecNick) {
+        if (pl.name.trim() === b6BpSt.curSpecNick) {
           b6BpSt.curSpecOid = pl.oid;
           break;
         }
@@ -3792,6 +4907,12 @@
       b6RebuildAgg(nw);
     }
     b6PruneMem(nw, nowWall);
+
+    if (b6BpSt.specEntered) b6UpdateRole(nw);
+    const isSoloSpec =
+      b6BpSt.specEntered &&
+      b6BpSt.curRole === "spec" &&
+      b6PeerSpecCount(nw, false) === 0;
 
     const camNow = b6GetCamCtr();
     let sMinX = Infinity,
@@ -3821,7 +4942,7 @@
     if (Number.isFinite(sMinX) && sMaxX > sMinX && sMaxY > sMinY) {
       b6BpSt.safeAoi = { minX: sMinX, minY: sMinY, maxX: sMaxX, maxY: sMaxY };
     }
-    if (!b6BpSt.scanning) {
+    if (!b6BpSt.scanning && !b6BpSt.specEntered) {
       const cam = camNow;
       if (cam) {
         let obsW = 0,
@@ -3851,7 +4972,7 @@
       }
     }
     if (Number.isFinite(pMinX) && pMaxX > pMinX && pMaxY > pMinY) {
-      if (!b6BpSt.scanning) {
+      if (!b6BpSt.scanning && !b6BpSt.specEntered) {
         const cam = camNow;
         const uMinX = Number.isFinite(sMinX) ? sMinX : pMinX;
         const uMaxX = Number.isFinite(sMaxX) ? sMaxX : pMaxX;
@@ -3930,23 +5051,24 @@
       }
     }
 
-    if (b6BpSt.scanning && remN >= 2 && v4WsCells.size === 0 && addN === 0) {
+    if (isSoloSpec && remN >= 2 && v4WsCells.size === 0 && addN === 0) {
       b6ResetWorld(false);
       try {
         q5RzL9wK.postMessage({
           type: "BYPASS_WORLD_RESET",
           senderId: v8WpM2tL,
+          srv: v4WsUrl,
         });
       } catch (_) {}
     }
     if (b6BpSt.got46At > 0 && !b6BpSt.got02After46 && nw >= b6BpSt.got46At) {
       b6BpSt.got02After46 = true;
     }
-    if (b6BpSt.scanning && b6BpSt.inMatch) {
+    if (isSoloSpec && b6BpSt.inMatch) {
       const forceBc = b6BpSt.got02After46 && !b6BpSt.hopFlushSent;
       if (forceBc) b6BpSt.hopFlushSent = true;
       b6FlushBc(forceBc);
-    } else if (!b6BpSt.scanning && b6BpSt.inMatch) {
+    } else if (!isSoloSpec && b6BpSt.inMatch) {
       b6SendMainAoi(nw);
     }
   }
@@ -4031,7 +5153,64 @@
       if (px >= r.left && px <= r.right && py >= r.top && py <= r.bottom)
         return false;
     }
+    const cv = b6GameCanvas();
+    const topEl = document.elementFromPoint(px, py);
+    if (
+      topEl &&
+      cv &&
+      topEl !== cv &&
+      !topEl.closest(".macro-txt-layer") &&
+      topEl.id !== "macro-bypass-field" &&
+      topEl.id !== "autorev-overlay"
+    ) {
+      return false;
+    }
     return true;
+  }
+
+  function b6GetLbRows() {
+    const direct = Array.from(
+      document.querySelectorAll("#leaderboard-list > div"),
+    );
+    if (direct.length) return direct;
+    const lp =
+      document.getElementById("leaderboard-list") ||
+      document.getElementById("leaderboard-panel");
+    if (!lp) return direct;
+    const out = [];
+    const els = lp.querySelectorAll("div, li, tr");
+    for (let i = 0; i < els.length; i++) {
+      const el = els[i];
+      if (el.children.length > 4) continue;
+      const tx = (el.textContent || "").trim();
+      if (/^\d+[\.\)]\s*\S+/.test(tx)) out.push(el);
+    }
+    return out;
+  }
+
+  function b6MatchLbRow(row, i, lb) {
+    const raw = (row.textContent || "")
+      .trim()
+      .replace(/^\d+[\.\)]?\s*/, "");
+    const rAt = lb[i];
+    if (rAt && rAt.nick) {
+      const rn = rAt.nick.trim();
+      if (!raw || raw === rn || raw.startsWith(rn)) {
+        return { oid: rAt.oid, nick: rn };
+      }
+    }
+    if (raw) {
+      const ex = lb.find((x) => x && x.nick && x.nick.trim() === raw);
+      if (ex) return { oid: ex.oid, nick: ex.nick.trim() };
+      const st = lb.find(
+        (x) => x && x.nick && raw.startsWith(x.nick.trim()),
+      );
+      if (st) return { oid: st.oid, nick: st.nick.trim() };
+    }
+    return {
+      oid: rAt ? rAt.oid : 0,
+      nick: (rAt && rAt.nick ? rAt.nick.trim() : "") || raw,
+    };
   }
 
   function b6WorldToScr(wx, wy, wr) {
@@ -4063,9 +5242,7 @@
   }
 
   function b6PickLb(nw, avoidAoi, smartDedupe) {
-    const rows = Array.from(
-      document.querySelectorAll("#leaderboard-list > div"),
-    );
+    const rows = b6GetLbRows();
     if (rows.length < 1) return null;
     const lb = b6BpSt.lb,
       n = rows.length;
@@ -4082,15 +5259,7 @@
     for (let k = 0; k < n; k++) {
       const i = (b6BpSt.rrIdx + k) % n;
       const row = rows[i];
-      const dNick = (row.textContent || "").trim().replace(/^\d+\.\s*/, "");
-      const rec =
-        lb[i] && (!dNick || lb[i].nick === dNick)
-          ? lb[i]
-          : dNick
-            ? lb.find((x) => x.nick === dNick)
-            : lb[i];
-      const oid = rec ? rec.oid : 0;
-      const nick = dNick || (rec ? rec.nick : "");
+      const { oid, nick } = b6MatchLbRow(row, i, lb);
       if (
         (!nick && !oid) ||
         (oid && oid === b6BpSt.curSpecOid) ||
@@ -4160,7 +5329,7 @@
       )
         continue;
       const pl = b6Plrs.get(c.oid),
-        nm = pl ? pl.name : "";
+        nm = pl ? pl.name.trim() : "";
       if (
         nm.includes("\uD83E\uDD16") ||
         (nm && nm === b6BpSt.curSpecNick) ||
@@ -4211,7 +5380,7 @@
       )
         continue;
       const pl = b6Plrs.get(c.oid),
-        nm = pl ? pl.name : "";
+        nm = pl ? pl.name.trim() : "";
       if (nm.includes("\uD83E\uDD16") || (nm && nm === b6BpSt.curSpecNick))
         continue;
       const sc = b6WorldToScr(c.x, c.y, c.r);
@@ -4273,7 +5442,7 @@
         )
           continue;
         const pl = b6Plrs.get(c.oid),
-          nm = pl ? pl.name : "";
+          nm = pl ? pl.name.trim() : "";
         if (nm.includes("\uD83E\uDD16") || (nm && nm === b6BpSt.curSpecNick))
           continue;
         const sc = b6WorldToScr(c.x, c.y, c.r);
@@ -4296,9 +5465,7 @@
 
     let bestLb = null,
       bestLbScore = -Infinity;
-    const rows = Array.from(
-      document.querySelectorAll("#leaderboard-list > div"),
-    );
+    const rows = b6GetLbRows();
     const lb = b6BpSt.lb,
       n = rows.length;
     let realCnt = 0;
@@ -4314,15 +5481,7 @@
     for (let k = 0; k < n; k++) {
       const i = (b6BpSt.rrIdx + k) % n,
         row = rows[i];
-      const dNick = (row.textContent || "").trim().replace(/^\d+\.\s*/, "");
-      const rec =
-        lb[i] && (!dNick || lb[i].nick === dNick)
-          ? lb[i]
-          : dNick
-            ? lb.find((x) => x.nick === dNick)
-            : lb[i];
-      const oid = rec ? rec.oid : 0;
-      const nick = dNick || (rec ? rec.nick : "");
+      const { oid, nick } = b6MatchLbRow(row, i, lb);
       if (
         (!nick && !oid) ||
         (oid && oid === b6BpSt.curSpecOid) ||
@@ -4409,20 +5568,10 @@
       if (cTgt && (cTgt.dist < 2400 || cTgt.dist < camDist - 350)) return cTgt;
     }
     b6BpSt.cvsMiss = 0;
-    const rows = Array.from(
-      document.querySelectorAll("#leaderboard-list > div"),
-    );
+    const rows = b6GetLbRows();
     let best = null;
     for (let i = 0; i < rows.length; i++) {
-      const dNick = (rows[i].textContent || "").trim().replace(/^\d+\.\s*/, "");
-      const rec =
-        b6BpSt.lb[i] && (!dNick || b6BpSt.lb[i].nick === dNick)
-          ? b6BpSt.lb[i]
-          : dNick
-            ? b6BpSt.lb.find((x) => x.nick === dNick)
-            : b6BpSt.lb[i];
-      const oid = rec ? rec.oid : 0;
-      const nick = dNick || (rec ? rec.nick : "");
+      const { oid, nick } = b6MatchLbRow(rows[i], i, b6BpSt.lb);
       if (
         (!nick && !oid) ||
         (oid && oid === b6BpSt.curSpecOid) ||
@@ -4455,21 +5604,11 @@
   }
 
   function b6PickBig(nw) {
-    const rows = Array.from(
-      document.querySelectorAll("#leaderboard-list > div"),
-    );
+    const rows = b6GetLbRows();
     let firstValid = null,
       firstFallback = null;
     for (let i = 0; i < rows.length; i++) {
-      const dNick = (rows[i].textContent || "").trim().replace(/^\d+\.\s*/, "");
-      const rec =
-        b6BpSt.lb[i] && (!dNick || b6BpSt.lb[i].nick === dNick)
-          ? b6BpSt.lb[i]
-          : dNick
-            ? b6BpSt.lb.find((x) => x.nick === dNick)
-            : b6BpSt.lb[i];
-      const oid = rec ? rec.oid : 0;
-      const nick = dNick || (rec ? rec.nick : "");
+      const { oid, nick } = b6MatchLbRow(rows[i], i, b6BpSt.lb);
       if ((!nick && !oid) || (oid && nw - (b6BadOid.get(oid) || 0) < 1500))
         continue;
       if (!firstFallback)
@@ -4493,20 +5632,11 @@
     const oid = b6BpSt.bestSpecOid,
       nick = b6BpSt.bestSpecNick;
     if (!oid || nw - (b6BadOid.get(oid) || 0) < 1500) return null;
-    const rows = Array.from(
-      document.querySelectorAll("#leaderboard-list > div"),
-    );
+    const rows = b6GetLbRows();
     for (let i = 0; i < rows.length; i++) {
-      const dNick = (rows[i].textContent || "").trim().replace(/^\d+\.\s*/, "");
-      const rec =
-        b6BpSt.lb[i] && (!dNick || b6BpSt.lb[i].nick === dNick)
-          ? b6BpSt.lb[i]
-          : dNick
-            ? b6BpSt.lb.find((x) => x.nick === dNick)
-            : b6BpSt.lb[i];
-      const rNick = dNick || (rec ? rec.nick : "");
-      if ((rec && rec.oid === oid) || (nick && rNick === nick)) {
-        return { kind: "lb", idx: i, row: rows[i], oid, nick: rNick };
+      const mr = b6MatchLbRow(rows[i], i, b6BpSt.lb);
+      if ((mr.oid && mr.oid === oid) || (nick && mr.nick === nick)) {
+        return { kind: "lb", idx: i, row: rows[i], oid, nick: mr.nick };
       }
     }
     return null;
@@ -4543,17 +5673,18 @@
   }
 
   function b6ScanStep() {
+    const nw = performance.now();
     if (
       !b6BpSt.scanning ||
       !m9TvL2sP.bypassEnabled ||
       !b6BpSt.specEntered ||
       b6BpSt.wasAlive ||
-      !b6IsMenuHidden()
+      !b6IsMenuHidden() ||
+      b6PeerSpecCount(nw, false) > 0
     ) {
       b6ScanStop();
       return;
     }
-    const nw = performance.now();
 
     if (b6BpSt.phase === "cvs_rmb") {
       if (nw < b6BpSt.phaseUntil) return;
@@ -4589,11 +5720,21 @@
 
     if (b6BpSt.phase === "menu") {
       const cm = document.getElementById("context-menu");
-      const ms = document.getElementById("menu-spectate");
+      let ms = document.getElementById("menu-spectate");
+      if (!ms && cm) {
+        const items = cm.querySelectorAll("div, button, li, a, span");
+        for (let i = 0; i < items.length; i++) {
+          if (/^spectate$/i.test((items[i].textContent || "").trim())) {
+            ms = items[i];
+            break;
+          }
+        }
+      }
       const cn = document.getElementById("context-name");
       if (
         cm &&
-        window.getComputedStyle(cm).display === "block" &&
+        window.getComputedStyle(cm).display !== "none" &&
+        cm.getClientRects().length > 0 &&
         ms &&
         window.getComputedStyle(ms).display !== "none"
       ) {
@@ -4623,6 +5764,7 @@
             q5RzL9wK.postMessage({
               type: "BYPASS_SCOUT_CLAIM",
               senderId: v8WpM2tL,
+              srv: v4WsUrl,
               oid: b6BpSt.pendOid,
               cx: ag ? ag.cx : 0,
               cy: ag ? ag.cy : 0,
@@ -4633,7 +5775,6 @@
         b6DispMouse(ms, "mousedown", 0, cx, cy, true);
         b6DispMouse(ms, "mouseup", 0, cx, cy, true);
         b6DispMouse(ms, "click", 0, cx, cy, false);
-        if (typeof ms.click === "function") ms.click();
         b6BpSt.phase = "confirm";
         b6BpSt.phaseUntil = nw + 780;
         return;
@@ -4658,7 +5799,7 @@
     }
 
     if (b6BpSt.phase === "confirm") {
-      if (b6BpSt.got46At > b6BpSt.sentAt && b6BpSt.got02After46) {
+      if (b6BpSt.got46At > 0 && b6BpSt.got46At >= b6BpSt.sentAt && b6BpSt.got02After46) {
         b6BpSt.cvsMiss = 0;
         b6BpSt.landedAt = nw;
         if (m9TvL2sP.bypassMethod !== "smart") {
@@ -4806,17 +5947,24 @@
     const nw = performance.now();
     if (nw - b6BpSt.lastPingAt >= 480) {
       b6BpSt.lastPingAt = nw;
-      v5PingPeers();
+      v5PingPeers(false);
     }
-    b6CheckPeerAlive(nw);
     const role = b6UpdateRole(nw);
-    const canScan = Boolean(m9TvL2sP.bypassEnabled && role === "spec");
-    if (canScan) {
-      if (!b6BpSt.scanning) b6ScanStart();
-      else {
-        if (b6BpSt.bcPending) b6FlushBc(false);
-        b6ScanStep();
+    const specPeers = b6PeerSpecCount(nw, false);
+    if (role !== "spec" || specPeers > 0) {
+      if (b6BpSt.scanning) b6ScanStop();
+      if (role === "spec" && specPeers > 0) {
+        b6Phantoms.clear();
+        b6BpSt.lastRxAt = 0;
       }
+      return;
+    }
+    if (b6BpSt.bcPending) b6FlushBc(false);
+    const hasData =
+      v4WsCells.size > 0 || b6Plrs.size > 0 || b6BpSt.lb.length > 0;
+    if (m9TvL2sP.bypassEnabled && hasData) {
+      if (!b6BpSt.scanning) b6ScanStart();
+      else b6ScanStep();
     } else if (b6BpSt.scanning) {
       b6ScanStop();
     }
@@ -4877,6 +6025,10 @@
         "position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:1;";
       b6BpOvCtx = b6BpOvCv.getContext("2d");
     }
+    if (gameCv) {
+      const gz = parseInt(window.getComputedStyle(gameCv).zIndex, 10);
+      b6BpOvCv.style.zIndex = Number.isFinite(gz) && gz >= 1 ? String(gz) : "1";
+    }
     if (gameCv && gameCv.parentNode) {
       if (
         b6BpOvCv.parentNode !== gameCv.parentNode ||
@@ -4932,16 +6084,21 @@
     try {
       const nw = performance.now();
       v4StepInterp(nw);
-      b6CheckPeerAlive(nw);
       const menuHid = b6IsMenuHidden();
       const cam = v4GetCam();
+      const allowPh = b6AllowPhantoms(nw);
+
+      if (!allowPh && b6Phantoms.size > 0) {
+        b6Phantoms.clear();
+        b6BpSt.lastRxAt = 0;
+      }
 
       const dlt = Math.min(50, Math.max(8, nw - b6BpSt.lastOvAt));
       const sm = 1 - Math.exp(-14 * dlt * 0.001);
 
       if (
+        allowPh &&
         (m9TvL2sP.bypassPhantoms || m9TvL2sP.bypassRadar) &&
-        !b6BpSt.scanning &&
         b6Phantoms.size > 0
       ) {
         const aoi = b6SafeBox();
@@ -4953,8 +6110,8 @@
 
       const hasCam = Boolean(cam);
       const active = Boolean(
+        allowPh &&
         m9TvL2sP.bypassPhantoms &&
-        !b6BpSt.scanning &&
         hasCam &&
         b6Phantoms.size > 0 &&
         nw - b6BpSt.lastRxAt < Math.max(m9TvL2sP.bypassTtl, 35000) + 500 &&
@@ -5202,7 +6359,7 @@
           b6BpWinEl && b6BpWinEl.classList.contains("open"),
         );
         const showR = Boolean(
-          m9TvL2sP.bypassRadar && !b6BpSt.scanning && (menuHid || winOpen),
+          m9TvL2sP.bypassRadar && (!b6BpSt.scanning || winOpen),
         );
         if (b6BpMapWin.style.display !== (showR ? "block" : "none")) {
           b6BpMapWin.style.display = showR ? "block" : "none";
@@ -5237,13 +6394,13 @@
           }
           b6BpRdCtx.stroke();
 
-          if (menuHid) {
+          if (menuHid || (b6BpSt.inMatch && allowPh)) {
             const isFixedRad = m9TvL2sP.bypassRadarMode === "fixed";
             const fixEnemyR = Math.max(2.4, Math.round(S * 0.013 * 10) / 10);
             const fixSelfR = Math.max(3.2, Math.round(S * 0.017 * 10) / 10);
             const rList = [];
 
-            for (const [cid, p] of b6Phantoms) {
+            if (allowPh) for (const [cid, p] of b6Phantoms) {
               if (
                 p.tag !== 2 ||
                 v4WsCells.has(cid) ||
@@ -5402,11 +6559,8 @@
       m9TvL2sP[k] = nv;
       if (k === "bypassEnabled") {
         b6BpSt.enableGraceUntil = 0;
-        if (!nv) {
-          b6ScanStop();
-          if (!m9TvL2sP.bypassPhantoms && !m9TvL2sP.bypassRadar)
-            b6ResetWorld(false);
-        }
+        if (!nv && b6BpSt.scanning) b6ScanStop();
+        else if (nv && b6TickScan) b6TickScan();
       } else if (k === "bypassMethod") {
         b6BpSt.cvsMiss = 0;
         b6BpSt.holdUntil = 0;
@@ -5426,8 +6580,6 @@
         (!document.hasFocus() || document.hidden)
       ) {
         hCl2xK9m();
-      } else if (k === "softColors" && !nv) {
-        j2RstSoft();
       } else if (k === "revNotify" && !nv) {
         if (r9RevNotClr) r9RevNotClr();
       } else if (k === "mapBgSrc") {
@@ -5520,8 +6672,15 @@
   }
 
   function w4GetCurSelfOid() {
+    if (!b6BpSt.specEntered && v4ActOid > 0) {
+      v4SelfOids.add(v4ActOid);
+      return v4ActOid;
+    }
     const id = parseInt(g5ReadPid(), 10);
-    if (Number.isSafeInteger(id) && id > 0) return id;
+    if (Number.isSafeInteger(id) && id > 0) {
+      if (!b6BpSt.specEntered) v4SelfOids.add(id);
+      return id;
+    }
     if (v4MyOid > 0) return v4MyOid;
     return v4ActOid;
   }
@@ -5553,8 +6712,6 @@
           cy: p.cy,
           r: p.r,
           oid: c.oid,
-          node: null,
-          model: null,
         };
       }
     }
@@ -5578,8 +6735,6 @@
           cy: p.cy,
           r: p.r,
           oid: c.oid,
-          node: null,
-          model: null,
         };
       }
     }
@@ -5907,9 +7062,16 @@
     return String(el.textContent || "").trim();
   }
 
+  function g5ReadBestIdStr() {
+    if (!b6BpSt.specEntered && v4ActOid > 0) return String(v4ActOid);
+    const id = g5ReadPid();
+    if (id && id !== "0") return id;
+    return "";
+  }
+
   function u2SyncPidState() {
     if (b6BpSt.specEntered) return;
-    const id = g5ReadPid();
+    const id = g5ReadBestIdStr();
     m9MbSt.activeId = id;
     const nId = parseInt(id, 10);
     if (Number.isSafeInteger(nId) && nId > 0) v4SelfOids.add(nId);
@@ -5937,37 +7099,48 @@
     else m9MbSt.activeBox = 0;
   }
 
-  function w3WaitPidFlip(prevId, maxMs, cb) {
+  function w3WaitPidFlip(prevId, maxMs, cb, expectId) {
     u2SyncPidState();
     const cur = m9MbSt.activeId;
-    if (cur !== prevId) {
+    if (expectId ? cur === expectId : cur !== prevId) {
       cb(true, cur);
       return;
     }
     const el = g4PidEl();
     let done = false;
     let ob = null;
+    let cancelWait = null;
     const fin = (ok) => {
       if (done) return;
       done = true;
+      if (w3FlipCb === chk) w3FlipCb = null;
       if (ob) ob.disconnect();
+      if (cancelWait) cancelWait();
       u2SyncPidState();
       cb(ok, m9MbSt.activeId);
     };
+    const chk = () => {
+      u2SyncPidState();
+      const now = m9MbSt.activeId;
+      if (expectId ? now === expectId : now !== prevId) fin(true);
+    };
+    w3FlipCb = chk;
     if (el && typeof MutationObserver === "function") {
-      ob = new MutationObserver(() => {
-        if (g5ReadPid() !== prevId) fin(true);
-      });
+      ob = new MutationObserver(chk);
       ob.observe(el, { childList: true, characterData: true, subtree: true });
     }
-    d2TinyWait(maxMs, () => fin(g5ReadPid() !== prevId));
+    cancelWait = d2TinyWait(maxMs, () => {
+      u2SyncPidState();
+      const now = m9MbSt.activeId;
+      fin(expectId ? now === expectId : now !== prevId);
+    });
   }
 
   function h4HasPeerTab() {
     const nw = performance.now();
     let alive = false;
-    v5PeerMap.forEach((ts, id) => {
-      if (nw - ts > 6500) {
+    v5PeerMap.forEach((rec, id) => {
+      if (!rec || nw - rec.ts > 6500) {
         v5PeerMap.delete(id);
       } else {
         alive = true;
@@ -5976,11 +7149,13 @@
     return alive;
   }
 
-  function v5PingPeers() {
+  function v5PingPeers(isRoleChg) {
     try {
       q5RzL9wK.postMessage({
-        type: "MB_PING",
+        type: isRoleChg ? "MB_ROLE" : "MB_PING",
         senderId: v8WpM2tL,
+        role: b6BpSt.curRole,
+        srv: b6SrvKey(),
       });
     } catch (_) {}
   }
@@ -6054,7 +7229,7 @@
       if (typeof hSP2xK9m !== "undefined") hSP2xK9m.add(ku);
       tg.dispatchEvent(ku);
     }
-    if (u9PxL2wT.has(kc)) {
+    if (u9PxL2wT.has(kc) && kc === g2BindTbl.ej) {
       const kh = new KeyboardEvent("keydown", {
         code: mt.code,
         key: mt.key,
@@ -6124,6 +7299,17 @@
         t2QnL9wP = e.clientX;
         b8VmK3xT = e.clientY;
         k9ChkCurUi(e);
+        if (w3DragSel && (e.buttons & 1) === 0) {
+          w3DragSel = false;
+          w3DragCvs = false;
+          for (let i = 0; i < w3PeDragGrp.length; i++)
+            w3PeDragGrp[i].classList.remove("macro-pe-txt");
+          w3PeDragGrp = [];
+        }
+        if (hSt2xK9m && hSt2xK9m.kind === "mouse" && document.hasFocus()) {
+          const msk = [1, 4, 2, 8, 16][hSt2xK9m.button] || 1;
+          if ((e.buttons & msk) === 0) hCl2xK9m();
+        }
       }
     },
     { capture: true, passive: true },
@@ -6149,7 +7335,13 @@
     const dt = ev.data;
     if (!dt || dt.senderId === v8WpM2tL) return;
     if (dt.senderId && dt.type !== "MB_BYE") {
-      v5PeerMap.set(dt.senderId, performance.now());
+      const prev = v5PeerMap.get(dt.senderId);
+      v5PeerMap.set(dt.senderId, {
+        ts: performance.now(),
+        role: dt.role !== undefined ? dt.role : prev ? prev.role : "menu",
+        srv: dt.srv !== undefined ? dt.srv : prev ? prev.srv : "",
+      });
+      if (!prev && b6BpSt.scanning) b6SentPlr.clear();
     }
     if (dt.type === "MB_PING") {
       b6BpSt.enableGraceUntil = 0;
@@ -6157,18 +7349,19 @@
         q5RzL9wK.postMessage({
           type: "MB_PONG",
           senderId: v8WpM2tL,
+          role: b6BpSt.curRole,
+          srv: b6SrvKey(),
         });
       } catch (_) {}
       return;
     }
-    if (dt.type === "MB_PONG") {
+    if (dt.type === "MB_PONG" || dt.type === "MB_ROLE") {
       b6BpSt.enableGraceUntil = 0;
       return;
     }
     if (dt.type === "MB_BYE") {
       v5PeerMap.delete(dt.senderId);
       b6BpSt.enableGraceUntil = 0;
-      b6CheckPeerAlive(performance.now());
       return;
     }
     if (dt.type === "MACRO_FULL_CFG_SYNC") {
@@ -6176,10 +7369,14 @@
       return;
     }
     if (dt.type === "BYPASS_WORLD_RESET") {
+      if (b6SrvKey(dt.srv) && b6SrvKey() && b6SrvKey(dt.srv) !== b6SrvKey())
+        return;
       b6ResetWorld(false);
       return;
     }
     if (dt.type === "BYPASS_SCOUT_CLAIM") {
+      if (b6SrvKey(dt.srv) && b6SrvKey() && b6SrvKey(dt.srv) !== b6SrvKey())
+        return;
       if (dt.oid) {
         b6Claims.set(dt.oid, {
           cx: dt.cx || 0,
@@ -6190,6 +7387,8 @@
       return;
     }
     if (dt.type === "BYPASS_MAIN_AOI") {
+      if (b6SrvKey(dt.srv) && b6SrvKey() && b6SrvKey(dt.srv) !== b6SrvKey())
+        return;
       const nw = performance.now();
       if (Array.isArray(dt.aoi) && dt.aoi.length === 4) {
         b6BpSt.mainAoi = {
@@ -6220,11 +7419,15 @@
       return;
     }
     if (dt.type === "BYPASS_FRAME") {
+      const nwF = performance.now();
+      if (b6SrvKey(dt.srv) && b6SrvKey() && b6SrvKey(dt.srv) !== b6SrvKey())
+        return;
       if (
-        (!m9TvL2sP.bypassEnabled &&
-          !m9TvL2sP.bypassPhantoms &&
-          !m9TvL2sP.bypassRadar) ||
         b6BpSt.scanning ||
+        b6BpSt.specEntered ||
+        b6BpSt.curRole === "spec" ||
+        b6PeerSpecCount(nwF, false) !== 1 ||
+        (!m9TvL2sP.bypassPhantoms && !m9TvL2sP.bypassRadar) ||
         Date.now() - dt.ts > 950
       )
         return;
@@ -6345,9 +7548,11 @@
     }
   };
 
-  setInterval(v5PingPeers, 1000);
-  window.addEventListener("focus", v5PingPeers, { passive: true });
-  document.addEventListener("visibilitychange", v5PingPeers, { passive: true });
+  setInterval(() => v5PingPeers(false), 1000);
+  window.addEventListener("focus", () => v5PingPeers(false), { passive: true });
+  document.addEventListener("visibilitychange", () => v5PingPeers(false), {
+    passive: true,
+  });
   const f4ByePeer = () => {
     try {
       q5RzL9wK.postMessage({ type: "MB_BYE", senderId: v8WpM2tL });
@@ -6404,7 +7609,7 @@
         tg &&
         tg.closest &&
         tg.closest(
-          "#macro-window, #macro-toggle-pill, #chat-container, #chat-panel, .chat-panel, button, a, select, #main-panel, #login-panel, #party-panel",
+          "#macro-window, #macro-toggle-pill, #macro-bypass-map, #chat-container, #chat-panel, .chat-panel, button, a, select, #main-panel, #login-panel, #party-panel",
         )
       )
         return;
@@ -6522,18 +7727,6 @@
           87;
         w5EjDisp(sentKc, isDown);
       }
-      if (typeof hEv2xK9m === "function") {
-        hEv2xK9m(
-          hSt2xK9m,
-          isDown
-            ? hSt2xK9m.kind === "key"
-              ? "keydown"
-              : "mousedown"
-            : hSt2xK9m.kind === "key"
-              ? "keyup"
-              : "mouseup",
-        );
-      }
     }
     if (m4EjPhys.down && g2BindTbl.ej > 0 && g2BindTbl.ej !== sentKc) {
       w5EjDisp(g2BindTbl.ej, isDown);
@@ -6585,17 +7778,13 @@
         return;
       }
       if (!h4HasPeerTab() && m4IsMbOn() && g2BindTbl.sw > 0) {
-        const curId = g5ReadPid();
+        const curId = g5ReadBestIdStr();
         const swDelta = (m9MbSt.swSeq - startSw) & 1;
-        const pidSwitched = Boolean(
-          startId &&
-          startId !== "0" &&
-          curId &&
-          curId !== "0" &&
-          curId !== startId &&
-          m9MbSt.swSeq !== startSw,
+        const haveIds = Boolean(
+          startId && startId !== "0" && curId && curId !== "0",
         );
-        if (swDelta === 1 || pidSwitched) {
+        const needSwitch = haveIds ? curId !== startId : swDelta === 1;
+        if (needSwitch) {
           if (k4MbBusy && tries < 16) {
             d2TinyWait(15, () => runSecond(tries + 1));
             return;
@@ -6608,39 +7797,44 @@
             m4SendEj(false);
           }
           w5PzR8tM(g2BindTbl.sw, 1);
-          w3WaitPidFlip(curId, hudHid ? 35 : 45, () => {
-            if (m9MbSt.matchGen !== runGen) {
-              k4FeedLock = false;
-              w5SetMbBusy(false);
-              if (onDone) onDone();
-              return;
-            }
-            if (Boolean(hSt2xK9m) || m4EjPhys.down) {
-              k4FeedLock = true;
-              m4SendEj(false);
-            }
-            s7PzR(5);
-            const backFrom = g5ReadPid();
-            d2TinyWait(25, () => {
+          w3WaitPidFlip(
+            curId,
+            hudHid ? 35 : 45,
+            () => {
               if (m9MbSt.matchGen !== runGen) {
                 k4FeedLock = false;
                 w5SetMbBusy(false);
                 if (onDone) onDone();
                 return;
               }
-              w5PzR8tM(g2BindTbl.sw, 1);
-              w3WaitPidFlip(backFrom, hudHid ? 35 : 45, () => {
-                k4FeedLock = false;
-                w5SetMbBusy(false);
-                if (
-                  m9MbSt.matchGen === runGen &&
-                  (Boolean(hSt2xK9m) || m4EjPhys.down)
-                )
-                  m4SendEj(true);
-                if (onDone) onDone();
+              if (Boolean(hSt2xK9m) || m4EjPhys.down) {
+                k4FeedLock = true;
+                m4SendEj(false);
+              }
+              s7PzR(5);
+              const backFrom = g5ReadBestIdStr();
+              d2TinyWait(25, () => {
+                if (m9MbSt.matchGen !== runGen) {
+                  k4FeedLock = false;
+                  w5SetMbBusy(false);
+                  if (onDone) onDone();
+                  return;
+                }
+                w5PzR8tM(g2BindTbl.sw, 1);
+                w3WaitPidFlip(backFrom, hudHid ? 35 : 45, () => {
+                  k4FeedLock = false;
+                  w5SetMbBusy(false);
+                  if (
+                    m9MbSt.matchGen === runGen &&
+                    (Boolean(hSt2xK9m) || m4EjPhys.down)
+                  )
+                    m4SendEj(true);
+                  if (onDone) onDone();
+                });
               });
-            });
-          });
+            },
+            startId && startId !== "0" ? startId : undefined,
+          );
           return;
         }
       }
@@ -6655,7 +7849,7 @@
 
   function k4MbFastFeed(delayMs, onDone) {
     const mbInit = !h4HasPeerTab() && m4IsMbOn();
-    const startId = mbInit ? g5ReadPid() : "";
+    const startId = mbInit ? g5ReadBestIdStr() : "";
     const startSw = m9MbSt.swSeq;
     const runGen = m9MbSt.matchGen;
     s7PzR(5);
@@ -6721,6 +7915,11 @@
       k4FfCancel(true);
       return;
     }
+    if (!v4FfAuto.splitConfirmed && v4FfAuto.pingEst < 300) {
+      if (v4FfAuto.clrLock) k4FfCancel(true);
+      else k4FfStopAutoOnly();
+      return;
+    }
     const minGap = w4FfMinGap(v4FfAuto.initOid, v4FfAuto.targetCid);
     const dynReach = Math.max(nFfSurgeReach, v4FfAuto.preMaxR * 0.72 + 250);
     if (Number.isFinite(minGap) && minGap <= dynReach) {
@@ -6736,11 +7935,7 @@
     const selfOid = w4GetCurSelfOid();
     if (!tWs || !selfOid || tWs.oid === selfOid) return;
 
-    const px = w4ReadFfLocked();
-    if (px && tWs.r > 0 && px.model && px.model.G > 0) {
-      const raw = px.model.G / tWs.r;
-      v4FfRadMul = Math.abs(raw - 1) < 0.12 ? 1 : raw;
-    }
+    v4FfRadMul = 1;
 
     const preCids = new Set();
     let preMaxR = 0;
@@ -6752,7 +7947,7 @@
     }
 
     const mbInit = !h4HasPeerTab() && m4IsMbOn();
-    const startId = mbInit ? g5ReadPid() : "";
+    const startId = mbInit ? g5ReadBestIdStr() : "";
     const startSw = m9MbSt.swSeq;
     const runGen = m9MbSt.matchGen;
     const hudPing = g5ReadPingMs();
@@ -6780,6 +7975,7 @@
       targetCid: v4FfLock.cellId,
       targetOid: v4FfLock.ownerId,
       t0: performance.now(),
+      pingEst,
       splitConfirmed: false,
       waitReach: false,
       preMaxR,
@@ -6805,7 +8001,15 @@
     }
     const runGen = m9MbSt.matchGen;
     const hudHid = m4HudHidden();
-    const allowNoAck = hudHid || Boolean(m9MbSt.box2Id) || g5ReadPingMs() >= 45;
+    const ping = g5ReadPingMs();
+    const w1Ms =
+      ping > 0
+        ? Math.max(hudHid ? 45 : 65, Math.min(110, Math.round(ping + 30)))
+        : hudHid
+          ? 45
+          : 75;
+    const allowNoAck =
+      hudHid || Boolean(m9MbSt.box2Id) || v4SelfOids.size >= 2 || ping >= 45;
     w5SetMbBusy(true);
     u2SyncPidState();
     const stId = m9MbSt.activeId;
@@ -6815,7 +8019,7 @@
       m4SendEj(false);
     }
     w5PzR8tM(g2BindTbl.sw, 1);
-    w3WaitPidFlip(stId, hudHid ? 35 : 45, (ok1, curId) => {
+    w3WaitPidFlip(stId, w1Ms, (ok1, curId) => {
       m9MbSt.lastTrace =
         "st=" + stId + " cur=" + curId + " ok1=" + ok1 + " sw=" + g2BindTbl.sw;
       if (
@@ -6842,13 +8046,18 @@
           return;
         }
         w5PzR8tM(g2BindTbl.sw, 1);
-        w3WaitPidFlip(curId, hudHid ? 35 : 45, () => {
-          k4FeedLock = false;
-          w5SetMbBusy(false);
-          if (m9MbSt.matchGen !== runGen) return;
-          if (Boolean(hSt2xK9m) || m4EjPhys.down) m4SendEj(true);
-          s7PzR(spCnt);
-        });
+        w3WaitPidFlip(
+          curId,
+          hudHid ? 35 : 45,
+          () => {
+            k4FeedLock = false;
+            w5SetMbBusy(false);
+            if (m9MbSt.matchGen !== runGen) return;
+            if (Boolean(hSt2xK9m) || m4EjPhys.down) m4SendEj(true);
+            s7PzR(spCnt);
+          },
+          stId && stId !== "0" ? stId : undefined,
+        );
       });
       n7KwQ2vL(m9TvL2sP.soloDelay, () => {
         function runStep2(tries) {
@@ -6867,8 +8076,21 @@
           if (!nowId || nowId === "0") return;
           if (nowId === stId) {
             const hudHid2 = m4HudHidden();
+            const ping2 = g5ReadPingMs();
+            const w2Ms =
+              ping2 > 0
+                ? Math.max(
+                    hudHid2 ? 45 : 65,
+                    Math.min(110, Math.round(ping2 + 30)),
+                  )
+                : hudHid2
+                  ? 45
+                  : 75;
             const allowNoAck2 =
-              hudHid2 || Boolean(m9MbSt.box2Id) || g5ReadPingMs() >= 45;
+              hudHid2 ||
+              Boolean(m9MbSt.box2Id) ||
+              v4SelfOids.size >= 2 ||
+              ping2 >= 45;
             const hadFeed2 = Boolean(hSt2xK9m) || m4EjPhys.down;
             w5SetMbBusy(true);
             if (hadFeed2) {
@@ -6876,7 +8098,7 @@
               m4SendEj(false);
             }
             w5PzR8tM(g2BindTbl.sw, 1);
-            w3WaitPidFlip(nowId, hudHid2 ? 35 : 45, (ok2) => {
+            w3WaitPidFlip(nowId, w2Ms, (ok2) => {
               if (m9MbSt.matchGen !== runGen || (!ok2 && !allowNoAck2)) {
                 k4FeedLock = false;
                 w5SetMbBusy(false);
@@ -6892,7 +8114,7 @@
                 m4SendEj(false);
               }
               s7PzR(5);
-              const b2Id = g5ReadPid();
+              const b2Id = g5ReadBestIdStr();
               d2TinyWait(25, () => {
                 if (m9MbSt.matchGen !== runGen) {
                   k4FeedLock = false;
@@ -6900,15 +8122,20 @@
                   return;
                 }
                 w5PzR8tM(g2BindTbl.sw, 1);
-                w3WaitPidFlip(b2Id, hudHid2 ? 35 : 45, () => {
-                  k4FeedLock = false;
-                  w5SetMbBusy(false);
-                  if (
-                    m9MbSt.matchGen === runGen &&
-                    (Boolean(hSt2xK9m) || m4EjPhys.down)
-                  )
-                    m4SendEj(true);
-                });
+                w3WaitPidFlip(
+                  b2Id,
+                  hudHid2 ? 35 : 45,
+                  () => {
+                    k4FeedLock = false;
+                    w5SetMbBusy(false);
+                    if (
+                      m9MbSt.matchGen === runGen &&
+                      (Boolean(hSt2xK9m) || m4EjPhys.down)
+                    )
+                      m4SendEj(true);
+                  },
+                  nowId && nowId !== "0" ? nowId : undefined,
+                );
               });
             });
           } else if (nowId !== stId) {
@@ -6975,7 +8202,9 @@
         const tg = e.target;
         const btn =
           tg && tg.closest
-            ? tg.closest("#btn-play, #btn-spec, #btn-leave-match, button")
+            ? tg.closest(
+                "#btn-play, #btn-spec, #btn-leave-match, button, [role='button'], .gota-btn, a",
+              )
             : null;
         if (!btn) return;
         const bid = btn.id || "";
@@ -7002,6 +8231,7 @@
         if (isSpec) {
           p2LxQ8vM();
           b6BpSt.specEntered = true;
+          b6BpSt.specAt = performance.now();
           b6BpSt.wasAlive = false;
           b6BpSt.lastPlayAt = 0;
           v4ActOid = 0;
@@ -7009,11 +8239,14 @@
           if (v4MyOid) v4SelfOids.add(v4MyOid);
           b6UpdateRole(performance.now());
         } else if (isPlay) {
-          b6BpSt.specEntered = false;
-          b6BpSt.wasAlive = true;
-          b6BpSt.lastPlayAt = performance.now();
-          b6ScanStop();
-          b6UpdateRole(performance.now());
+          if (e.type === "click") {
+            b6BpSt.specEntered = false;
+            b6BpSt.specAt = 0;
+            b6BpSt.wasAlive = true;
+            b6BpSt.lastPlayAt = performance.now();
+            b6ScanStop();
+            b6UpdateRole(performance.now());
+          }
         } else {
           b6BpSt.specEntered = false;
           b6BpSt.wasAlive = false;
@@ -7043,6 +8276,7 @@
               k4FfCancel(false);
             }
             b6BpSt.specEntered = false;
+            b6BpSt.specAt = 0;
             b6BpSt.wasAlive = true;
             b6BpSt.lastPlayAt = performance.now();
             b6ScanStop();
@@ -7062,6 +8296,21 @@
         } catch (_) {}
       }
     });
+
+    if (s3SrvAddr.size === 0 && v4OrigFetch) {
+      setTimeout(() => {
+        if (s3SrvAddr.size === 0) {
+          v4OrigFetch("https://accounts.gota.io/api/v2/utilities/servers")
+            .then((r) => (r && r.ok ? r.json() : null))
+            .then((d) => {
+              if (d) s3LoadJson(d);
+            })
+            .catch(() => {});
+        }
+      }, 900);
+    }
+    setInterval(s3ScanDomSrv, 1000);
+    s3ScanDomSrv();
   }
 
   let k6XpL1vQ = 1.0,
@@ -7093,18 +8342,20 @@
         (c.clientWidth || c.width) >= 300 &&
         (c.clientHeight || c.height) >= 200,
       );
+    const byId = document.getElementById("canvas");
+    if (r4CvOk(byId)) {
+      cachedGameCanvas = byId;
+      return byId;
+    }
     if (
       cachedGameCanvas &&
       cachedGameCanvas.isConnected &&
       r4CvOk(cachedGameCanvas)
     )
       return cachedGameCanvas;
-    const byId = document.getElementById("canvas");
-    if (r4CvOk(byId)) {
-      cachedGameCanvas = byId;
-      return byId;
-    }
     const list = document.querySelectorAll("canvas");
+    let best = null,
+      bestArea = 0;
     for (let i = 0; i < list.length; i++) {
       const c = list[i];
       if (
@@ -7114,13 +8365,22 @@
         c.id === "macro-grid-canvas" ||
         c.id === "macro-curline-canvas" ||
         c.id === "macro-bypass-field" ||
-        c.id === "macro-bypass-radar"
+        c.id === "macro-bypass-radar" ||
+        c.id === "minimap-canvas" ||
+        c.id === "leaderboard-canvas" ||
+        c.id === "party-canvas"
       )
         continue;
-      if (r4CvOk(c)) {
-        cachedGameCanvas = c;
-        return c;
+      if (!r4CvOk(c)) continue;
+      const area = (c.clientWidth || c.width) * (c.clientHeight || c.height);
+      if (area > bestArea) {
+        bestArea = area;
+        best = c;
       }
+    }
+    if (best) {
+      cachedGameCanvas = best;
+      return best;
     }
     return null;
   }
@@ -7171,8 +8431,6 @@
       v4WsLock = {
         cellId: t.cellId,
         ownerId: t.oid,
-        model: t.model,
-        node: t.node,
       };
       j2VnL8sT = false;
       x5QzL2wT.active = true;
@@ -7291,7 +8549,7 @@
     if (!raw || typeof raw !== "string")
       return "700 20px/20px Ubuntu,sans-serif";
     let s = raw.replace(
-      /(\d+(?:\.\d+)?)px(?:\s*\/\s*[\d.]+(?:px|em|%)?)?/i,
+      /(\d+(?:\.\d+)?)(?:px|pt|em|rem|%)(?:\s*\/\s*[\d.]+(?:px|pt|em|rem|%)?)?/i,
       "20px/20px",
     );
     if (!/20px\/20px/.test(s)) s = "700 20px/20px " + s;
@@ -7307,6 +8565,11 @@
     if (w3WCache.size > 600) w3WCache.clear();
     w3WCache.set(k, w);
     return w;
+  }
+
+  function w3IsNodeSelected(el) {
+    const sel = window.getSelection();
+    return Boolean(sel && !sel.isCollapsed && sel.containsNode(el, true));
   }
 
   function w3RecTxt(ctx, rawTxt, x, y, maxW, isStrk) {
@@ -7566,13 +8829,7 @@
       sl.vis = true;
     }
     if (sl.txt !== it.t) {
-      const sel = window.getSelection();
-      if (!(
-        w3DragSel &&
-        sel &&
-        !sel.isCollapsed &&
-        sel.containsNode(el, true)
-      )) {
+      if (!w3IsNodeSelected(el)) {
         el.textContent = it.t;
         sl.txt = it.t;
       }
@@ -7672,18 +8929,12 @@
       w3UpdSlot(sl, it);
     }
 
-    const sel = window.getSelection();
     let k = 0;
     for (let i = 0; i < lr.slots.length; i++) {
       const sl = lr.slots[i];
       if (sl.st === st) {
         lr.slots[k++] = sl;
-      } else if (
-        w3DragSel &&
-        sel &&
-        !sel.isCollapsed &&
-        sel.containsNode(sl.el, true)
-      ) {
+      } else if (w3IsNodeSelected(sl.el)) {
         lr.slots[k++] = sl;
       } else {
         sl.el.style.display = "none";
@@ -8228,8 +9479,7 @@
       }
     }
     if (w3PeHovered && w3PeHovered !== found) {
-      const sel = window.getSelection();
-      if (!(sel && !sel.isCollapsed && sel.containsNode(w3PeHovered, true))) {
+      if (!w3IsNodeSelected(w3PeHovered)) {
         w3PeHovered.classList.remove("macro-pe-txt");
       }
       w3PeHovered = null;
@@ -8294,309 +9544,10 @@
     }
   }
 
-  const n5SoftCache = new Map();
-  const g7SoftTint = new WeakMap();
-  const g7SoftSet = new Set();
-  const g7SoftGfx = new WeakMap();
-  const g7SoftGfxSet = new Set();
-  const g7SoftPrt = new WeakMap();
-  const g7SoftPrtSet = new Set();
-
-  let p9GlSoftAct = false;
-
-  function n5SoftNum(col) {
-    if (typeof col !== "number" || !Number.isFinite(col)) return col;
-    const ci = col & 0xffffff;
-    if (ci === 0 || ci === 0xffffff) return ci;
-    const hit = n5SoftCache.get(ci);
-    if (hit !== undefined) return hit;
-    const rn = ((ci >> 16) & 255) / 255;
-    const gn = ((ci >> 8) & 255) / 255;
-    const bn = (ci & 255) / 255;
-    const mx = Math.max(rn, gn, bn);
-    const mn = Math.min(rn, gn, bn);
-    const d = mx - mn;
-    const l = (mx + mn) * 0.5;
-    const sV = mx > 0 ? d / mx : 0;
-    const sL = d > 0 ? d / (1 - Math.abs(2 * l - 1)) : 0;
-    let out = ci;
-    if (
-      d >= 0.14 &&
-      (sV >= 0.2 || sL >= 0.22) &&
-      !(mx > 0.9 && mn > 0.78) &&
-      mx >= 0.63 &&
-      l >= 0.34
-    ) {
-      const ns = sV * 0.54;
-      const nv = mx + (1 - mx) * 0.35;
-      const nr = Math.max(
-        0,
-        Math.min(255, Math.round((1 - ns + ns * ((rn - mn) / d)) * nv * 255)),
-      );
-      const ng = Math.max(
-        0,
-        Math.min(255, Math.round((1 - ns + ns * ((gn - mn) / d)) * nv * 255)),
-      );
-      const nb = Math.max(
-        0,
-        Math.min(255, Math.round((1 - ns + ns * ((bn - mn) / d)) * nv * 255)),
-      );
-      out = (nr << 16) | (ng << 8) | nb;
-    }
-    if (n5SoftCache.size > 1024) n5SoftCache.clear();
-    n5SoftCache.set(ci, out);
-    return out;
-  }
-
-  function k2ReadTint(nd) {
-    const t = nd.tint;
-    if (typeof t === "number") return t & 0xffffff;
-    if (t && typeof t.toNumber === "function") return t.toNumber() & 0xffffff;
-    return -1;
-  }
-
   function k2IsBorder(nd) {
     if (!nd || typeof nd.getLocalBounds !== "function") return false;
     const b = m7Box(nd.getLocalBounds());
     return Boolean(b && (b.w >= 3800 || b.h >= 3800));
-  }
-
-  function k2SoftStyle(st, owner, kind) {
-    if (!st || typeof st.color !== "number") return false;
-    const cc = st.color & 0xffffff;
-    let rec = g7SoftGfx.get(st);
-    if (!rec) {
-      const sc = n5SoftNum(cc);
-      if (sc !== cc) {
-        rec = { raw: cc, soft: sc, owner, kind };
-        g7SoftGfx.set(st, rec);
-        g7SoftGfxSet.add(st);
-        st.color = sc;
-        return true;
-      }
-      return false;
-    }
-    if (cc !== rec.soft) {
-      rec.raw = cc;
-      rec.soft = n5SoftNum(cc);
-    }
-    if (rec.soft !== cc) {
-      st.color = rec.soft;
-      return true;
-    }
-    return false;
-  }
-
-  function k2SoftNode(nd) {
-    const tc = k2ReadTint(nd);
-    if (tc >= 0) {
-      let rec = g7SoftTint.get(nd);
-      if (!rec) {
-        const sc = n5SoftNum(tc);
-        if (sc !== tc) {
-          rec = { raw: tc, soft: sc };
-          g7SoftTint.set(nd, rec);
-          g7SoftSet.add(nd);
-          nd.tint = sc;
-        }
-      } else {
-        if (tc !== rec.soft) {
-          rec.raw = tc;
-          rec.soft = n5SoftNum(tc);
-        }
-        if (rec.soft !== tc) nd.tint = rec.soft;
-      }
-    }
-    if (
-      nd.context &&
-      Array.isArray(nd.context.instructions) &&
-      !k2IsBorder(nd)
-    ) {
-      const ins = nd.context.instructions;
-      let chg = false;
-      for (let i = 0; i < ins.length; i++) {
-        const it = ins[i];
-        if (
-          it &&
-          (it.action === "fill" || it.action === "stroke") &&
-          it.data &&
-          it.data.style
-        ) {
-          if (k2SoftStyle(it.data.style, nd.context, 1)) chg = true;
-        }
-      }
-      if (chg && typeof nd.context.onUpdate === "function")
-        nd.context.onUpdate();
-    } else if (
-      nd.geometry &&
-      Array.isArray(nd.geometry.graphicsData) &&
-      !k2IsBorder(nd)
-    ) {
-      const gd = nd.geometry.graphicsData;
-      let chg = false;
-      for (let i = 0; i < gd.length; i++) {
-        const g = gd[i];
-        if (!g) continue;
-        if (g.fillStyle && k2SoftStyle(g.fillStyle, nd.geometry, 2)) chg = true;
-        if (g.lineStyle && k2SoftStyle(g.lineStyle, nd.geometry, 2)) chg = true;
-      }
-      if (chg && typeof nd.geometry.invalidate === "function")
-        nd.geometry.invalidate();
-    }
-  }
-
-  function k2SoftWalk(nd, dp) {
-    if (
-      !nd ||
-      nd.destroyed ||
-      nd.visible === false ||
-      nd.isMask ||
-      typeof nd.text === "string"
-    )
-      return;
-    if (dp > 3) return;
-    if (nd.isParticleContainer && Array.isArray(nd.particleChildren)) {
-      const ps = nd.particleChildren;
-      for (let i = 0; i < ps.length; i++) {
-        const p = ps[i];
-        if (!p || typeof p.color !== "number") continue;
-        const pc = p.color & 0xffffff;
-        const pa = p.color & 0xff000000;
-        let rec = g7SoftPrt.get(p);
-        if (!rec) {
-          const sc = n5SoftNum(pc);
-          if (sc !== pc) {
-            rec = { raw: pc, soft: sc };
-            g7SoftPrt.set(p, rec);
-            g7SoftPrtSet.add(p);
-            p.color = (pa | sc) >>> 0;
-          }
-        } else {
-          if (pc !== rec.soft) {
-            rec.raw = pc;
-            rec.soft = n5SoftNum(pc);
-          }
-          if (rec.soft !== pc) p.color = (pa | rec.soft) >>> 0;
-        }
-      }
-      return;
-    }
-    k2SoftNode(nd);
-    const ch = nd.children;
-    if (ch && ch.length) {
-      for (let i = 0; i < ch.length; i++) k2SoftWalk(ch[i], dp + 1);
-    }
-  }
-
-  function k2SoftFrame(wld) {
-    if (!m9TvL2sP.softColors || p9GlSoftAct) {
-      if (g7SoftSet.size || g7SoftGfxSet.size || g7SoftPrtSet.size) j2RstSoft();
-      return;
-    }
-    if (!wld || !wld.children) return;
-    let cam = wld;
-    const wt = wld.worldTransform;
-    if (
-      wt &&
-      Math.abs(wt.a - 1) < 1e-4 &&
-      Math.abs(wt.d - 1) < 1e-4 &&
-      Math.abs(wt.tx) < 0.5 &&
-      Math.abs(wt.ty) < 0.5
-    ) {
-      for (let i = 0; i < wld.children.length; i++) {
-        const c = wld.children[i];
-        const cwt = c && c.worldTransform;
-        if (
-          c &&
-          c.children &&
-          c.children.length &&
-          cwt &&
-          cwt.a > 0.002 &&
-          cwt.a < 25 &&
-          (Math.abs(cwt.a - 1) > 1e-4 ||
-            Math.abs(cwt.tx) > 0.5 ||
-            Math.abs(cwt.ty) > 0.5)
-        ) {
-          cam = c;
-          break;
-        }
-      }
-    }
-    const ch = cam.children;
-    if (!ch || !ch.length) return;
-    for (let i = 0; i < ch.length; i++) {
-      const c = ch[i];
-      if (
-        !c ||
-        c.destroyed ||
-        c.visible === false ||
-        typeof c.text === "string"
-      )
-        continue;
-      if (c.isParticleContainer) {
-        k2SoftWalk(c, 0);
-        continue;
-      }
-      const sub = c.children;
-      if (sub && sub.length) {
-        if (
-          sub.length <= 16 &&
-          !sub.some((k) => k && k.children && k.children.length > 0) &&
-          k2IsBorder(c)
-        )
-          continue;
-        for (let j = 0; j < sub.length; j++) k2SoftWalk(sub[j], 0);
-      } else if (!k2IsBorder(c)) {
-        k2SoftWalk(c, 0);
-      }
-    }
-  }
-
-  function j2RstSoft() {
-    g7SoftSet.forEach((nd) => {
-      const rec = g7SoftTint.get(nd);
-      if (rec && nd && !nd.destroyed && k2ReadTint(nd) === rec.soft) {
-        nd.tint = rec.raw;
-      }
-      g7SoftTint.delete(nd);
-    });
-    g7SoftSet.clear();
-
-    const upd = new Set();
-    g7SoftGfxSet.forEach((st) => {
-      const rec = g7SoftGfx.get(st);
-      if (
-        rec &&
-        typeof st.color === "number" &&
-        (st.color & 0xffffff) === rec.soft
-      ) {
-        st.color = rec.raw;
-        if (rec.owner) upd.add(rec);
-      }
-      g7SoftGfx.delete(st);
-    });
-    g7SoftGfxSet.clear();
-    upd.forEach((r) => {
-      try {
-        if (r.kind === 1 && typeof r.owner.onUpdate === "function")
-          r.owner.onUpdate();
-        else if (r.kind === 2 && typeof r.owner.invalidate === "function")
-          r.owner.invalidate();
-      } catch (_) {}
-    });
-
-    g7SoftPrtSet.forEach((p) => {
-      const rec = g7SoftPrt.get(p);
-      if (
-        rec &&
-        typeof p.color === "number" &&
-        (p.color & 0xffffff) === rec.soft
-      ) {
-        p.color = ((p.color & 0xff000000) | rec.raw) >>> 0;
-      }
-      g7SoftPrt.delete(p);
-    });
-    g7SoftPrtSet.clear();
   }
 
   const c9LmW2xR = new Set();
@@ -8622,7 +9573,6 @@
       }
     }
     if (!wld) return;
-    k2SoftFrame(wld);
     if (m9TvL2sP.stripFilters) {
       if (wld.filters && wld.filters.length > 0) wld.filters = null;
       if (st.filters && st.filters.length > 0) st.filters = null;
@@ -8666,23 +9616,24 @@
       }
     }
     if (!cam.children) return;
-    let cc = null,
-      mx = 0;
+    const containers = [];
+    const activeParents = new Set();
     for (let i = 0; i < cam.children.length; i++) {
-      const c = cam.children[i],
-        n = c.children ? c.children.length : 0;
-      if (n > mx) {
-        mx = n;
-        cc = c;
-      }
+      const c = cam.children[i];
+      if (!c || c.destroyed || !c.children || !c.children.length) continue;
+      if (
+        c.children.length <= 16 &&
+        !c.children.some((k) => k && k.children && k.children.length > 0) &&
+        k2IsBorder(c)
+      )
+        continue;
+      containers.push(c);
+      activeParents.add(c);
     }
-    if (!cc || !cc.children) return;
-    if (m9TvL2sP.stripFilters && cc.filters && cc.filters.length > 0)
-      cc.filters = null;
-    const cl = cc.children;
+    if (!containers.length) return;
     if (c9LmW2xR.size > 0) {
       c9LmW2xR.forEach((c) => {
-        if (!c || c.destroyed || c.parent !== cc) {
+        if (!c || c.destroyed || !activeParents.has(c.parent)) {
           if (c && !c.destroyed) c.renderable = true;
           c9LmW2xR.delete(c);
         }
@@ -8695,21 +9646,28 @@
       mxX = sw + mg,
       mnY = -mg,
       mxY = sh + mg;
-    for (let i = 0; i < cl.length; i++) {
-      const c = cl[i];
-      if (!c || c.destroyed) continue;
-      if (!c.renderable && !c9LmW2xR.has(c)) continue;
-      const b = c.getBounds ? m7Box(c.getBounds()) : null;
-      if (!b) continue;
-      const out = b.x + b.w < mnX || b.x > mxX || b.y + b.h < mnY || b.y > mxY;
-      if (out) {
-        if (c.renderable) {
-          c.renderable = false;
-          c9LmW2xR.add(c);
+    for (let k = 0; k < containers.length; k++) {
+      const cc = containers[k];
+      if (m9TvL2sP.stripFilters && cc.filters && cc.filters.length > 0)
+        cc.filters = null;
+      const cl = cc.children;
+      for (let i = 0; i < cl.length; i++) {
+        const c = cl[i];
+        if (!c || c.destroyed) continue;
+        if (!c.renderable && !c9LmW2xR.has(c)) continue;
+        const b = c.getBounds ? m7Box(c.getBounds()) : null;
+        if (!b) continue;
+        const out =
+          b.x + b.w < mnX || b.x > mxX || b.y + b.h < mnY || b.y > mxY;
+        if (out) {
+          if (c.renderable) {
+            c.renderable = false;
+            c9LmW2xR.add(c);
+          }
+        } else if (c9LmW2xR.has(c)) {
+          c.renderable = true;
+          c9LmW2xR.delete(c);
         }
-      } else if (c9LmW2xR.has(c)) {
-        c.renderable = true;
-        c9LmW2xR.delete(c);
       }
     }
   }
@@ -8730,55 +9688,94 @@
 
   function m7SyncPixi(st, scn, rnd) {
     if (!st || !st.children || !st.children.length) return;
-    let wld = st.children[0];
-    if (
-      wld &&
-      (!wld.children || !wld.children.length) &&
-      st.children.length > 1
-    ) {
-      for (let i = 1; i < st.children.length; i++) {
-        if (
-          st.children[i] &&
-          st.children[i].children &&
-          st.children[i].children.length
-        ) {
-          wld = st.children[i];
-          break;
+    const sw = scn && scn.width ? scn.width : window.innerWidth;
+    const sh = scn && scn.height ? scn.height : window.innerHeight;
+    const nw = performance.now();
+    const wsCam = v4WsCam.init
+      ? { x: v4WsCam.x, y: v4WsCam.y, z: v4WsCam.z }
+      : b6BpSt.camAt > 0 && nw - b6BpSt.camAt < 2000
+        ? { x: b6BpSt.camX, y: b6BpSt.camY, z: b6BpSt.camZoom }
+        : null;
+    const sf = !wsCam && !b6BpSt.specEntered ? p9SelfCtr() : null;
+    let cam = null,
+      wt = null,
+      bestSc = -Infinity;
+
+    function scanCam(nd, dp) {
+      if (
+        !nd ||
+        nd.destroyed ||
+        nd.visible === false ||
+        nd.renderable === false ||
+        nd.isParticleContainer ||
+        typeof nd.text === "string"
+      )
+        return;
+      const cwt = nd.worldTransform;
+      const chN = nd.children ? nd.children.length : 0;
+      if (
+        chN > 0 &&
+        cwt &&
+        Number.isFinite(cwt.a) &&
+        Number.isFinite(cwt.d) &&
+        Number.isFinite(cwt.tx) &&
+        Number.isFinite(cwt.ty) &&
+        cwt.a > 0.002 &&
+        cwt.a < 25 &&
+        Math.abs(cwt.a - cwt.d) <= cwt.a * 0.03 &&
+        Math.abs(cwt.b) <= 1e-3 &&
+        Math.abs(cwt.c) <= 1e-3
+      ) {
+        const isId =
+          Math.abs(cwt.a - 1) < 1e-4 &&
+          Math.abs(cwt.tx) < 0.5 &&
+          Math.abs(cwt.ty) < 0.5;
+        let valid = true;
+        let sc =
+          Math.min(chN, 20) * 12 +
+          (dp === 1 ? 8000 : dp === 2 ? 4000 : 0) +
+          (!isId ? 50000 : 0) +
+          (Math.abs(cwt.a - 1) > 1e-3 ? 20000 : 0);
+        if (wsCam) {
+          if (
+            isId &&
+            Math.hypot(wsCam.x - sw * 0.5, wsCam.y - sh * 0.5) > 250
+          ) {
+            valid = false;
+          } else {
+            const px = cwt.a * wsCam.x + cwt.c * wsCam.y + cwt.tx;
+            const py = cwt.b * wsCam.x + cwt.d * wsCam.y + cwt.ty;
+            const cErr = Math.hypot(px - sw * 0.5, py - sh * 0.5);
+            if (cErr > Math.max(sw, sh) * 0.85) valid = false;
+            const expSc = wsCam.z * Math.max(sw / 1920, sh / 1080);
+            sc -=
+              cErr * 8 +
+              Math.abs(
+                Math.log(Math.max(1e-4, cwt.a / Math.max(1e-4, expSc))),
+              ) *
+                1200;
+          }
+        } else {
+          if (isId && (p9PixiOn || sf || v4WsCells.size > 0)) valid = false;
+          if (sf) {
+            const px = cwt.a * sf.x + cwt.c * sf.y + cwt.tx;
+            const py = cwt.b * sf.x + cwt.d * sf.y + cwt.ty;
+            sc -= Math.hypot(px - sw * 0.5, py - sh * 0.5) * 4;
+          }
         }
-      }
-    }
-    if (!wld) return;
-    let cam = wld,
-      wt = wld.worldTransform;
-    if (
-      wt &&
-      Math.abs(wt.a - 1) < 1e-4 &&
-      Math.abs(wt.d - 1) < 1e-4 &&
-      Math.abs(wt.tx) < 0.5 &&
-      Math.abs(wt.ty) < 0.5 &&
-      wld.children
-    ) {
-      for (let i = 0; i < wld.children.length; i++) {
-        const c = wld.children[i];
-        const cwt = c && c.worldTransform;
-        if (
-          c &&
-          c.children &&
-          c.children.length &&
-          cwt &&
-          cwt.a > 0.002 &&
-          cwt.a < 25 &&
-          (Math.abs(cwt.a - 1) > 1e-4 ||
-            Math.abs(cwt.tx) > 0.5 ||
-            Math.abs(cwt.ty) > 0.5)
-        ) {
-          cam = c;
+        if (valid && sc > bestSc) {
+          bestSc = sc;
+          cam = nd;
           wt = cwt;
-          break;
         }
       }
+      if (dp < 4 && chN > 0) {
+        for (let i = 0; i < chN; i++) scanCam(nd.children[i], dp + 1);
+      }
     }
-    if (!wt || !Number.isFinite(wt.a) || wt.a <= 1e-4) return;
+
+    scanCam(st, 0);
+    if (!wt || !cam) return;
     p9WtA = wt.a;
     p9WtB = wt.b;
     p9WtC = wt.c;
@@ -8791,9 +9788,10 @@
     if (p9CvRef && !p9CvRef.hasAttribute("data-macro-game-bg"))
       p9CvRef.setAttribute("data-macro-game-bg", "1");
     p9PixiOn = true;
-    p9LastPixiMs = performance.now();
+    p9LastPixiMs = nw;
 
     if (
+      !p9MapWsSet &&
       ((m9TvL2sP.mapBgEnabled && q8MwP) || m9TvL2sP.mapGridEnabled) &&
       cam.children
     ) {
@@ -9052,17 +10050,42 @@
         const rnWr = function (op) {
           r7DpK4vM++;
           const isRoot = r7DpK4vM === 1;
-          const st = isRoot
+          const opt1 = arguments.length > 1 ? arguments[1] : null;
+          const rt =
+            op && op.container !== undefined
+              ? op.target
+              : opt1 && typeof opt1 === "object"
+                ? opt1.renderTexture !== undefined
+                  ? opt1.renderTexture
+                  : opt1.baseTexture ||
+                      opt1.framebuffer ||
+                      opt1.source ||
+                      opt1.isRenderTexture
+                    ? opt1
+                    : null
+                : null;
+          const rndCv =
+            this.canvas ||
+            (this.view && this.view.tagName === "CANVAS"
+              ? this.view
+              : this.view && this.view.canvas) ||
+            null;
+          const mainCv = t8VwM4xK();
+          const isMainScr =
+            isRoot &&
+            (!rt || rt === rndCv || rt === this.view) &&
+            (!mainCv || !rndCv || rndCv === mainCv);
+          const st = isMainScr
             ? op && (op.container || op.target)
               ? op.container || op.target
               : op
             : null;
-          if (isRoot) {
+          if (isMainScr) {
             p9RndRef = this;
             p9ApplyRes(this);
           }
           if (
-            isRoot &&
+            isMainScr &&
             this.background &&
             typeof this.background.alpha === "number"
           ) {
@@ -9092,10 +10115,11 @@
             }
           }
           try {
-            if (isRoot && st && st.children) u5KnP8sT(st, this.screen);
+            if (isMainScr && st && st.children) u5KnP8sT(st, this.screen);
             const res = ro.apply(this, arguments);
-            if (isRoot && st && st.children) m7SyncPixi(st, this.screen, this);
-            if (isRoot && st && v9TxtOn()) w3PixiScan(st, this.screen, this);
+            if (isMainScr && st && st.children)
+              m7SyncPixi(st, this.screen, this);
+            if (isMainScr && st && v9TxtOn()) w3PixiScan(st, this.screen, this);
             return res;
           } finally {
             r7DpK4vM--;
@@ -9113,9 +10137,24 @@
     const og = pt.uniformMatrix4fv;
     pt.uniformMatrix4fv = function (lc, tr, dt) {
       if (dt && dt.length >= 16) {
-        const cv = cachedGameCanvas || t8VwM4xK();
-        if (cv && cv.width > 0 && this.canvas === cv) {
+        const cv = t8VwM4xK();
+        if (
+          cv &&
+          cv.width > 0 &&
+          this.canvas === cv &&
+          glScreenFbo.get(this) !== false
+        ) {
           f4NzQ8vR++;
+          if (
+            dt[0] > 0 &&
+            dt[0] < 0.02 &&
+            dt[5] < 0 &&
+            Math.abs(dt[12] + 1) < 0.02 &&
+            Math.abs(dt[13] - 1) < 0.02
+          ) {
+            p9ProjW = 2 / dt[0];
+            p9ProjH = -2 / dt[5];
+          }
           const m0 = Math.abs(dt[0]),
             m5 = Math.abs(dt[5]);
           if (
@@ -9140,21 +10179,14 @@
     };
   };
 
-  const uLocMap = new WeakMap();
-
-  const h6LocHook = (pt) => {
-    if (!pt || !pt.getUniformLocation) return;
-    const og = pt.getUniformLocation;
-    pt.getUniformLocation = function (pr, nm) {
-      const loc = og.apply(this, arguments);
-      if (
-        loc &&
-        typeof nm === "string" &&
-        /proj|tex|uv|color|sampler|filter/i.test(nm)
-      ) {
-        uLocMap.set(loc, 2);
+  const n4GlFbo = (pt) => {
+    if (!pt || !pt.bindFramebuffer) return;
+    const ogBf = pt.bindFramebuffer;
+    pt.bindFramebuffer = function (tgt, fb) {
+      if (tgt === 0x8d40 || tgt === 0x8ca9) {
+        glScreenFbo.set(this, fb === null);
       }
-      return loc;
+      return ogBf.apply(this, arguments);
     };
   };
 
@@ -9163,8 +10195,13 @@
     const og = pt.uniformMatrix3fv;
     pt.uniformMatrix3fv = function (lc, tr, dt) {
       if (dt && dt.length >= 9) {
-        const cv = cachedGameCanvas || t8VwM4xK();
-        if (cv && cv.width > 0 && this.canvas === cv) {
+        const cv = t8VwM4xK();
+        if (
+          cv &&
+          cv.width > 0 &&
+          this.canvas === cv &&
+          glScreenFbo.get(this) !== false
+        ) {
           f4NzQ8vR++;
           p9PushCamCand(
             "gl",
@@ -9200,188 +10237,6 @@
     };
   };
 
-  const glShType = new WeakMap();
-  const glOrigSrc = new WeakMap();
-  const glPatchedSh = new WeakSet();
-  const glCurProg = new WeakMap();
-  const glSoftLoc = new WeakMap();
-  const glSoftVal = new WeakMap();
-
-  const k2GlslFn = `
-uniform float _uMSoft;
-vec4 _mSoft(vec4 raw) {
-  if (_uMSoft < 0.5 || raw.a <= 0.001) return raw;
-  float rMx = max(raw.r, max(raw.g, raw.b));
-  float pre = (rMx <= raw.a + 0.004 && raw.a < 0.999) ? 1.0 : 0.0;
-  vec3 c = pre > 0.5 ? clamp(raw.rgb / raw.a, 0.0, 1.0) : clamp(raw.rgb, 0.0, 1.0);
-  float mx = max(c.r, max(c.g, c.b));
-  float mn = min(c.r, min(c.g, c.b));
-  float d = mx - mn;
-  float l = (mx + mn) * 0.5;
-  float sV = mx > 0.0001 ? d / mx : 0.0;
-  float sL = (d > 0.0001 && l > 0.0001 && l < 0.9999) ? d / (1.0 - abs(2.0 * l - 1.0)) : 0.0;
-  if (d < 0.14 || (sV < 0.20 && sL < 0.22) || (mx > 0.90 && mn > 0.78) || mx < 0.63 || l < 0.34) return raw;
-  float ns = sV * 0.54;
-  float nv = mx + (1.0 - mx) * 0.35;
-  vec3 nh = (c - vec3(mn)) / d;
-  vec3 sc = mix(vec3(1.0), nh, ns) * nv;
-  return vec4(pre > 0.5 ? sc * raw.a : sc, raw.a);
-}
-`;
-
-  function k2PatchFrag(src) {
-    if (typeof src !== "string" || src.includes("_mSoft")) return null;
-    const mMain = src.match(/\bvoid\s+main\s*\(\s*(?:void\s*)?\)\s*\{/);
-    if (!mMain) return null;
-    const is300 = /^\s*#version\s+300\s+es\b/m.test(src);
-    if (is300) {
-      const mOut = src.match(
-        /(?:layout\s*\([^)]*\)\s*)?\bout\s+(?:(?:highp|mediump|lowp)\s+)?vec4\s+([A-Za-z_]\w*)\s*;/,
-      );
-      if (!mOut) return null;
-      const outN = mOut[1];
-      const idx = mMain.index;
-      const head = src.slice(0, idx);
-      const tail = src.slice(idx).replace(/\bmain\b/, "_mOrigMain");
-      return (
-        head +
-        k2GlslFn +
-        tail +
-        `\nvoid main(){_mOrigMain();${outN}=_mSoft(${outN});}`
-      );
-    }
-    if (!/\bgl_FragColor\b/.test(src) || /\bgl_FragData\b/.test(src))
-      return null;
-    const idx = mMain.index;
-    const head = src.slice(0, idx).replace(/\bgl_FragColor\b/g, "_mFc0");
-    const tail = src
-      .slice(idx)
-      .replace(/\bmain\b/, "_mOrigMain")
-      .replace(/\bgl_FragColor\b/g, "_mFc0");
-    return (
-      head +
-      "\nvec4 _mFc0 = vec4(0.0);\n" +
-      k2GlslFn +
-      tail +
-      "\nvoid main(){_mOrigMain();gl_FragColor=_mSoft(_mFc0);}"
-    );
-  }
-
-  function k2SyncGlSoft(gl) {
-    if (gl.canvas !== (cachedGameCanvas || t8VwM4xK())) return;
-    f4NzQ8vR++;
-    const prog = glCurProg.get(gl);
-    if (!prog) return;
-    const loc = glSoftLoc.get(prog);
-    if (!loc) return;
-    p9GlSoftAct = true;
-    const want = m9TvL2sP.softColors ? 1 : 0;
-    if (glSoftVal.get(prog) !== want) {
-      glSoftVal.set(prog, want);
-      gl.uniform1f(loc, want);
-    }
-  }
-
-  const k2HookGlSoft = (pt) => {
-    if (!pt || pt.__mGlSoft) return;
-    pt.__mGlSoft = true;
-    const ogCrSh = pt.createShader;
-    const ogShSrc = pt.shaderSource;
-    const ogComp = pt.compileShader;
-    const ogUse = pt.useProgram;
-    const ogLink = pt.linkProgram;
-    const ogUnifLoc = pt.getUniformLocation;
-    const ogExt = pt.getExtension;
-
-    if (ogCrSh) {
-      pt.createShader = function (tp) {
-        const sh = ogCrSh.apply(this, arguments);
-        if (sh && tp === 0x8b30) glShType.set(sh, 1);
-        return sh;
-      };
-    }
-    if (ogShSrc) {
-      pt.shaderSource = function (sh, src) {
-        const isFrag =
-          glShType.has(sh) ||
-          (typeof src === "string" &&
-            !/\bgl_Position\b/.test(src) &&
-            (/\bgl_FragColor\b/.test(src) ||
-              /\bout\s+(?:(?:highp|mediump|lowp)\s+)?vec4\b/.test(src)));
-        if (isFrag && typeof src === "string") {
-          const p = k2PatchFrag(src);
-          if (p) {
-            glOrigSrc.set(sh, src);
-            glPatchedSh.add(sh);
-            return ogShSrc.call(this, sh, p);
-          }
-        }
-        glPatchedSh.delete(sh);
-        return ogShSrc.apply(this, arguments);
-      };
-    }
-    if (ogComp) {
-      pt.compileShader = function (sh) {
-        ogComp.apply(this, arguments);
-        if (
-          glPatchedSh.has(sh) &&
-          !this.getShaderParameter(sh, 0x8b81) &&
-          ogShSrc
-        ) {
-          const orig = glOrigSrc.get(sh);
-          glPatchedSh.delete(sh);
-          if (orig) {
-            ogShSrc.call(this, sh, orig);
-            ogComp.call(this, sh);
-          }
-        }
-      };
-    }
-    if (ogUse) {
-      pt.useProgram = function (prog) {
-        glCurProg.set(this, prog || null);
-        return ogUse.apply(this, arguments);
-      };
-    }
-    if (ogLink) {
-      pt.linkProgram = function (prog) {
-        ogLink.apply(this, arguments);
-        if (prog && this.getProgramParameter(prog, 0x8b82) && ogUnifLoc) {
-          const loc = ogUnifLoc.call(this, prog, "_uMSoft");
-          if (loc) {
-            glSoftLoc.set(prog, loc);
-            glSoftVal.set(prog, -1);
-          }
-        }
-      };
-    }
-    if (ogExt) {
-      pt.getExtension = function (nm) {
-        const ext = ogExt.apply(this, arguments);
-        if (
-          ext &&
-          typeof nm === "string" &&
-          nm === "ANGLE_instanced_arrays" &&
-          !ext.__mGlInst
-        ) {
-          ext.__mGlInst = true;
-          const glRef = this;
-          ["drawArraysInstancedANGLE", "drawElementsInstancedANGLE"].forEach(
-            (fn) => {
-              if (!ext[fn]) return;
-              const ogF = ext[fn];
-              ext[fn] = function () {
-                k2SyncGlSoft(glRef);
-                return ogF.apply(this, arguments);
-              };
-            },
-          );
-        }
-        return ext;
-      };
-    }
-  };
-
   const n4GlDrw = (pt) => {
     if (!pt) return;
     [
@@ -9393,36 +10248,36 @@ vec4 _mSoft(vec4 raw) {
       if (!pt[fn]) return;
       const og = pt[fn];
       pt[fn] = function () {
-        k2SyncGlSoft(this);
+        if (
+          this.canvas === (cachedGameCanvas || t8VwM4xK()) &&
+          glScreenFbo.get(this) !== false
+        )
+          f4NzQ8vR++;
         return og.apply(this, arguments);
       };
     });
   };
 
-  k2HookGlSoft(WebGLRenderingContext.prototype);
-  h6LocHook(WebGLRenderingContext.prototype);
+  n4GlFbo(WebGLRenderingContext.prototype);
+
   p5QzL9sT(WebGLRenderingContext.prototype);
   y2TvN7wM(WebGLRenderingContext.prototype);
   n4GlDrw(WebGLRenderingContext.prototype);
   if (typeof WebGL2RenderingContext !== "undefined") {
-    k2HookGlSoft(WebGL2RenderingContext.prototype);
-    h6LocHook(WebGL2RenderingContext.prototype);
+    n4GlFbo(WebGL2RenderingContext.prototype);
+
     p5QzL9sT(WebGL2RenderingContext.prototype);
     y2TvN7wM(WebGL2RenderingContext.prototype);
     n4GlDrw(WebGL2RenderingContext.prototype);
   }
 
-  const w7PxM3tL = CanvasRenderingContext2D.prototype.setTransform;
   ["setTransform", "scale", "translate"].forEach((fn) => {
     const og = CanvasRenderingContext2D.prototype[fn];
     if (!og) return;
     CanvasRenderingContext2D.prototype[fn] = function () {
       const res = og.apply(this, arguments);
       const cv = this.canvas;
-      if (
-        cv &&
-        (cv.id === "canvas" || cv === (cachedGameCanvas || t8VwM4xK()))
-      ) {
+      if (cv && (cv.id === "canvas" || cv === t8VwM4xK())) {
         const m = this.getTransform();
         if (fn === "setTransform") {
           const s = Math.hypot(m.a, m.b);
@@ -9466,13 +10321,6 @@ vec4 _mSoft(vec4 raw) {
         if (pz > 0.002 && pz < 50.0) return pz;
       }
     }
-    if (
-      p9C2On &&
-      p9C2A > 0.002 &&
-      p9C2A < 50.0 &&
-      (!p9PixiOn || nw - p9LastPixiMs > 500)
-    )
-      return p9C2A;
     return r3WnS8mT && Math.abs(k6XpL1vQ - r3WnS8mT) > 1e-5
       ? k6XpL1vQ / r3WnS8mT
       : m8QzV2tL;
@@ -10419,6 +11267,13 @@ vec4 _mSoft(vec4 raw) {
     v4StepInterp(nw);
     if (v9TxtOn()) w3TickTxt();
     b6RenderFrame();
+    if (p9CamCands.length > 0) {
+      const gCv0 = p9CvRef || p9C2Cv || b6GameCanvas();
+      if (gCv0) {
+        const r0 = gCv0.getBoundingClientRect();
+        if (r0 && r0.width > 0) p9PickCamCand(gCv0, r0, nw, true);
+      }
+    }
     if ((!r8QnS4mT || nw - w2VpL9xK > 40) && !b5TxM1wP) {
       b5TxM1wP = true;
       try {
@@ -10711,8 +11566,6 @@ vec4 _mSoft(vec4 raw) {
         v4FfLock = {
           cellId: t.cellId,
           ownerId: t.oid,
-          model: t.model,
-          node: t.node,
         };
         v4FfVis.active = true;
         v4FfVis.cx = t.cx;
@@ -10732,8 +11585,6 @@ vec4 _mSoft(vec4 raw) {
             v4FfLock = {
               cellId: t.cellId,
               ownerId: t.oid,
-              model: t.model,
-              node: t.node,
             };
             v4FfVis.active = true;
             v4FfVis.cx = t.cx;
@@ -12148,7 +12999,7 @@ vec4 _mSoft(vec4 raw) {
     if (tCa) tCa.checked = Boolean(m9TvL2sP.cursorArrow);
     const tSc2 = document.getElementById("macro-toggle-softcol");
     if (tSc2) tSc2.checked = Boolean(m9TvL2sP.softColors);
-    if (!m9TvL2sP.softColors) j2RstSoft();
+
     const tGr = document.getElementById("macro-toggle-map-grid");
     const cGr = document.getElementById("macro-grid-cur");
     const pGr = document.getElementById("macro-grid-pop");
@@ -12354,87 +13205,6 @@ vec4 _mSoft(vec4 raw) {
     return p4FillOg.apply(this, arguments);
   };
 
-  function k2SoftCss(sv) {
-    if (typeof sv !== "string") return null;
-    const s = sv.trim();
-    let num = -1;
-    let a = 1;
-    if (s[0] === "#") {
-      if (s.length === 4) {
-        const r = parseInt(s[1] + s[1], 16);
-        const g = parseInt(s[2] + s[2], 16);
-        const b = parseInt(s[3] + s[3], 16);
-        if (!isNaN(r + g + b)) num = (r << 16) | (g << 8) | b;
-      } else if (s.length === 7) {
-        const v = parseInt(s.slice(1), 16);
-        if (!isNaN(v)) num = v & 0xffffff;
-      }
-    } else if (s.startsWith("rgb")) {
-      const m = s.match(
-        /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\s*\)$/i,
-      );
-      if (m) {
-        if (m[4] !== undefined) a = parseFloat(m[4]);
-        if (a >= 0.85) {
-          const r = Math.max(0, Math.min(255, parseInt(m[1], 10)));
-          const g = Math.max(0, Math.min(255, parseInt(m[2], 10)));
-          const b = Math.max(0, Math.min(255, parseInt(m[3], 10)));
-          num = (r << 16) | (g << 8) | b;
-        }
-      }
-    }
-    if (num < 0) return null;
-    const sn = n5SoftNum(num);
-    if (sn === num) return null;
-    return a < 1
-      ? `rgba(${(sn >> 16) & 255},${(sn >> 8) & 255},${sn & 255},${a})`
-      : "#" + sn.toString(16).padStart(6, "0");
-  }
-
-  const p4C2Fill = CanvasRenderingContext2D.prototype.fill;
-  CanvasRenderingContext2D.prototype.fill = function () {
-    if (
-      m9TvL2sP.softColors &&
-      (!p9PixiOn || performance.now() - p9LastPixiMs > 500) &&
-      this.canvas &&
-      this.canvas === (cachedGameCanvas || t8VwM4xK())
-    ) {
-      const og = this.fillStyle;
-      const sc = k2SoftCss(og);
-      if (sc) {
-        this.fillStyle = sc;
-        try {
-          return p4C2Fill.apply(this, arguments);
-        } finally {
-          this.fillStyle = og;
-        }
-      }
-    }
-    return p4C2Fill.apply(this, arguments);
-  };
-
-  const p4C2Strk = CanvasRenderingContext2D.prototype.stroke;
-  CanvasRenderingContext2D.prototype.stroke = function () {
-    if (
-      m9TvL2sP.softColors &&
-      (!p9PixiOn || performance.now() - p9LastPixiMs > 500) &&
-      this.canvas &&
-      this.canvas === (cachedGameCanvas || t8VwM4xK())
-    ) {
-      const og = this.strokeStyle;
-      const sc = k2SoftCss(og);
-      if (sc) {
-        this.strokeStyle = sc;
-        try {
-          return p4C2Strk.apply(this, arguments);
-        } finally {
-          this.strokeStyle = og;
-        }
-      }
-    }
-    return p4C2Strk.apply(this, arguments);
-  };
-
   if (typeof OffscreenCanvasRenderingContext2D !== "undefined") {
     const o4Ft = OffscreenCanvasRenderingContext2D.prototype.fillText;
     OffscreenCanvasRenderingContext2D.prototype.fillText = function (
@@ -12550,7 +13320,11 @@ vec4 _mSoft(vec4 raw) {
         .filter(Boolean);
       if (pl.length) sel = pl[(Math.random() * pl.length) | 0];
     } else {
-      let pl = z4QzM8vL;
+      let pl = b6BpSt.lb.length
+        ? b6BpSt.lb
+            .map((x) => (x && x.nick ? x.nick.trim() : ""))
+            .filter(Boolean)
+        : z4QzM8vL;
       if (!pl.length) {
         const p = document.getElementById("leaderboard-panel");
         if (p && p.innerText)
@@ -12619,9 +13393,9 @@ vec4 _mSoft(vec4 raw) {
       .macro-info-icon{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;width:1.4em;height:1.4em;padding:0;border-radius:50%;background:var(--macro-btn-bg,#282828);border:1px solid var(--macro-btn-border,#555);color:var(--macro-title-color,#fff);font-size:1em;cursor:help;line-height:0;transition:color 0.28s ease,border-color 0.2s ease}
       .macro-info-icon svg{width:1.22em !important;height:1.22em !important;display:block !important;fill:currentColor !important;stroke:none !important;border:none !important;background:transparent !important;box-shadow:none !important;pointer-events:none}
       .macro-info-tooltip{position:absolute;bottom:calc(100% + 0.65em);right:0;width:21em;max-width:calc(100vw - 24px);background:rgba(14,14,14,0.98);border:1px solid #484848;border-radius:0.5em;padding:0.75em 0.9em;color:#e0e0e0;font-size:0.88em;line-height:1.4;text-transform:none;letter-spacing:0;font-weight:500;pointer-events:none;opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity 0.18s ease,transform 0.18s ease,visibility 0s linear 0.18s;box-shadow:0 8px 24px rgba(0,0,0,0.85);z-index:100000}
+      .macro-info-tooltip.tip-down{bottom:auto;top:calc(100% + 0.65em);transform:translateY(-4px)}
       .macro-info-wrap:hover .macro-info-tooltip{opacity:1;visibility:visible;transform:translateY(0);transition:opacity 0.18s ease,transform 0.18s ease,visibility 0s linear 0s}
       .macro-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.7em;font-size:1em;gap:0.8em;transition:color 0.28s ease}
-
       .macro-controls-group{display:flex;align-items:center;gap:0.6em}
       .macro-slider-track{width:7.5em;height:0.85em;background:var(--macro-btn-bg-sub,#141414);border:1px solid var(--macro-btn-border,#2d2d2d);border-radius:0.45em;position:relative;cursor:pointer;overflow:hidden}
       .macro-icon-btn{background:var(--macro-btn-bg,#242424);border:1px solid var(--macro-btn-border,#383838);color:var(--macro-btn-text,#eee);border-radius:0.35em;padding:0.35em 0.5em;font-size:1em;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:0;transition:background 0.12s,border-color 0.12s,color 0.28s ease}
@@ -12733,15 +13507,15 @@ vec4 _mSoft(vec4 raw) {
       .macro-rev-mtd-lbl{font-size:1em;font-weight:500;color:var(--macro-muted-text,#9aa0a6);text-transform:none;letter-spacing:0;white-space:nowrap;transition:color 0.28s ease}
       .macro-section-header .macro-pos-btn{width:auto;min-width:0;font-size:0.95em;padding:0.26em 0.52em;text-transform:none;letter-spacing:0;white-space:nowrap}
       #macro-revmtd-pop,#macro-ffmtd-pop,#macro-solofocus-pop{width:max-content;min-width:7.2em;max-width:13.5em}
-            .macro-win-body.macro-pal-dim .macro-section-header.macro-pal-active{opacity:1;pointer-events:auto;position:relative;z-index:49}
-            .macro-win-body.macro-pal-dim .macro-section-header.macro-pal-active>span{color:var(--macro-title-color,#fff);text-shadow:var(--macro-pal-glow,0 0 8px rgba(255,255,255,0.28))}
+      .macro-win-body.macro-pal-dim .macro-section-header.macro-pal-active{opacity:1;pointer-events:auto;position:relative;z-index:49}
+      .macro-win-body.macro-pal-dim .macro-section-header.macro-pal-active>span{color:var(--macro-title-color,#fff);text-shadow:var(--macro-pal-glow,0 0 8px rgba(255,255,255,0.28))}
       .macro-pos-btn{display:inline-flex;align-items:center;justify-content:space-between;gap:0.35em;width:6.2em;box-sizing:border-box;background:var(--macro-btn-bg,#242424);border:1px solid var(--macro-btn-border,#383838);color:var(--macro-btn-text,#eee);border-radius:0.35em;padding:0.36em 0.55em;font-family:inherit;font-size:0.9em;font-weight:600;cursor:pointer;transition:border-color 0.16s,filter 0.14s,color 0.28s ease}
       .macro-pos-btn:hover{filter:brightness(1.14)}
       .macro-pos-btn.open{border-color:var(--macro-accent-muted,rgba(255,255,255,0.48))}
       .macro-pos-btn .macro-lang-chev{width:0.9em;height:0.9em}
       #macro-xhair-btn{width:auto;min-width:6.2em;max-width:9.2em}
-            #macro-grid-btn{width:auto;min-width:6.2em;max-width:9.8em}
-            #macro-xhair-pop,#macro-grid-pop{width:max-content;min-width:6.2em;max-width:13.5em}
+      #macro-grid-btn{width:auto;min-width:6.2em;max-width:9.8em}
+      #macro-xhair-pop,#macro-grid-pop{width:max-content;min-width:6.2em;max-width:13.5em}
       .macro-pos-pop{display:none;position:absolute;left:auto;top:auto;box-sizing:border-box;padding:0.22em;background:var(--macro-lang-bg,rgba(24,24,24,0.98));border:1px solid var(--macro-border,#2e2e2e);border-radius:0.5em;box-shadow:0 14px 36px rgba(0,0,0,0.88);z-index:52;opacity:0;visibility:hidden;pointer-events:none;transform-origin:top center;transform:scale(0.95) translateY(-4px);transition:opacity 0.18s cubic-bezier(0.22,1,0.36,1),transform 0.2s cubic-bezier(0.22,1,0.36,1),visibility 0s linear 0.2s}
       .macro-pos-pop.drop-up{transform-origin:bottom center;transform:scale(0.95) translateY(4px)}
       #macro-window.open:not(.settings-open) .macro-pos-pop.open{opacity:1;visibility:visible;pointer-events:auto;transform:scale(1) translateY(0);transition:opacity 0.18s cubic-bezier(0.22,1,0.36,1),transform 0.2s cubic-bezier(0.22,1,0.36,1),visibility 0s linear 0s}
@@ -12769,7 +13543,6 @@ vec4 _mSoft(vec4 raw) {
       #macro-window input::selection,#macro-window textarea::selection{background:var(--macro-sel-bg,rgba(56,152,236,0.48));color:var(--macro-sel-fg,#ffffff)}
       body.macro-txt-sel-on *:not(#macro-window):not(#macro-window *):not(#macro-toggle-pill):not(#macro-bypass-map):not(#macro-bypass-map *):not(#autorev-overlay):not(#macro-bg-canvas):not(#macro-grid-canvas):not(#macro-curline-canvas):not(canvas):not(input[type="range"]):not(input[type="checkbox"]):not(input[type="radio"]):not(input[type="color"]):not(.macro-txt-layer){user-select:text !important;-webkit-user-select:text !important}
       body.macro-txt-sel-on *:not(#macro-window):not(#macro-window *):not(#macro-toggle-pill):not(#macro-bypass-map):not(#macro-bypass-map *):not(#autorev-overlay):not(#macro-bg-canvas):not(#macro-grid-canvas):not(#macro-curline-canvas):not(canvas):not(button):not(a):not(select):not(input):not(textarea):not(.macro-txt-layer){cursor:auto}
-
       body.macro-txt-sel-on .macro-pe-txt{pointer-events:auto !important;cursor:text !important}
       .macro-txt-layer{position:fixed;left:0;top:0;width:0;height:0;pointer-events:none !important;overflow:hidden;margin:0;padding:0;border:0;user-select:none !important;-webkit-user-select:none !important}
       .macro-cvs-txt{position:absolute;left:0;top:0;margin:0;padding:0;border:0;white-space:pre;display:block;width:max-content;transform-origin:0 0;color:transparent !important;background:transparent !important;font-family:'Ubuntu',sans-serif,Arial;font-size:20px;font-weight:700;line-height:20px;height:20px;user-select:text !important;-webkit-user-select:text !important;pointer-events:auto !important;cursor:text !important;box-sizing:border-box}
@@ -12939,10 +13712,10 @@ vec4 _mSoft(vec4 raw) {
         ${mkR(y4WpS9vT)}
         <div class="macro-sep"></div>
         <div class="macro-section-header" id="macro-hdr-rev">
-                  <span data-i18n="secRev">${k3Tr("secRev")}</span>
-                  <div class="macro-rev-hdr-r">
-                    <span class="macro-rev-mtd-lbl" data-i18n="revMtd">${k3Tr("revMtd")}</span>
-                    <button type="button" class="macro-pos-btn" id="macro-revmtd-btn">
+          <span data-i18n="secRev">${k3Tr("secRev")}</span>
+          <div class="macro-rev-hdr-r">
+            <span class="macro-rev-mtd-lbl" data-i18n="revMtd">${k3Tr("revMtd")}</span>
+            <button type="button" class="macro-pos-btn" id="macro-revmtd-btn">
               <span class="macro-lang-cur" id="macro-revmtd-cur">${m9TvL2sP.revMethod === "pixi" ? "Pixi" : "WebSocket"}</span>
               <svg class="macro-lang-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
             </button>
@@ -13022,18 +13795,18 @@ vec4 _mSoft(vec4 raw) {
         <div class="macro-sep"></div>
         <div class="macro-section-header"><span data-i18n="secBg">${k3Tr("secBg")}</span></div>
         <div class="macro-row" id="macro-row-map-grid">
-                  <span data-i18n="mapGrid">${k3Tr("mapGrid")}</span>
-                  <div class="macro-controls-group">
-                    <button type="button" class="macro-pos-btn" id="macro-grid-btn">
-                      <span class="macro-lang-cur" id="macro-grid-cur">${k3Tr(m9TvL2sP.mapGridMode === "over" ? "gridOver" : "gridBg")}</span>
-                      <svg class="macro-lang-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
-                    </button>
-                    <label class="macro-switch">
-                      <input type="checkbox" id="macro-toggle-map-grid">
-                      <span class="macro-switch-slider"></span>
-                    </label>
-                  </div>
-                </div>
+          <span data-i18n="mapGrid">${k3Tr("mapGrid")}</span>
+          <div class="macro-controls-group">
+            <button type="button" class="macro-pos-btn" id="macro-grid-btn">
+              <span class="macro-lang-cur" id="macro-grid-cur">${k3Tr(m9TvL2sP.mapGridMode === "over" ? "gridOver" : "gridBg")}</span>
+              <svg class="macro-lang-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <label class="macro-switch">
+              <input type="checkbox" id="macro-toggle-map-grid">
+              <span class="macro-switch-slider"></span>
+            </label>
+          </div>
+        </div>
         <div class="macro-row" id="macro-row-map-bg">
           <span data-i18n="mapBg">${k3Tr("mapBg")}</span>
           <div class="macro-btn-group">
@@ -13211,23 +13984,23 @@ vec4 _mSoft(vec4 raw) {
           </div>
         </div>
         <div class="macro-pos-pop" id="macro-xhair-pop">
-                  <div class="macro-lang-list">
-                    <button type="button" class="macro-pos-opt${m9TvL2sP.crosshairStyle !== "cross" ? " active" : ""}" data-xhair="plus"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="xhPlus">${k3Tr("xhPlus")}</span></button>
-                    <button type="button" class="macro-pos-opt${m9TvL2sP.crosshairStyle === "cross" ? " active" : ""}" data-xhair="cross"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="xhCross">${k3Tr("xhCross")}</span></button>
-                  </div>
-                </div>
-                <div class="macro-pos-pop" id="macro-grid-pop">
-                  <div class="macro-lang-list">
-                    <button type="button" class="macro-pos-opt${m9TvL2sP.mapGridMode !== "over" ? " active" : ""}" data-grid="bg"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="gridBg">${k3Tr("gridBg")}</span></button>
-                    <button type="button" class="macro-pos-opt${m9TvL2sP.mapGridMode === "over" ? " active" : ""}" data-grid="over"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="gridOver">${k3Tr("gridOver")}</span></button>
-                  </div>
-                </div>
-                <div class="macro-pos-pop" id="macro-ffmtd-pop">
-                          <div class="macro-lang-list">
-                            <button type="button" class="macro-pos-opt${m9TvL2sP.ffMethod !== "auto" ? " active" : ""}" data-ffmtd="manual"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="ffMan">${k3Tr("ffMan")}</span></button>
-                            <button type="button" class="macro-pos-opt${m9TvL2sP.ffMethod === "auto" ? " active" : ""}" data-ffmtd="auto"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="ffAuto">${k3Tr("ffAuto")}</span></button>
-                          </div>
-                        </div>
+          <div class="macro-lang-list">
+            <button type="button" class="macro-pos-opt${m9TvL2sP.crosshairStyle !== "cross" ? " active" : ""}" data-xhair="plus"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="xhPlus">${k3Tr("xhPlus")}</span></button>
+            <button type="button" class="macro-pos-opt${m9TvL2sP.crosshairStyle === "cross" ? " active" : ""}" data-xhair="cross"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="xhCross">${k3Tr("xhCross")}</span></button>
+          </div>
+        </div>
+        <div class="macro-pos-pop" id="macro-grid-pop">
+          <div class="macro-lang-list">
+            <button type="button" class="macro-pos-opt${m9TvL2sP.mapGridMode !== "over" ? " active" : ""}" data-grid="bg"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="gridBg">${k3Tr("gridBg")}</span></button>
+            <button type="button" class="macro-pos-opt${m9TvL2sP.mapGridMode === "over" ? " active" : ""}" data-grid="over"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="gridOver">${k3Tr("gridOver")}</span></button>
+          </div>
+        </div>
+        <div class="macro-pos-pop" id="macro-ffmtd-pop">
+          <div class="macro-lang-list">
+            <button type="button" class="macro-pos-opt${m9TvL2sP.ffMethod !== "auto" ? " active" : ""}" data-ffmtd="manual"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="ffMan">${k3Tr("ffMan")}</span></button>
+            <button type="button" class="macro-pos-opt${m9TvL2sP.ffMethod === "auto" ? " active" : ""}" data-ffmtd="auto"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="ffAuto">${k3Tr("ffAuto")}</span></button>
+          </div>
+        </div>
         <div class="macro-pos-pop" id="macro-solofocus-pop">
           <div class="macro-lang-list">
             <button type="button" class="macro-pos-opt${m9TvL2sP.soloFocus !== "window" ? " active" : ""}" data-solofocus="multibox"><span class="macro-lang-bar"></span><span class="macro-lang-name" data-i18n="sfMb">${k3Tr("sfMb")}</span></button>
@@ -13266,12 +14039,12 @@ vec4 _mSoft(vec4 raw) {
             </label>
           </div>
           <div class="macro-row">
-                      <span data-i18n="pillTr">${k3Tr("pillTr")}</span>
-                      <label class="macro-switch">
-                        <input type="checkbox" id="macro-toggle-pill-trans">
-                        <span class="macro-switch-slider"></span>
-                      </label>
-                    </div>
+            <span data-i18n="pillTr">${k3Tr("pillTr")}</span>
+            <label class="macro-switch">
+              <input type="checkbox" id="macro-toggle-pill-trans">
+              <span class="macro-switch-slider"></span>
+            </label>
+          </div>
           <div class="macro-sep"></div>
           <div class="macro-section-header"><span data-i18n="secCol">${k3Tr("secCol")}</span></div>
           <div class="macro-row">
@@ -13296,12 +14069,12 @@ vec4 _mSoft(vec4 raw) {
               </button>
           </div>
           <div class="macro-sep"></div>
-                    <div class="macro-section-header"><span data-i18n="secCfg">${k3Tr("secCfg")}</span></div>
-                    <textarea class="macro-textarea macro-cfg-json" id="macro-cfg-json" spellcheck="false" data-i18n-ph="cfgPh" placeholder="${k3Tr("cfgPh")}"></textarea>
-                    <div class="macro-cfg-btns">
-                      <button type="button" class="macro-cfg-btn" id="macro-btn-cfg-copy" data-i18n="cfgCopy">${k3Tr("cfgCopy")}</button>
-                      <button type="button" class="macro-cfg-btn" id="macro-btn-cfg-apply" data-i18n="cfgApply">${k3Tr("cfgApply")}</button>
-                    </div>
+          <div class="macro-section-header"><span data-i18n="secCfg">${k3Tr("secCfg")}</span></div>
+          <textarea class="macro-textarea macro-cfg-json" id="macro-cfg-json" spellcheck="false" data-i18n-ph="cfgPh" placeholder="${k3Tr("cfgPh")}"></textarea>
+          <div class="macro-cfg-btns">
+            <button type="button" class="macro-cfg-btn" id="macro-btn-cfg-copy" data-i18n="cfgCopy">${k3Tr("cfgCopy")}</button>
+            <button type="button" class="macro-cfg-btn" id="macro-btn-cfg-apply" data-i18n="cfgApply">${k3Tr("cfgApply")}</button>
+          </div>
           <div class="macro-lang-pop" id="macro-lang-pop">
             <div class="macro-lang-list" id="macro-lang-list">
               ${t3LangList.map((l) => `<button type="button" class="macro-lang-opt${l.code === m9TvL2sP.lang ? " active" : ""}" data-lang="${l.code}"><span class="macro-lang-bar"></span><span class="macro-lang-name">${l.name}</span><span class="macro-lang-code">${l.code.toUpperCase()}</span></button>`).join("")}
@@ -13876,6 +14649,22 @@ vec4 _mSoft(vec4 raw) {
       "1.15em",
     );
 
+    win.querySelectorAll(".macro-info-wrap").forEach((wr) => {
+      const tip = wr.querySelector(".macro-info-tooltip");
+      if (!tip || !b7NmQ2xL) return;
+      wr.addEventListener("mouseenter", () => {
+        tip.classList.remove("tip-down");
+        const wRc = wr.getBoundingClientRect();
+        const bRc = b7NmQ2xL.getBoundingClientRect();
+        const tH = tip.offsetHeight || 160;
+        const spAbove = wRc.top - bRc.top;
+        const spBelow = bRc.bottom - wRc.bottom;
+        if (spAbove < tH + 10 && spBelow >= spAbove) {
+          tip.classList.add("tip-down");
+        }
+      });
+    });
+
     win.addEventListener(
       "wheel",
       (e) => {
@@ -14296,24 +15085,17 @@ vec4 _mSoft(vec4 raw) {
     if (tBp) {
       tBp.addEventListener("change", (e) => {
         m9TvL2sP.bypassEnabled = e.target.checked;
-        if (m9TvL2sP.bypassEnabled) {
-          if (!h4HasPeerTab()) {
-            const pop = window.open(
-              location.href,
-              "_blank",
-              "popup=yes,width=560,height=440",
-            );
-            b6BpSt.enableGraceUntil = performance.now() + (pop ? 12000 : 1200);
-          } else {
-            b6BpSt.enableGraceUntil = performance.now() + 1500;
-          }
-        } else {
-          b6BpSt.enableGraceUntil = 0;
-          b6ScanStop();
-          if (!m9TvL2sP.bypassPhantoms && !m9TvL2sP.bypassRadar)
-            b6ResetWorld(false);
+        if (m9TvL2sP.bypassEnabled && !h4HasPeerTab()) {
+          window.open(
+            location.href,
+            "_blank",
+            "popup=yes,width=560,height=440",
+          );
         }
+        if (!m9TvL2sP.bypassEnabled && b6BpSt.scanning) b6ScanStop();
+        b6BpSt.enableGraceUntil = 0;
         x3QnK8wR();
+        if (m9TvL2sP.bypassEnabled && b6TickScan) b6TickScan();
         e.target.blur();
         f4RefocusGame();
       });
@@ -15643,7 +16425,7 @@ vec4 _mSoft(vec4 raw) {
       scTgl.addEventListener("change", (e) => {
         m9TvL2sP.softColors = e.target.checked;
         x3QnK8wR();
-        if (!m9TvL2sP.softColors) j2RstSoft();
+
         e.target.blur();
         f4RefocusGame();
       });
@@ -15705,7 +16487,6 @@ vec4 _mSoft(vec4 raw) {
       b6BpSt.returnToBest = false;
       x3QnK8wR();
       r8QnM4tL();
-
       f4RefocusGame();
     });
 
@@ -15714,7 +16495,6 @@ vec4 _mSoft(vec4 raw) {
         opt.getAttribute("data-bprad") === "fixed" ? "fixed" : "real";
       x3QnK8wR();
       r8QnM4tL();
-
       f4RefocusGame();
     });
 
@@ -16183,6 +16963,7 @@ vec4 _mSoft(vec4 raw) {
           }, 1300);
           return;
         }
+        const prevBpEnabled = Boolean(m9TvL2sP.bypassEnabled);
         hCl2xK9m();
         q2WnS7xM(false);
         k4FfCancel(false);
@@ -16235,17 +17016,20 @@ vec4 _mSoft(vec4 raw) {
           );
         k8QmN3vR();
         f4KzP9wL(win);
+        if (m9TvL2sP.bypassEnabled && !prevBpEnabled && !h4HasPeerTab()) {
+          window.open(
+            location.href,
+            "_blank",
+            "popup=yes,width=560,height=440",
+          );
+        }
+        b6BpSt.enableGraceUntil = 0;
         x3QnK8wR();
         q4ApplyLang();
         if (s2NpK7wL) s2NpK7wL();
         if (p9RndRef) p9ApplyRes(p9RndRef);
-        if (!m9TvL2sP.bypassEnabled) {
-          b6ScanStop();
-          b6ResetWorld(false);
-        }
         if (b6FitMapWin) b6FitMapWin();
         if (b6SyncRadarLock) b6SyncRadarLock();
-
         e7CfgBoxSync(true);
         clearTimeout(cfgApplyTm);
         cfgApplyBtn.classList.remove("macro-cfg-err");
@@ -16306,7 +17090,6 @@ vec4 _mSoft(vec4 raw) {
         q4ApplyLang();
         if (b6FitMapWin) b6FitMapWin();
         if (b6SyncRadarLock) b6SyncRadarLock();
-
         if (s2NpK7wL) s2NpK7wL();
         if (p9RndRef) p9ApplyRes(p9RndRef);
         e7CfgBoxSync(true);
@@ -16527,6 +17310,26 @@ vec4 _mSoft(vec4 raw) {
       lXh = false;
 
     function g4CamMtx(gCv, rL, rT, rW, rH, nw) {
+      v4StepInterp(nw);
+      if (gCv) {
+        const cRc = gCv.getBoundingClientRect();
+        if (cRc && cRc.width > 0) {
+          const picked = p9PickCamCand(gCv, cRc, nw, false);
+          if (picked) {
+            return {
+              a: picked.a,
+              b: 0,
+              c: 0,
+              d: picked.d,
+              tx: picked.tx,
+              ty: picked.ty,
+            };
+          }
+        }
+      }
+      if (kAct && nw - p9GlMs <= 500) {
+        return { a: zM, b: 0, c: 0, d: zM, tx: rL + tX, ty: rT + tY };
+      }
       if (p9PixiOn && nw - p9LastPixiMs <= 500) {
         const sw = p9ScW > 0 ? p9ScW : rW;
         const sh = p9ScH > 0 ? p9ScH : rH;
@@ -16541,29 +17344,24 @@ vec4 _mSoft(vec4 raw) {
           ty: rT + p9WtTy * sy,
         };
       }
-      if (p9CamCands.length > 0 && gCv) {
-        const cRc = gCv.getBoundingClientRect();
-        if (cRc && cRc.width > 0) p9PickCamCand(gCv, cRc, nw);
-      }
-      if (kAct && nw - p9GlMs <= 500) {
-        return { a: zM, b: 0, c: 0, d: zM, tx: rL + tX, ty: rT + tY };
-      }
-      if (p9C2On && gCv && gCv.width > 0 && gCv.height > 0) {
-        const sx = rW / gCv.width,
-          sy = rH / gCv.height;
-        return {
-          a: p9C2A * sx,
-          b: 0,
-          c: 0,
-          d: p9C2D * sy,
-          tx: rL + p9C2Tx * sx,
-          ty: rT + p9C2Ty * sy,
-        };
-      }
       if (v4WsCam.init || b6BpSt.camAt > 0) {
-        const cx = v4WsCam.init ? v4WsCam.dx : b6BpSt.camX;
-        const cy = v4WsCam.init ? v4WsCam.dy : b6BpSt.camY;
-        const cz = v4WsCam.init ? v4WsCam.dz : b6BpSt.camZoom;
+        const liveWs =
+          document.hidden || b6BpSt.scanning || nw - v4InterpAt > 120;
+        const cx = v4WsCam.init
+          ? liveWs
+            ? v4WsCam.x
+            : v4WsCam.dx
+          : b6BpSt.camX;
+        const cy = v4WsCam.init
+          ? liveWs
+            ? v4WsCam.y
+            : v4WsCam.dy
+          : b6BpSt.camY;
+        const cz = v4WsCam.init
+          ? liveWs
+            ? v4WsCam.z
+            : v4WsCam.dz
+          : b6BpSt.camZoom;
         const sc = cz * Math.max(rW / 1920, rH / 1080);
         if (sc > 0.002) {
           return {
@@ -16688,6 +17486,23 @@ vec4 _mSoft(vec4 raw) {
       ctx.restore();
     }
 
+    function d4DrawCrop(ctx, src, sW, sH, mX, mY, mW, mH) {
+      const mAsp = mW / mH;
+      const sAsp = sW / sH;
+      let sx = 0,
+        sy = 0,
+        sw = sW,
+        sh = sH;
+      if (sAsp > mAsp) {
+        sw = sH * mAsp;
+        sx = (sW - sw) * 0.5;
+      } else if (sAsp < mAsp) {
+        sh = sW / mAsp;
+        sy = (sH - sh) * 0.5;
+      }
+      ctx.drawImage(src, sx, sy, sw, sh, mX, mY, mW, mH);
+    }
+
     function drawBg() {
       const isFix = Boolean(m9TvL2sP.fixedBackgroundEnabled && u4TkQ);
       const isMap = Boolean(m9TvL2sP.mapBgEnabled && q8MwP);
@@ -16709,6 +17524,22 @@ vec4 _mSoft(vec4 raw) {
         } catch (_) {}
       }
 
+      if (!isFix && !isMap && !isBgGrid && !isOverGrid) {
+        if (stEl.textContent) stEl.textContent = "";
+        if (bgDrty) {
+          c2D.setTransform(1, 0, 0, 1, 0, 0);
+          c2D.clearRect(0, 0, bCv.width, bCv.height);
+          bgDrty = false;
+        }
+        if (gridDrty) {
+          g2D.setTransform(1, 0, 0, 1, 0, 0);
+          g2D.clearRect(0, 0, gCvOv.width, gCvOv.height);
+          gridDrty = false;
+        }
+        return;
+      }
+
+      p9BgDrawAt = performance.now();
       const bW = document.documentElement.clientWidth || window.innerWidth;
       const bH = document.documentElement.clientHeight || window.innerHeight;
       const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
@@ -16722,7 +17553,10 @@ vec4 _mSoft(vec4 raw) {
         rH = bH,
         mtx = null;
       if (isMap || isBgGrid || isOverGrid) {
-        gCv = p9CvRef || p9C2Cv || t8VwM4xK();
+        gCv =
+          t8VwM4xK() ||
+          (p9CvRef && p9CvRef.isConnected ? p9CvRef : null) ||
+          (p9C2Cv && p9C2Cv.isConnected ? p9C2Cv : null);
         if (gCv && !gCv.hasAttribute("data-macro-game-bg"))
           gCv.setAttribute("data-macro-game-bg", "1");
         const cRc = gCv ? gCv.getBoundingClientRect() : null;
@@ -16798,15 +17632,22 @@ vec4 _mSoft(vec4 raw) {
               const v = q8MwP.v;
               if (v.paused && !document.hidden) v.play().catch(() => {});
               if (v.readyState >= 2 && v.videoWidth && v.videoHeight) {
-                const sDim = Math.min(v.videoWidth, v.videoHeight);
-                const sx = (v.videoWidth - sDim) * 0.5,
-                  sy = (v.videoHeight - sDim) * 0.5;
-                c2D.drawImage(v, sx, sy, sDim, sDim, mX, mY, mW, mH);
+                d4DrawCrop(c2D, v, v.videoWidth, v.videoHeight, mX, mY, mW, mH);
               }
             } else if (q8MwP.t === 3) {
               const im = q8MwP.v;
-              if (im.complete && im.naturalWidth)
-                c2D.drawImage(im, mX, mY, mW, mH);
+              if (im.complete && im.naturalWidth && im.naturalHeight) {
+                d4DrawCrop(
+                  c2D,
+                  im,
+                  im.naturalWidth,
+                  im.naturalHeight,
+                  mX,
+                  mY,
+                  mW,
+                  mH,
+                );
+              }
             }
             c2D.restore();
           }
@@ -16971,6 +17812,7 @@ vec4 _mSoft(vec4 raw) {
     window.addEventListener(
       "resize",
       () => {
+        p9RcAt = 0;
         drawBg();
         if (m9TvL2sP.crosshairEnabled) k9SyncXhair();
       },
@@ -16979,14 +17821,11 @@ vec4 _mSoft(vec4 raw) {
 
     function loop() {
       const nw = performance.now();
-      if (
-        (!p9PixiOn || nw - p9LastPixiMs > 45) &&
-        (!kAct || nw - p9GlMs > 45 || nw - w2VpL9xK > 45)
-      )
+      if ((!p9PixiOn || nw - p9LastPixiMs > 45) && nw - p9BgDrawAt > 4)
         drawBg();
-      window.requestAnimationFrame(loop);
+      k9LwP2xM(loop);
     }
-    window.requestAnimationFrame(loop);
+    k9LwP2xM(loop);
   }
 
   if (document.readyState === "loading") {
